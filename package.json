@@ -1,0 +1,26 @@
+{
+  "name": "txtxx.github.io",
+  "version": "1.0.0",
+  "description": "Personal academic homepage and blog built with Astro.",
+  "scripts": {
+    "dev": "astro dev",
+    "start": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TxTxxx/TxTxx.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/TxTxxx/TxTxx.github.io/issues"
+  },
+  "homepage": "https://txtxxx.github.io",
+  "dependencies": {
+    "astro": "^6.1.5"
+  }
+}

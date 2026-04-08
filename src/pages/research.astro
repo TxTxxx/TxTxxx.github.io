@@ -1,0 +1,114 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { aboutProfile, selectedWorks } from "../data/profile";
+---
+
+<BaseLayout title="Research | TxTxx" description="Research profile" pathname="/research" variant="academic">
+  <section class="academic-hero">
+    <div>
+      <div class="eyebrow">Research profile</div>
+      <h1>{aboutProfile.name}</h1>
+      <p class="role">
+        {aboutProfile.role}
+        <span>{aboutProfile.affiliation}</span>
+      </p>
+    </div>
+    <p class="summary">{aboutProfile.bio}</p>
+  </section>
+
+  <section class="academic-grid">
+    <article class="panel">
+      <h2>Research interests</h2>
+      <ul>
+        {aboutProfile.interests.map((item) => <li>{item}</li>)}
+      </ul>
+    </article>
+    <article class="panel">
+      <h2>Selected work</h2>
+      <ul class="works">
+        {selectedWorks.map((work) => (
+          <li>
+            <a href={work.href}>{work.title}</a>
+            <span>
+              {work.venue}, {work.year}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  </section>
+</BaseLayout>
+
+<style>
+  .academic-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  h1 {
+    margin: 0.55rem 0 0.75rem;
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 5vw, 4.2rem);
+  }
+
+  .role,
+  .summary,
+  .works span {
+    color: var(--muted);
+  }
+
+  .role {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .academic-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .panel {
+    padding: 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 1.25rem;
+    background: var(--bg-elevated);
+  }
+
+  .panel h2 {
+    margin-top: 0;
+    font-size: 1.2rem;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    line-height: 1.8;
+  }
+
+  .works {
+    list-style: none;
+    padding: 0;
+  }
+
+  .works li + li {
+    margin-top: 1rem;
+  }
+
+  .works a {
+    display: block;
+    font-weight: 600;
+  }
+
+  @media (max-width: 820px) {
+    .academic-hero,
+    .academic-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -1,0 +1,71 @@
+---
+import "../styles/global.css";
+import { siteMeta } from "../data/profile";
+
+interface Props {
+  title?: string;
+  description?: string;
+  variant?: "blog" | "academic";
+  pathname?: string;
+}
+
+const {
+  title = siteMeta.title,
+  description = siteMeta.description,
+  variant = "blog",
+  pathname = Astro.url.pathname
+} = Astro.props;
+
+const navItems = [
+  { href: "/", label: "Home" },
+  { href: "/blog", label: "Blog" },
+  { href: "/research", label: "Research" },
+  { href: "/about", label: "About" }
+];
+---
+
+<!doctype html>
+<html lang={variant === "academic" ? "en" : "zh-CN"}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body class:list={["site-root", variant === "academic" ? "academic-surface" : "blog-surface"]}>
+    <header class="site-header">
+      <div class="site-header-inner">
+        <a class="brand" href="/">
+          <span class="brand-mark">TxTxx</span>
+          <span class="brand-title">Notes, research, and public drafts</span>
+        </a>
+        <nav class="nav" aria-label="Primary">
+          {
+            navItems.map((item) => (
+              <a class={pathname === item.href ? "active" : ""} href={item.href}>
+                {item.label}
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+    </header>
+    <main class="site-shell">
+      <slot />
+    </main>
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <div>
+          <div>{siteMeta.title}</div>
+          <div class="muted">{siteMeta.tagline}</div>
+        </div>
+        <div class="site-footer-links">
+          <a href={`mailto:${siteMeta.email}`}>Email</a>
+          <a href={siteMeta.github}>GitHub</a>
+          <a href={siteMeta.scholar}>Scholar</a>
+          <a href={siteMeta.cv}>CV</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
