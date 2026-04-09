@@ -5,15 +5,24 @@ import { aboutProfile, selectedWorks } from "../data/profile";
 
 <BaseLayout title="Research | TxTxx" description="Research profile" pathname="/research" variant="academic">
   <section class="academic-hero">
-    <div>
+    <div class="hero-copy">
       <div class="eyebrow">Research profile</div>
       <h1>{aboutProfile.name}</h1>
       <p class="role">
         {aboutProfile.role}
         <span>{aboutProfile.affiliation}</span>
       </p>
+      <p class="summary">{aboutProfile.bio}</p>
     </div>
-    <p class="summary">{aboutProfile.bio}</p>
+    <aside class="hero-panel">
+      <div class="hero-panel-inner">
+        <div class="eyebrow">Current interests</div>
+        <ul class="pill-list">
+          {aboutProfile.interests.map((item) => <li>{item}</li>)}
+        </ul>
+        <p>Selected work and contact details live below, but the page now shares the same warmer editorial surface as the blog.</p>
+      </div>
+    </aside>
   </section>
 
   <section class="academic-grid">
@@ -42,16 +51,16 @@ import { aboutProfile, selectedWorks } from "../data/profile";
 <style>
   .academic-hero {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--line);
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 1.25rem;
+    align-items: stretch;
   }
 
   h1 {
     margin: 0.55rem 0 0.75rem;
     font-family: var(--serif);
-    font-size: clamp(2.5rem, 5vw, 4.2rem);
+    font-size: clamp(2.8rem, 5vw, 4.8rem);
+    line-height: 0.96;
   }
 
   .role,
@@ -60,29 +69,63 @@ import { aboutProfile, selectedWorks } from "../data/profile";
     color: var(--muted);
   }
 
+  .hero-copy,
+  .hero-panel-inner,
+  .panel {
+    border: 1px solid var(--line);
+    border-radius: 2rem;
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
+  }
+
+  .hero-copy {
+    padding: clamp(1.8rem, 4vw, 3rem);
+  }
+
   .role {
     display: flex;
     gap: 0.75rem;
     flex-wrap: wrap;
   }
 
+  .summary {
+    margin: 1rem 0 0;
+    line-height: 1.8;
+    max-width: 56ch;
+  }
+
+  .hero-panel-inner {
+    height: 100%;
+    padding: 1.7rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.56), rgba(255, 248, 240, 0.92)),
+      linear-gradient(135deg, rgba(178, 76, 44, 0.15), transparent 45%);
+  }
+
+  .hero-panel-inner p {
+    margin: 1rem 0 0;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
   .academic-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 1.5rem;
   }
 
   .panel {
-    padding: 1.4rem;
-    border: 1px solid var(--line);
-    border-radius: 1.25rem;
-    background: var(--bg-elevated);
+    padding: 1.6rem;
   }
 
   .panel h2 {
-    margin-top: 0;
-    font-size: 1.2rem;
+    margin: 0 0 0.85rem;
+    font-size: 1.5rem;
+    font-family: var(--serif);
   }
 
   ul {
@@ -103,6 +146,7 @@ import { aboutProfile, selectedWorks } from "../data/profile";
   .works a {
     display: block;
     font-weight: 600;
+    margin-bottom: 0.15rem;
   }
 
   @media (max-width: 820px) {

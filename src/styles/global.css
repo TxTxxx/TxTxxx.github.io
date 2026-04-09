@@ -215,19 +215,8 @@ main {
   pointer-events: none;
 }
 
-.academic-surface {
-  --bg: #f7f8f5;
-  --bg-elevated: rgba(255, 255, 255, 0.82);
-  --text: #171a1f;
-  --muted: #5e6775;
-  --line: rgba(23, 26, 31, 0.12);
-  --accent: #234b74;
-  --accent-soft: rgba(35, 75, 116, 0.12);
-  background: linear-gradient(180deg, #f8fafc 0%, #f4f7f8 100%);
-}
-
-.academic-surface::before {
-  display: none;
+.academic-content .brand-title {
+  letter-spacing: 0.01em;
 }
 
 @media (max-width: 720px) {
