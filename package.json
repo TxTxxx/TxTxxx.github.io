@@ -21,6 +21,9 @@
   },
   "homepage": "https://txtxxx.github.io",
   "dependencies": {
-    "astro": "^6.1.5"
+    "astro": "^6.1.5",
+    "katex": "^0.16.45",
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0"
   }
 }

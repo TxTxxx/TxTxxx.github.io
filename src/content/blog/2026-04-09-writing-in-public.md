@@ -6,7 +6,6 @@ tags:
   - website
   - research
   - notes
-featured_slot: 1
 draft: false
 ---
 
