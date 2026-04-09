@@ -1,55 +1,16 @@
 ---
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import PostCard from "../../components/PostCard.astro";
-
-const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
-  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
 ---
 
-<BaseLayout title="Blog | TxTxx" description="Blog archive" pathname="/blog">
-  <section class="blog-header">
-    <div class="eyebrow">Blog archive</div>
-    <h1>持续写作，而不是一次性整理。</h1>
-    <p>
-      这里放技术文章、研究随笔、读书摘记和还在发育中的观察。文章以 Markdown 管理，方便持续添加与修订。
-    </p>
-  </section>
-
-  <section class="archive-grid">
-    {posts.map((post) => <PostCard post={post} />)}
-  </section>
-</BaseLayout>
-
-<style>
-  .blog-header {
-    max-width: 46rem;
-    margin-bottom: 2.2rem;
-  }
-
-  .blog-header h1 {
-    margin: 0.5rem 0 1rem;
-    font-family: var(--serif);
-    font-size: clamp(2.4rem, 6vw, 4.8rem);
-    line-height: 1;
-  }
-
-  .blog-header p {
-    margin: 0;
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  .archive-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1rem;
-  }
-
-  @media (max-width: 820px) {
-    .archive-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="refresh" content="0; url=/" />
+    <link rel="canonical" href="/" />
+    <meta name="robots" content="noindex" />
+    <title>Redirecting...</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href="/">/</a>...</p>
+  </body>
+</html>

@@ -3,18 +3,27 @@ import type { CollectionEntry } from "astro:content";
 
 interface Props {
   post: CollectionEntry<"blog">;
+  variant?: "default" | "featured";
 }
 
-const { post } = Astro.props;
+const { post, variant = "default" } = Astro.props;
 const formattedDate = post.data.date.toLocaleDateString("en-US", {
   year: "numeric",
   month: "short",
   day: "numeric"
 });
+const hasImage = Boolean(post.data.cover_image);
 ---
 
-<article class="post-card">
+<article class:list={["post-card", variant === "featured" ? "featured" : undefined, hasImage ? "with-image" : "text-only"]}>
   <a href={`/blog/${post.id}/`} class="post-card-link">
+    {
+      hasImage && (
+        <div class="post-card-media">
+          <img src={post.data.cover_image} alt={post.data.cover_alt ?? post.data.title} loading="lazy" />
+        </div>
+      )
+    }
     <div class="post-card-meta">
       <span>{formattedDate}</span>
       <span>{post.data.tags.join(" / ")}</span>
@@ -35,12 +44,39 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
 
   .post-card-link {
     display: block;
+    height: 100%;
     padding: 1.4rem;
+  }
+
+  .post-card.with-image .post-card-link {
+    padding: 0;
   }
 
   .post-card-link:hover h3,
   .post-card-link:focus-visible h3 {
     color: var(--accent);
+  }
+
+  .post-card-media {
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(255, 248, 240, 0.82)),
+      linear-gradient(135deg, rgba(178, 76, 44, 0.2), transparent 45%);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .post-card-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .post-card.with-image .post-card-meta,
+  .post-card.with-image h3,
+  .post-card.with-image p {
+    margin-left: 1.4rem;
+    margin-right: 1.4rem;
   }
 
   .post-card-meta {
@@ -63,5 +99,42 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     margin: 0;
     color: var(--muted);
     line-height: 1.6;
+  }
+
+  .post-card.with-image p {
+    margin-bottom: 1.4rem;
+  }
+
+  .post-card.featured {
+    border-radius: 2rem;
+  }
+
+  .post-card.featured .post-card-link {
+    padding: 1.8rem;
+  }
+
+  .post-card.featured.with-image .post-card-link {
+    padding: 0;
+  }
+
+  .post-card.featured .post-card-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .post-card.featured h3 {
+    font-size: clamp(1.9rem, 3vw, 2.7rem);
+    line-height: 1;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-card.featured.with-image .post-card-meta,
+  .post-card.featured.with-image h3,
+  .post-card.featured.with-image p {
+    margin-left: 1.8rem;
+    margin-right: 1.8rem;
+  }
+
+  .post-card.featured.with-image p {
+    margin-bottom: 1.8rem;
   }
 </style>

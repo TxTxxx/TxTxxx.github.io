@@ -2,183 +2,99 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PostCard from "../components/PostCard.astro";
-import { siteMeta } from "../data/profile";
 
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
-const featuredPosts = posts.slice(0, 3);
+
+const featuredBySlot = new Map<number, (typeof posts)[number]>();
+
+for (const slot of [1, 2] as const) {
+  const candidates = posts.filter((post) => post.data.featured_slot === slot);
+  if (candidates.length > 0) {
+    featuredBySlot.set(
+      slot,
+      candidates.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())[0]
+    );
+  }
+}
+
+const featuredPosts = [1, 2]
+  .map((slot) => featuredBySlot.get(slot))
+  .filter(Boolean) as (typeof posts);
+
+for (const post of posts) {
+  if (featuredPosts.length >= 2) break;
+  if (!featuredPosts.some((featuredPost) => featuredPost.id === post.id)) {
+    featuredPosts.push(post);
+  }
+}
+
+const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) => featuredPost.id === post.id));
 ---
 
-<BaseLayout title={`${siteMeta.title} | Blog`} description={siteMeta.description} pathname="/">
-  <section class="hero">
-    <div class="hero-copy">
-      <div class="eyebrow">Independent publication</div>
-      <h1>在这里写研究边角、技术札记，以及还没长成论文的想法。</h1>
-      <p>
-        这是一个博客优先的个人站：前台是持续更新的写作，后台是更克制的学术主页。你可以先从最新文章读起，也可以直接进入
-        Research 查看英文简介。
-      </p>
-      <div class="hero-actions">
-        <a class="button-link" href="/blog">Read the blog</a>
-        <a class="button-link ghost" href="/research">Open research profile</a>
-      </div>
-    </div>
-    <div class="hero-panel">
-      <div class="hero-panel-inner">
-        <div class="eyebrow">Current focus</div>
-        <ul class="pill-list">
-          <li>AI and workflows</li>
-          <li>Research tooling</li>
-          <li>Field notes</li>
-        </ul>
-        <p>
-          我希望这个站同时容纳两种节奏：一种是科研主页所需要的稳定、可扫描和可信；另一种是博客写作所需要的试验性、感受和开放性。
-        </p>
-      </div>
-    </div>
+<BaseLayout title="Blog | TxTxx" description="Blog archive" pathname="/">
+  <section class="blog-header">
+    <div class="eyebrow">Blog archive</div>
+    <h1>持续写作，而不是一次性整理。</h1>
+    <p>
+      这里放技术文章、研究随笔、读书摘记和还在发育中的观察。顶部是两篇置顶内容，其余文章按时间继续展开。
+    </p>
   </section>
 
-  <section class="feature-grid">
+  <section class="featured-grid">
+    {featuredPosts.map((post) => <PostCard post={post} variant="featured" />)}
+  </section>
+
+  <section class="archive-section">
     <div class="section-heading">
-      <h2>Latest writing</h2>
-      <a class="muted" href="/blog">See all posts</a>
+      <h2>More writing</h2>
+      <span class="muted">{archivePosts.length} posts</span>
     </div>
-    <div class="post-grid">
-      {featuredPosts.map((post) => <PostCard post={post} />)}
-    </div>
-  </section>
-
-  <section class="split-callout">
-    <div class="callout-card">
-      <div class="eyebrow">English academic page</div>
-      <h2>Research profile</h2>
-      <p>
-        A concise page for affiliation, research interests, selected work, and contact links. Built to be clean,
-        factual, and easy to share.
-      </p>
-      <a class="button-link ghost" href="/research">Visit research</a>
-    </div>
-    <div class="callout-card accent">
-      <div class="eyebrow">Editorial stream</div>
-      <h2>Blog archive</h2>
-      <p>
-        Markdown-first writing workflow with tags, summaries, and a layout that can evolve toward more experimental
-        essays over time.
-      </p>
-      <a class="button-link" href="/blog">Browse archive</a>
+    <div class="archive-grid">
+      {archivePosts.map((post) => <PostCard post={post} />)}
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .hero {
-    display: grid;
-    grid-template-columns: 1.35fr 0.95fr;
-    gap: 1.5rem;
-    align-items: stretch;
+  .blog-header {
+    max-width: 46rem;
+    margin-bottom: 2rem;
   }
 
-  .hero-copy,
-  .hero-panel-inner,
-  .callout-card {
-    border: 1px solid var(--line);
-    border-radius: 2rem;
-    background: var(--bg-elevated);
-    box-shadow: var(--shadow);
-  }
-
-  .hero-copy {
-    padding: clamp(1.8rem, 5vw, 3.8rem);
-    min-height: 28rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .hero-copy h1 {
-    margin: 0.6rem 0 1rem;
+  .blog-header h1 {
+    margin: 0.5rem 0 1rem;
     font-family: var(--serif);
-    font-size: clamp(2.6rem, 6vw, 5.4rem);
-    line-height: 0.95;
-    max-width: 11ch;
+    font-size: clamp(2.6rem, 6vw, 4.9rem);
+    line-height: 0.98;
   }
 
-  .hero-copy p,
-  .hero-panel p,
-  .callout-card p {
+  .blog-header p {
+    margin: 0;
     color: var(--muted);
-    font-size: 1.02rem;
     line-height: 1.7;
   }
 
-  .hero-actions {
-    display: flex;
-    gap: 0.9rem;
-    flex-wrap: wrap;
-    margin-top: 1rem;
-  }
-
-  .hero-panel {
-    position: relative;
-  }
-
-  .hero-panel-inner {
-    height: 100%;
-    padding: 1.8rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    background:
-      linear-gradient(160deg, rgba(255, 255, 255, 0.56), rgba(255, 248, 240, 0.92)),
-      linear-gradient(135deg, rgba(178, 76, 44, 0.15), transparent 45%);
-  }
-
-  .feature-grid,
-  .split-callout {
-    margin-top: 3.5rem;
-  }
-
-  .post-grid,
-  .split-callout {
+  .featured-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
   }
 
-  .split-callout {
+  .archive-section {
+    margin-top: 3rem;
+  }
+
+  .archive-grid {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .callout-card {
-    padding: 1.8rem;
-  }
-
-  .callout-card h2 {
-    margin: 0.4rem 0 0.75rem;
-    font-family: var(--serif);
-    font-size: 2rem;
-  }
-
-  .callout-card.accent {
-    background: linear-gradient(180deg, rgba(178, 76, 44, 0.95), rgba(131, 55, 32, 0.94));
-    color: #fff6ee;
-  }
-
-  .callout-card.accent p,
-  .callout-card.accent .eyebrow {
-    color: rgba(255, 246, 238, 0.8);
-  }
-
-  .callout-card.accent .button-link {
-    background: #fff6ee;
-    color: #6d2a17;
+    gap: 1rem;
   }
 
   @media (max-width: 900px) {
-    .hero,
-    .post-grid,
-    .split-callout {
+    .featured-grid,
+    .archive-grid {
       grid-template-columns: 1fr;
     }
   }

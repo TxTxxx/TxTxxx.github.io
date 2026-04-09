@@ -6,6 +6,9 @@ tags:
   - tooling
   - ai
   - workflow
+featured_slot: 2
+cover_image: /images/research-tools-cover.svg
+cover_alt: Abstract editorial illustration for research tooling
 draft: false
 ---
 
