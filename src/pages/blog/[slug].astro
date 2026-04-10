@@ -24,11 +24,28 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
   <article class="post-article">
     <header class="post-header">
       <div class="eyebrow">Essay</div>
-      <h1>{post.data.title}</h1>
-      <p>{post.data.summary}</p>
-      <div class="post-meta">
-        <span>{formattedDate}</span>
-        <span>{post.data.tags.join(" / ")}</span>
+      <div class="post-header-copy">
+        <h1>{post.data.title}</h1>
+        {
+          post.data.cover_image && (
+            <div class="post-header-media">
+              <div class="post-header-media-frame">
+                <img
+                  src={post.data.cover_image}
+                  alt={post.data.cover_alt ?? post.data.title}
+                  loading="eager"
+                />
+              </div>
+            </div>
+          )
+        }
+      </div>
+      <div class="post-header-bottom">
+        <p>{post.data.summary}</p>
+        <div class="post-meta">
+          <span>{formattedDate}</span>
+          <span>{post.data.tags.join(" / ")}</span>
+        </div>
       </div>
     </header>
 
@@ -50,12 +67,27 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     margin-bottom: 2rem;
   }
 
+  .post-header-copy {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 28rem;
+    align-items: flex-start;
+    gap: 1.5rem;
+    min-width: 0;
+    margin-top: 0.5rem;
+  }
+
   .post-header h1 {
-    margin: 0.5rem 0 1rem;
-    font-size: clamp(2.6rem, 6vw, 4.6rem);
+    margin: 0;
+    font-size: clamp(2.2rem, 4.6vw, 4.2rem);
     line-height: 0.98;
     font-family: var(--serif);
-    max-width: 12ch;
+    min-width: 0;
+    max-width: 10ch;
+  }
+
+  .post-header-bottom {
+    margin-top: 1rem;
+    max-width: 44rem;
   }
 
   .post-header p,
@@ -69,6 +101,35 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     flex-wrap: wrap;
     font-size: 0.92rem;
     margin-top: 1rem;
+  }
+
+  .post-header-media {
+    width: 28rem;
+    aspect-ratio: 16 / 10;
+    justify-self: end;
+    padding: 0.8rem;
+    border-radius: 1.6rem;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(255, 248, 240, 0.82)),
+      linear-gradient(135deg, rgba(178, 76, 44, 0.2), transparent 45%);
+    border: 1px solid var(--line);
+    box-shadow: var(--shadow);
+  }
+
+  .post-header-media-frame {
+    width: 100%;
+    height: 100%;
+    border-radius: 1.2rem;
+    overflow: hidden;
+    background: rgba(255, 251, 244, 0.72);
+    border: 1px solid rgba(31, 30, 26, 0.08);
+  }
+
+  .post-header-media img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: rgba(255, 255, 255, 0.75);
   }
 
   .post-body {
@@ -111,5 +172,21 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
 
   .post-body :global(pre code) {
     color: #f5efe4;
+  }
+
+  @media (max-width: 640px) {
+    .post-header-copy {
+      grid-template-columns: 1fr;
+    }
+
+    .post-header h1,
+    .post-header-bottom {
+      max-width: none;
+    }
+
+    .post-header-media {
+      width: min(100%, 22rem);
+      justify-self: start;
+    }
   }
 </style>
