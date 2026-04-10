@@ -2,3 +2,4 @@ node_modules/
 .astro/
 dist/
 AGENTS.md
+BLOG_IMPORT_PROMPT.md
