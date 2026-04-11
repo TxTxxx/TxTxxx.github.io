@@ -7,7 +7,12 @@ import { aboutProfile, selectedWorks } from "../data/profile";
   <section class="academic-hero">
     <div class="hero-copy">
       <div class="eyebrow">Research profile</div>
-      <h1>{aboutProfile.name}</h1>
+      <div class="title-row">
+        <h1>{aboutProfile.name}</h1>
+        <div class="image-card logo-card">
+          <img src="/images/北京交通大学-logo.svg" alt="Beijing Jiaotong University emblem" class="media logo-media" />
+        </div>
+      </div>
       <p class="role">
         {aboutProfile.role}
         <span>{aboutProfile.affiliation}</span>
@@ -28,9 +33,14 @@ import { aboutProfile, selectedWorks } from "../data/profile";
   <section class="academic-grid">
     <article class="panel">
       <h2>Research interests</h2>
-      <ul>
-        {aboutProfile.interests.map((item) => <li>{item}</li>)}
-      </ul>
+      <div class="interests-layout">
+        <ul>
+          {aboutProfile.interests.map((item) => <li>{item}</li>)}
+        </ul>
+        <div class="image-card robot-card">
+          <img src="/images/embodied-robot.png" alt="Robot illustration related to embodied AI" class="media robot-media" />
+        </div>
+      </div>
     </article>
     <article class="panel">
       <h2>Selected work</h2>
@@ -69,6 +79,13 @@ import { aboutProfile, selectedWorks } from "../data/profile";
     color: var(--muted);
   }
 
+  .title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
   .hero-copy,
   .hero-panel-inner,
   .panel {
@@ -80,6 +97,42 @@ import { aboutProfile, selectedWorks } from "../data/profile";
 
   .hero-copy {
     padding: clamp(1.8rem, 4vw, 3rem);
+  }
+
+  .image-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1.4rem;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(255, 248, 240, 0.94)),
+      linear-gradient(135deg, rgba(178, 76, 44, 0.1), transparent 55%);
+    overflow: visible;
+  }
+
+  .media {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    display: block;
+  }
+
+  .logo-card {
+    flex: 0 0 15rem;
+    width: 15rem;
+    height: 15rem;
+    padding: 1rem;
+  }
+
+  .logo-media {
+    width: 5rem;
+    height: 5rem;
+  }
+
+  .robot-card {
+    width: 15rem;
+    min-height: 15rem;
+    padding: 0.85rem;
   }
 
   .role {
@@ -128,6 +181,13 @@ import { aboutProfile, selectedWorks } from "../data/profile";
     font-family: var(--serif);
   }
 
+  .interests-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    gap: 1rem;
+    align-items: stretch;
+  }
+
   ul {
     margin: 0;
     padding-left: 1.2rem;
@@ -153,6 +213,22 @@ import { aboutProfile, selectedWorks } from "../data/profile";
     .academic-hero,
     .academic-grid {
       grid-template-columns: 1fr;
+    }
+
+    .title-row,
+    .interests-layout {
+      grid-template-columns: 1fr;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .logo-card {
+      width: min(15rem, 100%);
+      height: 15rem;
+    }
+
+    .robot-card {
+      width: min(15rem, 100%);
     }
   }
 </style>

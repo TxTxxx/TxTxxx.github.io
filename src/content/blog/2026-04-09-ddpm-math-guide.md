@@ -6,7 +6,7 @@ tags:
   - ddpm
   - diffusion-models
   - generative-models
-featured_slot: 1
+
 cover_image: /images/ddpm-cover.png
 cover_alt: Diagram illustrating DDPM forward diffusion and reverse denoising process
 draft: false

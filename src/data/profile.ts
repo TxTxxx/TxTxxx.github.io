@@ -3,7 +3,7 @@ export const siteMeta = {
   tagline: "Research notes, field observations, and technical essays in progress.",
   description:
     "A personal site for sharing research-facing work, reading notes, and blog posts.",
-  email: "hello@txtxx.dev",
+  email: "txtxxcr7@163.com",
   github: "https://github.com/TxTxxx",
   scholar: "#",
   cv: "#"
@@ -11,13 +11,13 @@ export const siteMeta = {
 
 export const aboutProfile = {
   name: "TxTxx",
-  role: "Researcher / Engineer",
-  affiliation: "Your Lab or Institution",
-  bio: "I work at the intersection of research, systems, and writing. This site separates ongoing writing from a concise academic profile.",
+  role: "Undergraduate Student",
+  affiliation: "Beijing Jiaotong University (BJTU)",
+  bio: "I am an undergraduate student at Beijing Jiaotong University. My current interests center on embodied AI and robot learning, and I enjoy sharing what I learn through research notes and technical writing. Outside academics, I am also a football fan.",
   interests: [
-    "Human-centered AI systems",
-    "Machine learning for real-world workflows",
-    "Computational social science"
+    "Embodied AI",
+    "Robot learning",
+    "Vision-language-action models"
   ]
 };
 
