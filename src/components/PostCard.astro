@@ -13,9 +13,18 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
   day: "numeric"
 });
 const hasImage = Boolean(post.data.cover_image);
+const category = post.id.split("/")[0] ?? "blog";
 ---
 
-<article class:list={["post-card", variant === "featured" ? "featured" : undefined, hasImage ? "with-image" : "text-only"]}>
+<article
+  class:list={[
+    "post-card",
+    variant === "featured" ? "featured" : undefined,
+    hasImage ? "with-image" : "text-only",
+    category === "journal" && variant !== "featured" ? "journal-card" : undefined
+  ]}
+  data-category={category}
+>
   <a href={`/blog/${post.id}/`} class="post-card-link">
     {
       hasImage && (
@@ -156,5 +165,56 @@ const hasImage = Boolean(post.data.cover_image);
 
   .post-card.featured.with-image p {
     margin-bottom: 1.8rem;
+  }
+
+  .post-card.journal-card {
+    border-radius: 1.2rem;
+    background: rgba(255, 252, 247, 0.72);
+    box-shadow: 0 10px 20px rgba(33, 26, 15, 0.05);
+  }
+
+  .post-card.journal-card .post-card-link {
+    padding: 0.9rem 0.95rem 1rem;
+  }
+
+  .post-card.journal-card.with-image .post-card-link {
+    padding: 0;
+  }
+
+  .post-card.journal-card .post-card-media {
+    aspect-ratio: 16 / 10;
+    padding: 0.65rem;
+  }
+
+  .post-card.journal-card .post-card-media-frame {
+    border-radius: 0.95rem;
+  }
+
+  .post-card.journal-card.with-image .post-card-meta,
+  .post-card.journal-card.with-image h3,
+  .post-card.journal-card.with-image p {
+    margin-left: 0.95rem;
+    margin-right: 0.95rem;
+  }
+
+  .post-card.journal-card .post-card-meta {
+    gap: 0.55rem;
+    font-size: 0.74rem;
+    margin-bottom: 0.45rem;
+  }
+
+  .post-card.journal-card h3 {
+    font-size: 1rem;
+    line-height: 1.2;
+    margin-bottom: 0.3rem;
+  }
+
+  .post-card.journal-card p {
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .post-card.journal-card.with-image p {
+    margin-bottom: 0.95rem;
   }
 </style>

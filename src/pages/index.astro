@@ -3,6 +3,11 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PostCard from "../components/PostCard.astro";
 
+const categoryLabels = {
+  blog: "普通博客",
+  journal: "保研日志"
+} as const;
+const defaultCategory = "blog";
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
@@ -36,7 +41,7 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
 <BaseLayout title="Blog | TxTxx" description="Blog archive" pathname="/">
   <section class="blog-header">
     <div class="eyebrow">Blog archive</div>
-    <h1>持续写作，而不是一次性整理。</h1>
+    <h1>Trying to be 100% of CR7.</h1>
     <p>
       这里放技术文章、研究随笔、读书摘记和还在发育中的观察。顶部是两篇置顶内容，其余文章按时间继续展开。
     </p>
@@ -48,14 +53,74 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
 
   <section class="archive-section">
     <div class="section-heading">
-      <h2>More writing</h2>
-      <span class="muted">{archivePosts.length} posts</span>
+      <div class="archive-heading-copy">
+        <h2>More writing</h2>
+        <span class="muted archive-count">
+          总 blog 记录 {archivePosts.length} 篇
+        </span>
+      </div>
+      <div class="archive-filter-bar">
+        <span class="archive-filter-label">分类</span>
+        <div class="archive-filters" aria-label="Archive category filters">
+          <button type="button" class="archive-filter active" data-filter="blog">
+            <span class="archive-filter-mark">#</span>
+            <span>{categoryLabels.blog}</span>
+          </button>
+          <button type="button" class="archive-filter" data-filter="journal">
+            <span class="archive-filter-mark">#</span>
+            <span>{categoryLabels.journal}</span>
+          </button>
+        </div>
+      </div>
     </div>
-    <div class="archive-grid">
+    <div class="archive-empty muted" data-empty-state hidden>
+      这个分类下暂时还没有文章。
+    </div>
+    <div class="archive-grid" data-archive-grid>
       {archivePosts.map((post) => <PostCard post={post} />)}
     </div>
   </section>
 </BaseLayout>
+
+<script>
+  const defaultCategory = "blog";
+  const filterButtons = Array.from(document.querySelectorAll(".archive-filter"));
+  const archiveGrid = document.querySelector("[data-archive-grid]");
+  const archiveCards = Array.from(archiveGrid?.querySelectorAll(".post-card") ?? []);
+  const emptyState = document.querySelector("[data-empty-state]");
+
+  const applyFilter = (category) => {
+    let visibleCount = 0;
+
+    archiveCards.forEach((card) => {
+      const matches = card.dataset.category === category;
+      card.toggleAttribute("hidden", !matches);
+      if (matches) visibleCount += 1;
+    });
+
+    filterButtons.forEach((button) => {
+      const isActive = button.dataset.filter === category;
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+
+    archiveGrid?.classList.toggle("journal-mode", category === "journal");
+
+    if (emptyState && archiveGrid) {
+      emptyState.toggleAttribute("hidden", visibleCount !== 0);
+      archiveGrid.toggleAttribute("hidden", visibleCount === 0);
+    }
+  };
+
+  filterButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const category = button.dataset.filter ?? defaultCategory;
+      applyFilter(category);
+    });
+  });
+
+  applyFilter(defaultCategory);
+</script>
 
 <style>
   .blog-header {
@@ -86,15 +151,137 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
     margin-top: 3rem;
   }
 
+  .archive-heading-copy {
+    display: flex;
+    align-items: baseline;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .archive-filters {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .archive-filter-bar {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 0.95rem;
+    border: 1px solid rgba(178, 76, 44, 0.14);
+    border-radius: 1.35rem;
+    background:
+      linear-gradient(160deg, rgba(255, 255, 255, 0.72), rgba(255, 248, 240, 0.92)),
+      linear-gradient(135deg, rgba(178, 76, 44, 0.08), transparent 52%);
+    box-shadow: 0 14px 30px rgba(33, 26, 15, 0.06);
+  }
+
+  .archive-filter-label {
+    color: var(--text);
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .archive-filter {
+    border: 1px solid rgba(31, 30, 26, 0.08);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--muted);
+    border-radius: 999px;
+    padding: 0.62rem 0.92rem;
+    font: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.12rem;
+    cursor: pointer;
+    box-shadow: 0 8px 18px rgba(33, 26, 15, 0.04);
+    transition: color 180ms ease, transform 180ms ease, background-color 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+  }
+
+  .archive-filter-mark {
+    font-family: var(--mono);
+    font-size: 0.9em;
+    opacity: 0.82;
+  }
+
+  .archive-filter:hover,
+  .archive-filter:focus-visible {
+    color: var(--text);
+    border-color: rgba(178, 76, 44, 0.22);
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(33, 26, 15, 0.08);
+  }
+
+  .archive-filter.active {
+    color: var(--accent);
+    background: rgba(255, 248, 240, 0.96);
+    border-color: rgba(178, 76, 44, 0.28);
+    box-shadow:
+      inset 0 0 0 1px rgba(178, 76, 44, 0.08),
+      0 12px 24px rgba(178, 76, 44, 0.12);
+  }
+
+  .archive-filter:focus-visible,
+  .archive-filter.active {
+    outline: none;
+  }
+
+  .archive-empty {
+    padding: 1.25rem 1.35rem;
+    border: 1px dashed var(--line);
+    border-radius: 1.3rem;
+    background: rgba(255, 255, 255, 0.44);
+    margin-bottom: 1rem;
+  }
+
   .archive-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1rem;
   }
 
+  .archive-grid.journal-mode {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.8rem;
+    align-items: start;
+  }
+
   @media (max-width: 900px) {
     .featured-grid,
     .archive-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .archive-grid.journal-mode {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .section-heading {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .archive-filters {
+      justify-content: flex-start;
+    }
+
+    .archive-filter-bar {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .archive-grid.journal-mode {
       grid-template-columns: 1fr;
     }
   }
