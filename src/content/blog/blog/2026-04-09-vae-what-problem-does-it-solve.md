@@ -6,7 +6,6 @@ tags:
   - vae
   - generative-models
   - deep-learning
-featured_slot: 2
 cover_image: /images/vae-cover.png
 cover_alt: Diagram illustrating variational autoencoder latent sampling and generation
 draft: false
