@@ -1,5 +1,5 @@
 ---
-title: OpenVLA 与 OpenVLA-OFT 在 LIBERO 上的微调复现：30000 Step 下三种策略的差异
+title: OpenVLA 与 OpenVLA-OFT 在 LIBERO 上的微调复现：三种策略、学习率与 LoRA rank
 date: 2026-04-15
 summary: 在 LIBERO 上复现原版 OpenVLA、OpenVLA+PD&AC 和 OpenVLA+PD&AC+ContL1，统一只训练 30000 step，先分析三种策略的差异与结果，再比较学习率和 LoRA rank 对收敛的影响。
 tags:
@@ -14,15 +14,15 @@ cover_alt: Overview of LIBERO-Spatial, LIBERO-Object, LIBERO-Goal, and LIBERO-Lo
 draft: false
 ---
 
-# OpenVLA 和 OpenVLA-OFT 风格微调的差别，不只在超参数上
+# OpenVLA 与 OpenVLA-OFT 在 LIBERO 上的微调复现：三种策略、学习率与 LoRA rank
 
-我把三条路线都在 `LIBERO spatial no noops` 上跑了一遍：原版 `OpenVLA`、`OpenVLA + PD&AC`、`OpenVLA + PD&AC + ContL1`。所有微调实验都统一只跑了 `30000 step`(算力和资金都有限)。因此，这篇文章讨论的是同一预算下三种策略各自跑到了什么位置，而不是它们在充分收敛后的最终上限。
+这篇文章把三条路线都放在 `LIBERO spatial no noops` 上跑了一遍：原版 `OpenVLA`、`OpenVLA + PD&AC`、`OpenVLA + PD&AC + ContL1`。所有实验统一只训练 `30000 step`，因此这里比较的是同一预算下各条路线跑到了什么位置，而不是充分收敛后的最终上限。
 
-这次复现里，最先需要说清的不是哪条曲线更低，而是三种策略优化的目标本来就不同。原版 OpenVLA 仍然沿着离散动作 token 做训练；`PD&AC` 把动作输出改成并行 `action chunk` 预测；`PD&AC + ContL1` 则在并行预测的基础上继续把动作头改成连续动作回归。
+先要说明的一点是，这三条路线的训练目标并不相同。原版 OpenVLA 还是离散动作 token 训练；`PD&AC` 改成并行 `action chunk` 预测；`PD&AC + ContL1` 则进一步改成连续动作回归。
 
-这会直接影响两件事。第一，训练面板里出现的指标已经不是同一种量，不能拿一个 `accuracy` 或一个 `loss` 横向定输赢。第二，推理 benchmark 的延迟也会跟着变化，因为 `action_chunk_len` 从原版的 1 变成了 8。这篇文章按这个顺序展开：先看三种策略本身的区别和复现结果，再看学习率与 LoRA rank 这两组参数实验。
+这意味着训练面板里的指标不能直接横向比较，推理延迟也会因为 `action_chunk_len` 的变化一起改变。后面的结果都基于这个前提来解释。
 
-## 三种微调策略的区别，先看动作表示和解码方式
+## 三种微调策略在动作表示和解码方式上的差异
 
 原版 `OpenVLA` 的动作输出仍然是离散 token。训练面板里最稳定出现的是 `train_loss`、`l1_loss` 和 `action_accuracy`，推理 benchmark 里 `action_chunk_len=1`，也就是一次只预测一段长度为 1 的动作输出。
 
@@ -32,7 +32,7 @@ draft: false
 
 这一步必须先说清。因为后面你会看到，三条路线都能收敛，但它们收敛到的不是同一个目标。原版 `OpenVLA` 的 `action_accuracy`，和 `PD&AC` 面板里的 `Curr Action Accuracy`，以及 `PD&AC + ContL1` 里的 L1 误差，本来就不能当作同一种信号解释。
 
-## 三种策略分别复现出了什么结果
+## 三种微调策略各自复现出了什么结果
 
 先看原版 `OpenVLA`。我这里选 `lr=5e-4` 这一组作为代表图，因为它在这次实验里给出了更高的末尾 `action_accuracy`。
 
@@ -71,7 +71,7 @@ draft: false
 
 因此，三种策略的复现结果可以先总结成一句话：它们都能开始收敛，但原版 OpenVLA 在优化离散动作 token，`PD&AC` 在优化并行 chunk 下的离散动作预测，`PD&AC + ContL1` 在优化并行 chunk 下的连续动作误差。这也是后面所有参数分析的前提。这里还要加一个直接结论：在统一只跑 `30000 step` 的前提下，OpenVLA-OFT 相关路线还没有达到充分收敛，所以它们的动作准确率不会和普通版 OpenVLA 一样高。
 
-## 原版 OpenVLA 中，学习率会改变最终指标的平衡
+## 学习率如何影响原版 OpenVLA 的收敛指标
 
 在原版 `OpenVLA` 上，我只改了学习率，其余设置保持一致：同样的数据、同样的 `LoRA rank=32`、同样的 batch 设定，而且同样只训练 `30000 step`。对比的是 `lr=3e-4` 和 `lr=5e-4`。
 
@@ -95,7 +95,7 @@ draft: false
 
 就这组实验而言，可以下一个比较明确的结论：`5e-4` 没有把训练跑坏，反而把末尾 `l1_loss` 和 `action_accuracy` 再往上推了一点；但它也把总 `train_loss` 保持在更高的位置。复现原版 OpenVLA 时，如果只跑一个学习率，很容易把结论下得过早。
 
-## 在 PD&AC + ContL1 里，LoRA rank 会直接影响连续动作误差
+## LoRA rank 如何影响 PD&AC + ContL1 的连续动作误差
 
 第二组控制变量实验放在 `PD&AC + ContL1` 上。我固定了训练方法、数据设置和学习率 `5e-4`，同样统一训练 `30000 step`，只比较 `LoRA rank=16` 和 `LoRA rank=32`。
 
@@ -119,7 +119,7 @@ draft: false
 
 这个结论不应该直接外推到所有任务和所有模型规模，但至少说明两件事：如果你跑的是 `PD&AC + ContL1` 这条连续动作头路线，LoRA rank 不适合默认取一个偏小的值然后不再对比；同时在 `30000 step` 的预算下，这条路线还没有表现出已经完全收敛的迹象。
 
-## 三种策略的速度差异，主因是 action chunk 并行预测
+## 三种策略的速度差异主要来自 action chunk 并行预测
 
 除了训练曲线，我还对三种策略各跑了一次推理 benchmark。这里最重要的不是单个小数点，而是 `action_chunk_len` 和平均延迟之间的关系。
 
@@ -161,10 +161,10 @@ draft: false
 
 速度结果非常明确。原版 OpenVLA 的平均延迟约为 `199ms`，而 `PD&AC` 和 `PD&AC + ContL1` 都降到了 `56-57ms` 左右。这里的主要变化不是损失函数，而是一次前向直接预测 `8` 个动作的并行 `action chunk` 路线。`PD&AC` 与 `PD&AC + ContL1` 的延迟几乎一致，也说明 ContL1 主要改变的是动作建模方式，而不是推理吞吐本身。
 
-## 这次复现能先确认三件事
+## 这次复现可以先确认的三个结论
 
 第一，原版 `OpenVLA`、`PD&AC` 和 `PD&AC + ContL1` 的差别首先是方法结构不同，具体体现在动作表示、解码方式和训练目标上，而不是只改了一个超参数。
 
 第二，在原版 `OpenVLA` 里，学习率会改变最终指标组合。当前实验中，`5e-4` 给出了更好的 `l1_loss` 和 `action_accuracy`，但 `3e-4` 的总 `train_loss` 更低。
 
-第三，这篇文章里的所有微调实验都只训练了 `30000 step`。在这个预算下，原版 OpenVLA 已经能把动作准确率推到更高的位置，而 OpenVLA-OFT 相关路线还没有达到充分收敛，因此动作准确率会不如普通版 OpenVLA。如果你的关注点同时包括控制频率，那么并行 `action chunk` 预测带来的系统收益仍然足够明显，平均延迟从约 `199ms` 降到了约 `56ms`。
+第三，所有实验都只训练了 `30000 step`。在这个预算下，原版 OpenVLA 已经能把动作准确率推到更高的位置，而 OpenVLA-OFT 相关路线还没有充分收敛。如果目标同时包含控制频率，那么并行 `action chunk` 预测带来的系统收益仍然很明确，平均延迟从约 `199ms` 降到了约 `56ms`。

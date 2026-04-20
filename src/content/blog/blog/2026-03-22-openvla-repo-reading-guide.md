@@ -1,5 +1,5 @@
 ---
-title: OpenVLA 仓库阅读指南：先抓主线，再读训练与动作建模
+title: OpenVLA 仓库阅读指南：模型主线、ActionTokenizer 与训练入口
 date: 2026-03-22
 summary: 一篇面向初学者的 OpenVLA 仓库阅读指南，重点解释模型主线、ActionTokenizer、数据流和训练入口应该怎么串起来看。
 tags:
@@ -11,15 +11,15 @@ cover_alt: OpenVLA system overview showing training data, VLA model, and closed-
 draft: false
 ---
 
-# OpenVLA 仓库最难的地方，不是模型有多大，而是第一次读时很容易找错入口
+# OpenVLA 仓库阅读指南：模型主线、ActionTokenizer 与训练入口
 
-第一次读 `openvla` 这种仓库，最常见的问题不是“看不懂某一行代码”，而是“根本不知道先看哪里”。这和很多常见的深度学习仓库不太一样。OpenVLA 不只是一个模型定义文件加一个训练脚本，它把 `PrismaticVLM`、动作离散化、RLDS 轨迹数据、训练配置、LoRA 微调和部署接口都叠在了一起。
+`openvla` 难读的地方通常不是某一行实现，而是入口选择。这个仓库同时包含 `PrismaticVLM`、动作离散化、RLDS 轨迹数据、训练配置、LoRA 微调和部署接口。如果一开始就顺着目录树平铺去看，很容易在不同层之间来回跳，但建立不起主线。
 
-如果一开始就顺着目录树从上往下扫，很容易在 `TFDS`、`RLDS`、`Prismatic`、`FSDP` 这些层之间来回跳，最后知道这个仓库“东西很多”，但还是没建立主线。这篇文章想解决的就是这个问题：不是把整个仓库逐文件复述一遍，而是给出一条更适合初学者熟悉 OpenVLA 的阅读路径。
+这篇文章的目标不是逐文件复述仓库，而是先把阅读顺序排出来。对第一次接触 OpenVLA 的人来说，先抓住推理链、动作 token 化和训练入口，比追着所有配置文件和数据细节跑更有效。
 
-我的判断很简单：OpenVLA 不是那种“实现特别花”的仓库，它真正难的地方在于系统层次叠得深。只要先把主线抓住，后面的复杂度就会开始变得具体。
+OpenVLA 的复杂度主要来自系统层次多，而不是实现故意写得绕。把主线理顺以后，仓库里的模块关系会清楚很多。
 
-## 先别看目录树，先把 OpenVLA 压成两条链路
+## 先建立 OpenVLA 的推理链和训练链
 
 理解 OpenVLA 时，比目录结构更重要的是下面两条链路。
 
@@ -29,7 +29,7 @@ draft: false
 
 这两条链路一旦建立起来，仓库里那些看起来分散的文件就会开始归位。真正需要优先理解的模块也会变得很清楚：`openvla.py`、`action_tokenizer.py`、`materialize.py`、`dataset.py`、`finetune.py`。
 
-## OpenVLA 真正做的，不是从零重写一个 VLM，而是给 VLM 增加动作输出能力
+## OpenVLA 如何在 VLM 上增加动作输出能力
 
 第一次看 OpenVLA，很容易下意识去找“模型主体”到底在哪。但往下读会发现，这个仓库真正新增的核心逻辑并没有想象中那么分散。
 
@@ -54,7 +54,7 @@ class OpenVLA(PrismaticVLM):
 
 这类仓库最容易让人误判的地方就在这里。文件很多，不代表每一层同样重要。OpenVLA 更值得优先关注的是桥接层，而不是所有底层细节。
 
-## 如果只能先读一个函数，应该读 `predict_action()`
+## 为什么 `predict_action()` 是最合适的入口
 
 对第一次熟悉 OpenVLA 的人来说，最好的入口不是训练脚本，而是推理入口。
 
@@ -117,7 +117,7 @@ $$
 
 这里 $\hat{\mathbf{a}}$ 是 token 解码后的归一化动作，$\mathbf{q}_{01}$ 和 $\mathbf{q}_{99}$ 则来自训练时保存的动作统计量。
 
-## OpenVLA 和普通 VLM 最本质的差别，藏在 `ActionTokenizer`
+## `ActionTokenizer` 如何把连续动作映射成离散 token
 
 如果只挑一个文件作为 OpenVLA 的技术核心，`train.py` 甚至都不是首选。更值得精读的是 [`prismatic/vla/action_tokenizer.py`](/Users/txtxx/code/python/openvla/prismatic/vla/action_tokenizer.py)。
 
@@ -201,7 +201,7 @@ def decode_token_ids_to_actions(self, action_token_ids: np.ndarray) -> np.ndarra
 
 如果这个地方没有想清楚，后面看训练代码时很容易误以为 OpenVLA 只是把动作“字符串化”了。实际上它做的是一整套动作离散化和反离散化约定。
 
-## OpenVLA 的数据层之所以重，是因为它处理的是轨迹，不是普通样本
+## 为什么 OpenVLA 的数据层比普通 VLM 更复杂
 
 相比模型层，第一次阅读 OpenVLA 更容易卡住的地方往往是数据层。因为从这里开始，仓库不再像一个纯 PyTorch 项目，而是开始同时出现 `tensorflow`、`tensorflow_datasets`、`dlimp` 和 `torch`。
 
@@ -311,7 +311,7 @@ def restructure(traj):
 
 所以对于第一次读 OpenVLA 的人来说，数据层很重要，但它不是最适合拿来建立第一层理解的地方。
 
-## `train.py` 更像实验编排脚本，不是最适合新手的第一入口
+## `train.py` 在训练栈里负责什么
 
 一旦前面的主线清楚了，再回头看训练脚本，理解就会轻很多。
 
@@ -387,7 +387,7 @@ vla_dataset, action_tokenizer, collator = get_vla_dataset_and_collator(
 
 它当然重要，但对于初次阅读来说，并不是最高性价比的入口。先看清推理主线，再回来理解 `train.py`，通常会顺很多。
 
-## 对大多数第一次复现的人来说，`finetune.py` 比 `train.py` 更值得先看
+## 为什么初次复现更适合先读 `finetune.py`
 
 如果目标是完整复现大规模预训练设置，那么 `train.py` 是主角。  
 但如果目标是尽快把 OpenVLA 跑在新任务上，或者先建立一个能动手的整体理解，那么 [`vla-scripts/finetune.py`](/Users/txtxx/code/python/openvla/vla-scripts/finetune.py) 更适合先读。
@@ -438,7 +438,7 @@ vla_dataset = RLDSDataset(
 
 这也是为什么 `finetune.py` 往往更适合作为第一次复现的入口。它没有绕开 OpenVLA 的核心设计，只是把它放进了一个更容易动手的工作流里。
 
-## OpenVLA 的复杂度是真的，但它不是乱
+## OpenVLA 的复杂度主要来自哪些层次
 
 整体读下来，一个很明显的感受是：OpenVLA 不轻，但它并不乱。
 
@@ -454,7 +454,7 @@ vla_dataset = RLDSDataset(
 
 这也是为什么这篇文章一直在强调“入口”而不是“覆盖面”。第一次读这种仓库时，最容易浪费掉的不是时间，而是注意力。如果一开始把注意力放错层，后面很容易陷入细节，却抓不住真正关键的设计。
 
-## 如果只打算花两个小时熟悉这个仓库，可以按这个顺序读
+## 两小时熟悉 OpenVLA 的推荐阅读顺序
 
 对于第一次接触 OpenVLA 的人，我会建议下面这个顺序：
 
@@ -464,7 +464,7 @@ vla_dataset = RLDSDataset(
 4. 读 [`vla-scripts/finetune.py`](/Users/txtxx/code/python/openvla/vla-scripts/finetune.py)，建立“怎么把它跑起来”的感觉。
 5. 最后再读 [`prismatic/vla/datasets/rlds/dataset.py`](/Users/txtxx/code/python/openvla/prismatic/vla/datasets/rlds/dataset.py) 和 [`vla-scripts/train.py`](/Users/txtxx/code/python/openvla/vla-scripts/train.py)，补齐完整训练链路。
 
-如果这篇文章能起到一个作用，我希望是这个：让第一次读 OpenVLA 的人，不再从最重、最绕、也最容易劝退自己的地方开始。
+如果这篇文章有用，作用应该是把第一次读 OpenVLA 的路径压短一些，让入口先稳定下来，再回头补最重的数据层和训练层。
 
 接下来更值得继续写的两个问题其实也已经很明确了：
 
