@@ -1,6 +1,6 @@
 ---
 title: OpenVLA 仓库阅读指南：先抓主线，再读训练与动作建模
-date: 2026-04-09
+date: 2026-03-22
 summary: 一篇面向初学者的 OpenVLA 仓库阅读指南，重点解释模型主线、ActionTokenizer、数据流和训练入口应该怎么串起来看。
 tags:
   - openvla
@@ -23,23 +23,6 @@ draft: false
 
 理解 OpenVLA 时，比目录结构更重要的是下面两条链路。
 
-```mermaid
-flowchart LR
-    A[Image + Instruction] --> B[Prompt + Processor]
-    B --> C[OpenVLA / PrismaticVLM]
-    C --> D[Action Tokens]
-    D --> E[ActionTokenizer Decode]
-    E --> F[Continuous Action]
-```
-
-```mermaid
-flowchart LR
-    A[RLDS Trajectory] --> B[Standardize Fields]
-    B --> C[Normalize + Windowing]
-    C --> D[Batch Transform]
-    D --> E[Tokenized Sample]
-    E --> F[train.py / finetune.py]
-```
 
 第一条链路是推理链，回答的是模型如何从图像和语言走到动作。  
 第二条链路是训练链，回答的是机器人轨迹如何被改造成语言模型可以消费的样本。

@@ -1,6 +1,6 @@
 ---
 title: DeepSpeed 和 PyTorch DDP，差的不是 API，而是你愿不愿意为更大模型付出工程复杂度
-date: 2026-04-19
+date: 2026-04-05
 summary: 从训练状态复制、ZeRO 分片、启动方式、checkpoint 到迁移成本，拆清 DeepSpeed 和原生 PyTorch DDP 在工程层面的差异与适用场景。
 tags:
   - deepspeed

@@ -1,6 +1,6 @@
 ---
 title: Flow Matching 想做的，不是去噪，而是直接学会“怎么流过去”
-date: 2026-04-10
+date: 2026-04-26
 summary: 从连续向量场、ODE、条件路径到训练目标，系统解释 Flow Matching 为什么能把生成问题改写成一个直接的向量回归问题。
 tags:
   - flow-matching

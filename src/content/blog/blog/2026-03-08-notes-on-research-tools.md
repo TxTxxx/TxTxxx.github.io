@@ -1,6 +1,6 @@
 ---
 title: Notes on Building Research Tools That People Actually Keep Using
-date: 2026-03-28
+date: 2026-03-08
 summary: Adoption is often a workflow problem before it becomes a model problem.
 tags:
   - tooling
