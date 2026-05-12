@@ -3,3 +3,4 @@ node_modules/
 dist/
 AGENTS.md
 BLOG_IMPORT_PROMPT.md
+temp/
