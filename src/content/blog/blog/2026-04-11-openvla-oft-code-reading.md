@@ -8,7 +8,6 @@ tags:
   - code-reading
   - multimodal
 cover_image: /images/openvla-oft-cover.png
-featured_slot: 1
 cover_alt: OpenVLA-OFT on ALOHA robot showing LLM, vision encoders, FiLM conditioning, parallel decoding, and 25-step action chunks
 draft: false
 ---
