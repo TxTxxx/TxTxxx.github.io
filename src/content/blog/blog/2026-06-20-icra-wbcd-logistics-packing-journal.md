@@ -1,7 +1,7 @@
 ---
-title: ICRA WBCD 随记：我们在 Logistics Packing 拿到第一名的几天
+title: ICRA WBCD 随记：我们在 Logistics Packing 拿到全球第一名的几天
 date: 2026-06-20
-summary: 到现场、跑通遥操作、凌晨三点调试、领奖。技术报告以后再写，这篇只记 ICRA WBCD 那几天里留下来的画面。
+summary: 到现场、跑通遥操作、凌晨三点调试、领奖。技术报告以后再写，这篇只记我们在 ICRA WBCD Logistics Packing 赛道拿到全球第一名那几天里留下来的画面。
 tags:
   - icra
   - wbcd
@@ -16,9 +16,11 @@ featured_slot: 2
 draft: false
 ---
 
-结果先放在前面：我们拿到了 ICRA WBCD Logistics Packing 赛道全球第一。
+结果先放在前面：我们拿到了 ICRA WBCD Logistics Packing 赛道全球第一名。
 
-这个blog是一个简单的记录，技术报告我们目前正在努力推进。现在回头想，那几天留在脑子里的反而是一些很散的画面：进场时拍歪的背景板，桌上乱七八糟的线，凌晨三点还亮着的屏幕，还有最后拿到奖状时那种有点不真实的感觉。
+WBCD 的全称是 What Bimanuals Can Do，是 ICRA 相关的双臂机器人挑战赛。它不是评一个统一的总冠军，而是不同赛道各自排名；我们参加的是 Logistics Packing，也就是物流包装这个赛道。
+
+这个 blog 是一个简单的记录，技术报告我们目前正在努力推进。现在回头想，那几天留在脑子里的反而是一些很散的画面：进场时拍歪的背景板，桌上乱七八糟的线，凌晨三点还亮着的屏幕，还有最后拿到奖状时那种有点不真实的感觉。
 
 <figure style="margin: 2rem 0;">
   <img src="/images/WBCD/wbcd-backdrop-casual-snapshot.jpeg" alt="ICRA WBCD event backdrop with What Bimanuals Can Do text" style="width: 100%; border-radius: 1rem;" />
