@@ -8,6 +8,7 @@ tags:
   - steerable-policies
   - embodied-ai
   - code-reading
+category: embodied-ai
 cover_image: /images/steerable-policies-bridge-cover.png
 cover_alt: Screenshot of the Steerable Policies project page showing human, VLM, and low-level policy interaction modes
 draft: false

@@ -8,7 +8,7 @@ tags:
   - robotics
   - finetuning
   - libero
-featured_slot: 2
+category: embodied-ai
 cover_image: /images/openvla-reproduce-cover.jpg
 cover_alt: Overview of LIBERO-Spatial, LIBERO-Object, LIBERO-Goal, and LIBERO-Long benchmark tasks
 draft: false

@@ -4,10 +4,11 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import PostCard from "../components/PostCard.astro";
 
 const categoryLabels = {
-  blog: "普通博客",
+  "embodied-ai": "具身智能",
+  "tech-sharing": "技术分享",
   journal: "保研日志"
 } as const;
-const defaultCategory = "blog";
+const defaultCategory = "embodied-ai";
 const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
   (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 );
@@ -62,9 +63,13 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
       <div class="archive-filter-bar">
         <span class="archive-filter-label">分类</span>
         <div class="archive-filters" aria-label="Archive category filters">
-          <button type="button" class="archive-filter active" data-filter="blog">
+          <button type="button" class="archive-filter active" data-filter="embodied-ai">
             <span class="archive-filter-mark">#</span>
-            <span>{categoryLabels.blog}</span>
+            <span>{categoryLabels["embodied-ai"]}</span>
+          </button>
+          <button type="button" class="archive-filter" data-filter="tech-sharing">
+            <span class="archive-filter-mark">#</span>
+            <span>{categoryLabels["tech-sharing"]}</span>
           </button>
           <button type="button" class="archive-filter" data-filter="journal">
             <span class="archive-filter-mark">#</span>
@@ -83,7 +88,7 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
 </BaseLayout>
 
 <script>
-  const defaultCategory = "blog";
+  const defaultCategory = "embodied-ai";
   const filterButtons = Array.from(document.querySelectorAll(".archive-filter"));
   const archiveGrid = document.querySelector("[data-archive-grid]");
   const archiveCards = Array.from(archiveGrid?.querySelectorAll(".post-card") ?? []);

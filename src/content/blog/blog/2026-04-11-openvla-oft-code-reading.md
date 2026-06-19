@@ -7,6 +7,7 @@ tags:
   - robotics
   - code-reading
   - multimodal
+category: embodied-ai
 cover_image: /images/openvla-oft-cover.png
 cover_alt: OpenVLA-OFT on ALOHA robot showing LLM, vision encoders, FiLM conditioning, parallel decoding, and 25-step action chunks
 draft: false

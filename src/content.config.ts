@@ -8,8 +8,10 @@ const blog = defineCollection({
     date: z.coerce.date(),
     summary: z.string(),
     tags: z.array(z.string()).default([]),
+    category: z.enum(["embodied-ai", "tech-sharing", "journal"]).optional(),
     featured_slot: z.union([z.literal(1), z.literal(2)]).optional(),
     cover_image: z.string().optional(),
+    cover_fit: z.enum(["contain", "cover"]).default("contain"),
     cover_alt: z.string().optional(),
     draft: z.boolean().default(false)
   })

@@ -6,6 +6,7 @@ tags:
   - openvla
   - robotics
   - repo-reading
+category: embodied-ai
 cover_image: /images/openvla-overview.png
 cover_alt: OpenVLA system overview showing training data, VLA model, and closed-loop robot control
 draft: false

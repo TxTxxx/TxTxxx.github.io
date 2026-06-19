@@ -13,7 +13,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
   day: "numeric"
 });
 const hasImage = Boolean(post.data.cover_image);
-const category = post.id.split("/")[0] ?? "blog";
+const category = post.data.category ?? (post.id.startsWith("journal/") ? "journal" : "tech-sharing");
 ---
 
 <article
@@ -21,6 +21,7 @@ const category = post.id.split("/")[0] ?? "blog";
     "post-card",
     variant === "featured" ? "featured" : undefined,
     hasImage ? "with-image" : "text-only",
+    post.data.cover_fit === "cover" ? "cover-image" : undefined,
     category === "journal" && variant !== "featured" ? "journal-card" : undefined
   ]}
   data-category={category}
@@ -94,6 +95,11 @@ const category = post.id.split("/")[0] ?? "blog";
     height: 100%;
     object-fit: contain;
     background: rgba(255, 255, 255, 0.75);
+  }
+
+  .post-card.cover-image .post-card-media img {
+    object-fit: cover;
+    background: transparent;
   }
 
   .post-card.with-image .post-card-meta,

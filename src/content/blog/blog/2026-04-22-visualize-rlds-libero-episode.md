@@ -7,6 +7,7 @@ tags:
   - tfds
   - libero
   - robotics
+category: embodied-ai
 cover_image: /images/rlds-episode-inspection-cover.png
 cover_alt: Terminal-style diagram showing an RLDS episode with episode metadata, steps, and exported step images
 draft: false
@@ -305,4 +306,3 @@ conda run -n keyan python scripts/inspect_raw_rlds_episode.py \
 第二种是训练结果不对的时候。比起一上来就读 dataloader 和训练主循环，先把一条原始 episode 展开看看，通常更快定位问题到底出在原始数据，还是出在后面的变换逻辑。
 
 如果下一步还要继续查，我一般会再看两处：`features.json` 里的 schema，和训练代码里的 batch transform。前者回答“理论上应该长什么样”，后者回答“训练前又被改成了什么样”。
-
