@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-08-27T13:30:19.851Z",
+  "generatedAt": "2026-08-27T13:54:17.746Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 6,
-    "papers": 4,
+    "nodes": 3,
+    "papers": 1,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
-    "connections": 3,
-    "evidenceSignals": 21
+    "connections": 1,
+    "evidenceSignals": 12
   },
   "nodes": [
     {
@@ -39,107 +39,29 @@
       "atlasCardImages": 0
     },
     {
-      "id": "paper-87c0882e55",
-      "path": "20 论文/blackP05VisionLanguageActionModel",
-      "title": "π0.5: a Vision-Language-Action Model with Open-World Generalization",
+      "id": "paper-950732f3cc",
+      "path": "20 论文/suttonDynaIntegratedArchitecture1991",
+      "title": "Dyna, an integrated architecture for learning, planning, and reacting",
       "type": "paper",
-      "citekey": "blackP05VisionLanguageActionModel",
+      "citekey": "suttonDynaIntegratedArchitecture1991",
       "status": "inbox",
       "readingLevel": "",
       "paperRole": "",
       "atlasLabel": "",
-      "year": 2025,
-      "authors": "Kevin Black, Noah Brown, James Darpinian, Karan Dhabalia, Danny Driess, Adnan Esmail, Michael Equi, Chelsea Finn, Niccolo Fusai, Manuel Y Galliker, Dibya Ghosh, Lachy Groom, Karol Hausman, Brian Ichter, Szymon Jakubczak, Tim Jones, Liyiming Ke, Devin LeBlanc, Sergey Levine, Adrian Li-Bell, Mohith Mothukuri, Suraj Nair, Karl Pertsch, Allen Z Ren, Lucy Xiaoyang Shi, Laura Smith, Jost Tobias Springenberg, Kyle Stachowicz, James Tanner, Quan Vuong, Homer Walke, Anna Walling, Haohuan Wang, Lili Yu, Ury Zhilinsky",
+      "year": 1991,
+      "authors": "Richard S. Sutton",
       "topics": [
         "vla"
       ],
-      "created": "2026-08-26",
+      "created": "2026-08-27",
       "readDate": "",
-      "doi": "10.48550/arXiv.2504.16054",
-      "sourceUrl": "https://arxiv.org/abs/2504.16054",
-      "zoteroUri": "zotero://select/library/items/ITSIWBDA",
-      "noteDensity": 18,
-      "evidenceCount": 0,
-      "maturity": 47,
-      "atlasCardHtml": "",
-      "atlasCardImages": 0
-    },
-    {
-      "id": "paper-e943cce3a1",
-      "path": "20 论文/chenSteerableVisionLanguageActionPolicies2026",
-      "title": "Steerable Vision-Language-Action Policies for Embodied Reasoning and Hierarchical Control",
-      "type": "paper",
-      "citekey": "chenSteerableVisionLanguageActionPolicies2026",
-      "status": "inbox",
-      "readingLevel": "",
-      "paperRole": "方法",
-      "atlasLabel": "",
-      "year": 2026,
-      "authors": "William Chen, Jagdeep Singh Bhatia, Catherine Glossop, Nikhil Mathihalli, Ria Doshi, Andy Tang, Danny Driess, Karl Pertsch, Sergey Levine",
-      "topics": [
-        "vla"
-      ],
-      "created": "2026-08-26",
-      "readDate": "",
-      "doi": "",
-      "sourceUrl": "https://arxiv.org/abs/2602.13193v3",
-      "zoteroUri": "zotero://select/library/items/GNUVIYID",
-      "noteDensity": 31,
-      "evidenceCount": 10,
-      "maturity": 81,
-      "atlasCardHtml": "",
-      "atlasCardImages": 0
-    },
-    {
-      "id": "paper-8bad68c87a",
-      "path": "20 论文/kimOpenVLAOpenSourceVisionLanguageAction2024",
-      "title": "OpenVLA: An Open-Source Vision-Language-Action Model",
-      "type": "paper",
-      "citekey": "kimOpenVLAOpenSourceVisionLanguageAction2024",
-      "status": "inbox",
-      "readingLevel": "deep",
-      "paperRole": "基础模型",
-      "atlasLabel": "",
-      "year": 2024,
-      "authors": "Moo Jin Kim, Karl Pertsch, Siddharth Karamcheti, Ted Xiao, Ashwin Balakrishna, Suraj Nair, Rafael Rafailov, Ethan Foster, Grace Lam, Pannag Sanketi, Quan Vuong, Thomas Kollar, Benjamin Burchfiel, Russ Tedrake, Dorsa Sadigh, Sergey Levine, Percy Liang, Chelsea Finn",
-      "topics": [
-        "vla"
-      ],
-      "created": "2026-08-26",
-      "readDate": "",
-      "doi": "10.48550/arXiv.2406.09246",
-      "sourceUrl": "http://arxiv.org/abs/2406.09246",
-      "zoteroUri": "zotero://select/library/items/QWBLPCWX",
-      "noteDensity": 31,
-      "evidenceCount": 9,
-      "maturity": 91,
-      "atlasCardHtml": "",
-      "atlasCardImages": 0
-    },
-    {
-      "id": "paper-e73f5eec2a",
-      "path": "20 论文/wuPragmaticVLAFoundation2026",
-      "title": "A Pragmatic VLA Foundation Model",
-      "type": "paper",
-      "citekey": "wuPragmaticVLAFoundation2026",
-      "status": "inbox",
-      "readingLevel": "",
-      "paperRole": "",
-      "atlasLabel": "",
-      "year": 2026,
-      "authors": "Wei Wu, Fan Lu, Yunnan Wang, Shuai Yang, Shi Liu, Fangjing Wang, Qian Zhu, He Sun, Yong Wang, Shuailei Ma, Yiyu Ren, Kejia Zhang, Hui Yu, Jingmei Zhao, Shuai Zhou, Zhenqi Qiu, Houlong Xiong, Ziyu Wang, Zechen Wang, Ran Cheng, Yong-Lu Li, Yongtao Huang, Xing Zhu, Yujun Shen, Kecheng Zheng",
-      "topics": [
-        "vla"
-      ],
-      "created": "2026-08-26",
-      "readDate": "",
-      "doi": "10.48550/arXiv.2601.18692",
-      "sourceUrl": "http://arxiv.org/abs/2601.18692",
-      "zoteroUri": "zotero://select/library/items/KC7GZU4H",
-      "noteDensity": 18,
-      "evidenceCount": 2,
-      "maturity": 49,
-      "atlasCardHtml": "",
+      "doi": "10.1145/122344.122377",
+      "sourceUrl": "https://dl.acm.org/doi/10.1145/122344.122377",
+      "zoteroUri": "zotero://select/library/items/XY5RTM64",
+      "noteDensity": 0,
+      "evidenceCount": 12,
+      "maturity": 30,
+      "atlasCardHtml": "<p>hello</p>",
       "atlasCardImages": 0
     },
     {
@@ -172,16 +94,6 @@
     }
   ],
   "edges": [
-    {
-      "source": "field-e8aefa3d89",
-      "target": "paper-8bad68c87a",
-      "kind": "manual"
-    },
-    {
-      "source": "field-e8aefa3d89",
-      "target": "paper-e943cce3a1",
-      "kind": "manual"
-    },
     {
       "source": "field-e8aefa3d89",
       "target": "concept-facd23940b",
