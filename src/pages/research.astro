@@ -1,12 +1,3 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
-import ResearchObservatory from "../components/ResearchObservatory.astro";
+return Astro.redirect("/atlas/", 301);
 ---
-
-<BaseLayout
-  title="Research Observatory | TxTxx"
-  description="一张由 Zotero 与 Obsidian 共同驱动的个人研究知识星图。"
-  pathname="/research"
->
-  <ResearchObservatory />
-</BaseLayout>
