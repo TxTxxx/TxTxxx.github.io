@@ -117,6 +117,13 @@ function normalizeTopics(value, type) {
   return [];
 }
 
+function normalizeAtlasLabel(value) {
+  if (typeof value !== "string") return "";
+  const label = value.trim();
+  if (!label || /\s/.test(label) || label.length > 18) return "";
+  return label;
+}
+
 async function collectMarkdown(folder) {
   const absolute = path.join(vaultRoot, folder);
   const entries = await fs.readdir(absolute, { withFileTypes: true });
@@ -164,6 +171,7 @@ for (const source of sources) {
       status,
       readingLevel: metadata.reading_level || "",
       paperRole: metadata.paper_role || "",
+      atlasLabel: normalizeAtlasLabel(metadata.atlas_label),
       year: override.year || normalizeYear(metadata.year),
       authors: typeof metadata.authors === "string" ? metadata.authors : Array.isArray(metadata.authors) ? metadata.authors.join(", ") : "",
       topics: normalizeTopics(metadata.topics, source.type),

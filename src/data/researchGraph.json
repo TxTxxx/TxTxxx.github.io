@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-08-27T07:19:19.013Z",
+  "generatedAt": "2026-08-27T12:15:09.637Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 27,
+    "nodes": 28,
     "papers": 4,
     "concepts": 1,
     "fields": 1,
-    "fragments": 21,
+    "fragments": 22,
     "connections": 23,
     "evidenceSignals": 21
   },
@@ -20,6 +20,7 @@
       "status": "developing",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -44,6 +45,7 @@
       "status": "inbox",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": 2025,
       "authors": "Kevin Black, Noah Brown, James Darpinian, Karan Dhabalia, Danny Driess, Adnan Esmail, Michael Equi, Chelsea Finn, Niccolo Fusai, Manuel Y Galliker, Dibya Ghosh, Lachy Groom, Karol Hausman, Brian Ichter, Szymon Jakubczak, Tim Jones, Liyiming Ke, Devin LeBlanc, Sergey Levine, Adrian Li-Bell, Mohith Mothukuri, Suraj Nair, Karl Pertsch, Allen Z Ren, Lucy Xiaoyang Shi, Laura Smith, Jost Tobias Springenberg, Kyle Stachowicz, James Tanner, Quan Vuong, Homer Walke, Anna Walling, Haohuan Wang, Lili Yu, Ury Zhilinsky",
       "topics": [
@@ -67,6 +69,7 @@
       "status": "inbox",
       "readingLevel": "",
       "paperRole": "方法",
+      "atlasLabel": "",
       "year": 2026,
       "authors": "William Chen, Jagdeep Singh Bhatia, Catherine Glossop, Nikhil Mathihalli, Ria Doshi, Andy Tang, Danny Driess, Karl Pertsch, Sergey Levine",
       "topics": [
@@ -90,6 +93,7 @@
       "status": "inbox",
       "readingLevel": "deep",
       "paperRole": "基础模型",
+      "atlasLabel": "",
       "year": 2024,
       "authors": "Moo Jin Kim, Karl Pertsch, Siddharth Karamcheti, Ted Xiao, Ashwin Balakrishna, Suraj Nair, Rafael Rafailov, Ethan Foster, Grace Lam, Pannag Sanketi, Quan Vuong, Thomas Kollar, Benjamin Burchfiel, Russ Tedrake, Dorsa Sadigh, Sergey Levine, Percy Liang, Chelsea Finn",
       "topics": [
@@ -113,6 +117,7 @@
       "status": "inbox",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": 2026,
       "authors": "Wei Wu, Fan Lu, Yunnan Wang, Shuai Yang, Shi Liu, Fangjing Wang, Qian Zhu, He Sun, Yong Wang, Shuailei Ma, Yiyu Ren, Kejia Zhang, Hui Yu, Jingmei Zhao, Shuai Zhou, Zhenqi Qiu, Houlong Xiong, Ziyu Wang, Zechen Wang, Ran Cheng, Yong-Lu Li, Yongtao Huang, Xing Zhu, Yujun Shen, Kecheng Zheng",
       "topics": [
@@ -136,6 +141,7 @@
       "status": "developing",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -161,6 +167,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -184,6 +191,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -207,6 +215,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -230,6 +239,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -253,6 +263,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -276,6 +287,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -299,6 +311,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -322,6 +335,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -345,6 +359,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -368,6 +383,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -391,6 +407,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -414,6 +431,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -437,6 +455,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -460,6 +479,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -483,6 +503,31 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-5c37a30934",
+      "path": "embodied intelligence/WAM综述",
+      "title": "WAM综述",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -506,6 +551,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -529,6 +575,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -552,6 +599,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -575,6 +623,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -598,6 +647,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
@@ -621,6 +671,7 @@
       "status": "legacy",
       "readingLevel": "",
       "paperRole": "",
+      "atlasLabel": "",
       "year": null,
       "authors": "",
       "topics": [
