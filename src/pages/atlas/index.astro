@@ -206,6 +206,7 @@ const personalNodes = personalPapers.map((node, index) => {
     y: center[1] + personalGaussian() * spread * 0.78,
     z: center[2] + personalGaussian() * spread * 0.58,
     size: 0.68 + maturity * 0.0026,
+    maturity,
     year: node.year,
     kind: "personal",
     noteType: node.type,
@@ -215,7 +216,6 @@ const personalNodes = personalPapers.map((node, index) => {
     zoteroUri: node.zoteroUri,
     cardHtml: node.atlasCardHtml,
     cardImageCount: node.atlasCardImages,
-    signal: true,
     fieldMode: "personal",
     phase: personalRandom() * Math.PI * 2 + index * 0.03
   };
@@ -472,7 +472,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const spritesByField = new Map([["demo", []], ["personal", []]]);
 
           const baseNodeOpacity = (node) => node.kind === "personal"
-            ? node.signal ? 0.88 : 0.58
+            ? 0.56 + Math.min(100, Math.max(0, Number(node.maturity) || 0)) * 0.0026
             : node.kind === "preview" ? 0.74 : node.atlasLabel ? 0.72 : 0.58;
 
           data.nodes.forEach((node) => {
@@ -542,18 +542,23 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               sprite.userData.fieldRing = fieldRing;
             }
 
-            if (node.kind === "preview" || (node.kind === "personal" && node.signal)) {
+            if (node.kind === "preview" || node.kind === "personal") {
+              const interactionOnly = node.kind === "personal";
               const ringMaterial = new THREE.MeshBasicMaterial({
                 color: new THREE.Color(node.accent || "#ffffff"),
                 transparent: true,
-                opacity: node.fieldMode === activeFieldMode ? 0.3 : 0,
+                opacity: interactionOnly ? 0 : node.fieldMode === activeFieldMode ? 0.3 : 0,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false,
                 side: THREE.DoubleSide
               });
               const ring = new THREE.Mesh(new THREE.RingGeometry(node.size * 0.56, node.size * 0.62, 64), ringMaterial);
               ring.position.copy(sprite.position);
-              ring.userData = { parentNode: node.id, targetOpacity: node.fieldMode === activeFieldMode ? 0.3 : 0 };
+              ring.userData = {
+                parentNode: node.id,
+                interactionOnly,
+                targetOpacity: interactionOnly ? 0 : node.fieldMode === activeFieldMode ? 0.3 : 0
+              };
               universe.add(ring);
               sprite.userData.ring = ring;
             }
@@ -642,7 +647,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               const isActive = isInField && (!activeIds || activeIds.has(sprite.userData.id));
               sprite.userData.targetOpacity = !isInField ? 0 : isActive ? sprite.userData.baseOpacity : 0.045;
               sprite.userData.targetScale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.24 : 1);
-              if (sprite.userData.ring) sprite.userData.ring.userData.targetOpacity = !isInField ? 0 : isActive ? 0.3 : 0.025;
+              if (sprite.userData.ring && !sprite.userData.ring.userData.interactionOnly) {
+                sprite.userData.ring.userData.targetOpacity = !isInField ? 0 : isActive ? 0.3 : 0.025;
+              }
               if (sprite.userData.fieldRing) sprite.userData.fieldRing.userData.targetOpacity = !isInField ? 0 : isActive ? 0.2 : 0.015;
               if (sprite.userData.labelSprite) {
                 sprite.userData.labelSprite.userData.baseOpacity = !isInField ? 0 : isActive ? (sprite.userData.id === selected ? 0.82 : 0.54) : 0.02;
@@ -987,6 +994,14 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 sprite.position.y = base.y + Math.sin(elapsed * 0.27 + sprite.userData.phase) * 0.035;
               }
               if (sprite.userData.ring) {
+                if (sprite.userData.ring.userData.interactionOnly) {
+                  const isInField = sprite.userData.fieldMode === activeFieldMode;
+                  sprite.userData.ring.userData.targetOpacity = !isInField
+                    ? 0
+                    : sprite.userData.id === selected
+                      ? 0.3
+                      : hovered === sprite ? 0.18 : 0;
+                }
                 sprite.userData.ring.position.copy(sprite.position);
                 sprite.userData.ring.rotation.z = elapsed * 0.08 + sprite.userData.phase;
                 sprite.userData.ring.material.opacity += (sprite.userData.ring.userData.targetOpacity - sprite.userData.ring.material.opacity) * 0.12;

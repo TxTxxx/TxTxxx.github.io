@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T14:27:53.298Z",
+  "generatedAt": "2026-08-27T14:36:59.344Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
     "nodes": 3,
@@ -61,8 +61,8 @@
       "noteDensity": 0,
       "evidenceCount": 12,
       "maturity": 30,
-      "atlasCardHtml": "",
-      "atlasCardImages": 0
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-950732f3cc-81eec9001553.png\" alt=\"截屏2026-08-27 22.21.29\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>作为非常早期的论文，提出了一套把学习，模型，规划，实时行动统一起来的智能体架构</li>\n<li>文章提出类比说Dyna是在行动前在脑子里面想后再行动，而普通强化学习就是脑子里不思考直接行动（如果在脑子里思考过程极快，相对于强化学习的效率也会特别高）</li>\n<li>Dyna的思考过程和执行过程像是一个异步过程，并且重要的是他是增量式的，会不断地去思考更新策略（与Planner架构不同），举一个简单的例子就是Dyna的规划过程会提前存进Q函数里，而不是等到具体情况后才临时计算（平时就在不断规划，修改Q值）</li>\n<li>Dyna 的规划结果会提前存进 Q 函数（或策略）里，而不是等遇到具体情况后才临时计算（平时就在不停地规划，修改Q值），感觉是一个概念上的异步的过程。（所以说它是一个增量的学习）</li>\n<li>智能体观测到的状态不等于是环境的真实状态</li>\n</ol>",
+      "atlasCardImages": 1
     },
     {
       "id": "concept-facd23940b",
