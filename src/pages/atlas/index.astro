@@ -102,12 +102,12 @@ const previewReadSignals = previewReadTitles.map((title, index) => {
     hasEssay: index === 0 || index === 2,
     cluster: cluster.id,
     clusterLabel: cluster.label,
-    color: "#ffffff",
+    color: "#dffaff",
     accent: cluster.color,
     x: cluster.center[0] + Math.cos(angle) * 1.15,
     y: cluster.center[1] + Math.sin(angle) * 1.15,
     z: cluster.center[2] + 1.1,
-    size: 1.28 + index * 0.06,
+    size: 1.02 + index * 0.035,
     year: 2026,
     kind: "preview",
     demo: true,
@@ -310,12 +310,12 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           renderer.setSize(window.innerWidth, window.innerHeight);
           renderer.outputColorSpace = THREE.SRGBColorSpace;
           renderer.toneMapping = THREE.ACESFilmicToneMapping;
-          renderer.toneMappingExposure = 1.12;
+          renderer.toneMappingExposure = 1;
           mount.appendChild(renderer.domElement);
 
           const composer = new EffectComposer(renderer);
           composer.addPass(new RenderPass(scene, camera));
-          const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.18, 0.78, 0.12);
+          const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.82, 0.58, 0.22);
           composer.addPass(bloom);
 
           const controls = new OrbitControls(camera, renderer.domElement);
@@ -340,7 +340,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               map: glowTexture,
               color: new THREE.Color(node.color),
               transparent: true,
-              opacity: node.kind === "personal" ? 1 : node.atlasLabel ? 0.8 : 0.66,
+              opacity: node.kind === "personal" ? 0.88 : node.kind === "preview" ? 0.74 : node.atlasLabel ? 0.72 : 0.58,
               blending: THREE.AdditiveBlending,
               depthWrite: false
             });
@@ -366,13 +366,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 toneMapped: false
               });
               const labelSprite = new THREE.Sprite(labelMaterial);
-              const labelHeight = 0.76;
-              const offsetY = node.size * 0.5 + 0.5;
+              const labelHeight = 0.52;
+              const offsetY = node.size * 0.42 + 0.28;
               labelSprite.scale.set(labelHeight * labelTexture.aspect, labelHeight, 1);
               labelSprite.position.copy(sprite.position);
               labelSprite.position.y += offsetY;
               labelSprite.renderOrder = 3;
-              labelSprite.userData = { parentNode: node.id, offsetY, baseOpacity: 0.62 };
+              labelSprite.userData = { parentNode: node.id, offsetY, baseOpacity: 0.54 };
               universe.add(labelSprite);
               sprite.userData.labelSprite = labelSprite;
             }
@@ -381,7 +381,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               const ringMaterial = new THREE.MeshBasicMaterial({
                 color: new THREE.Color(node.accent || "#ffffff"),
                 transparent: true,
-                opacity: 0.46,
+                opacity: 0.3,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false,
                 side: THREE.DoubleSide
@@ -456,12 +456,12 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const updateNodeOpacity = (activeIds = null) => {
             sprites.forEach((sprite) => {
               const isActive = !activeIds || activeIds.has(sprite.userData.id);
-              sprite.material.opacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 1 : sprite.userData.atlasLabel ? 0.82 : 0.72) : 0.055;
-              const scale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.42 : 1);
+              sprite.material.opacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 0.84 : sprite.userData.atlasLabel ? 0.74 : 0.62) : 0.045;
+              const scale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.24 : 1);
               sprite.scale.setScalar(scale);
-              if (sprite.userData.ring) sprite.userData.ring.material.opacity = isActive ? 0.46 : 0.04;
+              if (sprite.userData.ring) sprite.userData.ring.material.opacity = isActive ? 0.3 : 0.025;
               if (sprite.userData.labelSprite) {
-                sprite.userData.labelSprite.userData.baseOpacity = isActive ? (sprite.userData.id === selected ? 0.96 : 0.62) : 0.025;
+                sprite.userData.labelSprite.userData.baseOpacity = isActive ? (sprite.userData.id === selected ? 0.82 : 0.54) : 0.02;
               }
             });
           };
@@ -624,7 +624,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 const labelSprite = sprite.userData.labelSprite;
                 labelSprite.position.copy(sprite.position);
                 labelSprite.position.y += labelSprite.userData.offsetY;
-                const hoverBoost = hovered === sprite ? 1.46 : 1;
+                const hoverBoost = hovered === sprite ? 1.28 : 1;
                 const targetOpacity = Math.min(1, labelSprite.userData.baseOpacity * hoverBoost);
                 labelSprite.material.opacity += (targetOpacity - labelSprite.material.opacity) * 0.12;
               }
