@@ -1,6 +1,4 @@
 ---
-import researchGraph from "../../data/researchGraph.json";
-
 const clusters = [
   { id: "vla", label: "VLA", color: "#6fe8ff", center: [-10, 4, 0] },
   { id: "world", label: "WORLD MODELS", color: "#8f84ff", center: [-4, -7, -2] },
@@ -67,14 +65,19 @@ clusters.forEach((cluster, clusterIndex) => {
   }
 });
 
-const personalPapers = researchGraph.nodes.filter((node) => node.type === "paper");
-const personalClusterIds = ["vla", "reasoning", "vla", "data"];
-const personalNodes = personalPapers.map((paper, index) => {
-  const cluster = clusters.find((item) => item.id === personalClusterIds[index]) ?? clusters[0];
-  const angle = (index / Math.max(personalPapers.length, 1)) * Math.PI * 2;
+const previewReadTitles = [
+  "Reading Signal / Embodied Transfer",
+  "Reading Signal / Closed-Loop Reasoning",
+  "Reading Signal / Open-World Control",
+  "Reading Signal / Scalable Interaction Data"
+];
+const previewClusterIds = ["vla", "reasoning", "vla", "data"];
+const previewReadSignals = previewReadTitles.map((title, index) => {
+  const cluster = clusters.find((item) => item.id === previewClusterIds[index]) ?? clusters[0];
+  const angle = (index / previewReadTitles.length) * Math.PI * 2;
   return {
-    id: `personal-${paper.id}`,
-    title: paper.title,
+    id: `preview-read-${index}`,
+    title,
     cluster: cluster.id,
     clusterLabel: cluster.label,
     color: "#ffffff",
@@ -82,20 +85,15 @@ const personalNodes = personalPapers.map((paper, index) => {
     x: cluster.center[0] + Math.cos(angle) * 1.15,
     y: cluster.center[1] + Math.sin(angle) * 1.15,
     z: cluster.center[2] + 1.1,
-    size: 1.05 + paper.maturity / 175,
-    year: paper.year,
-    kind: "personal",
-    demo: false,
-    phase: index * 1.7,
-    status: paper.status,
-    sourceUrl: paper.sourceUrl,
-    zoteroUri: paper.zoteroUri,
-    noteDensity: paper.noteDensity,
-    evidenceCount: paper.evidenceCount
+    size: 1.28 + index * 0.06,
+    year: 2026,
+    kind: "preview",
+    demo: true,
+    phase: index * 1.7
   };
 });
 
-const nodes = [...demoNodes, ...personalNodes];
+const nodes = [...demoNodes, ...previewReadSignals];
 const nodeById = new Map(nodes.map((node) => [String(node.id), node]));
 const edges: Array<{ source: string; target: string; kind: string }> = [];
 
@@ -119,10 +117,10 @@ for (let index = 0; index < clusters.length; index += 1) {
   edges.push({ source: current, target: next, kind: "cross-field" });
 }
 
-personalNodes.forEach((node, index) => {
-  edges.push({ source: node.id, target: `demo-${node.cluster}-0`, kind: "personal" });
+previewReadSignals.forEach((node, index) => {
+  edges.push({ source: node.id, target: `demo-${node.cluster}-0`, kind: "preview" });
   const nearby = demoNodes.filter((candidate) => candidate.cluster === node.cluster)[3 + index * 2];
-  if (nearby) edges.push({ source: node.id, target: String(nearby.id), kind: "personal" });
+  if (nearby) edges.push({ source: node.id, target: String(nearby.id), kind: "preview" });
 });
 
 const atlasData = {
@@ -303,7 +301,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             sprites.push(sprite);
             spriteById.set(node.id, sprite);
 
-            if (node.kind === "personal") {
+            if (node.kind === "personal" || node.kind === "preview") {
               const ringMaterial = new THREE.MeshBasicMaterial({
                 color: new THREE.Color(node.accent || "#ffffff"),
                 transparent: true,
@@ -372,7 +370,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const updateNodeOpacity = (activeIds = null) => {
             sprites.forEach((sprite) => {
               const isActive = !activeIds || activeIds.has(sprite.userData.id);
-              sprite.material.opacity = isActive ? (sprite.userData.kind === "personal" ? 1 : 0.72) : 0.055;
+              sprite.material.opacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 1 : 0.72) : 0.055;
               const scale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.42 : 1);
               sprite.scale.setScalar(scale);
               if (sprite.userData.ring) sprite.userData.ring.material.opacity = isActive ? 0.46 : 0.04;
@@ -415,7 +413,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             const direction = camera.position.clone().sub(controls.target).normalize();
             focusTarget = sprite.position.clone();
             focusCameraPosition = sprite.position.clone().add(direction.multiplyScalar(6.5));
-            setText("[data-focus-kind]", node.kind === "personal" ? "PERSONAL / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
+            setText("[data-focus-kind]", node.kind === "personal" ? "PERSONAL / READ SIGNAL" : node.kind === "preview" ? "SIMULATED / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
             setText("[data-focus-title]", node.title);
             setText("[data-focus-year]", node.year ? String(node.year) : "—");
             setText("[data-focus-cluster]", node.clusterLabel);
@@ -504,7 +502,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               tooltip.hidden = !hovered;
               renderer.domElement.style.cursor = hovered ? "pointer" : "grab";
               if (hovered) {
-                setText("[data-hover-index]", hovered.userData.kind === "personal" ? "PERSONAL" : hovered.userData.clusterLabel);
+                setText("[data-hover-index]", hovered.userData.kind === "personal" ? "PERSONAL" : hovered.userData.kind === "preview" ? "DEMO READ" : hovered.userData.clusterLabel);
                 setText("[data-hover-title]", hovered.userData.title);
               }
             }
