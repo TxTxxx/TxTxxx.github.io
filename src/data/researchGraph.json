@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T13:54:17.746Z",
+  "generatedAt": "2026-08-27T14:27:53.298Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
     "nodes": 3,
@@ -45,23 +45,23 @@
       "type": "paper",
       "citekey": "suttonDynaIntegratedArchitecture1991",
       "status": "inbox",
-      "readingLevel": "",
-      "paperRole": "",
-      "atlasLabel": "",
+      "readingLevel": "normal",
+      "paperRole": "方法",
+      "atlasLabel": "Dyna",
       "year": 1991,
       "authors": "Richard S. Sutton",
       "topics": [
-        "vla"
+        "world model"
       ],
       "created": "2026-08-27",
-      "readDate": "",
+      "readDate": "2026-08-27",
       "doi": "10.1145/122344.122377",
       "sourceUrl": "https://dl.acm.org/doi/10.1145/122344.122377",
       "zoteroUri": "zotero://select/library/items/XY5RTM64",
       "noteDensity": 0,
       "evidenceCount": 12,
       "maturity": 30,
-      "atlasCardHtml": "<p>hello</p>",
+      "atlasCardHtml": "",
       "atlasCardImages": 0
     },
     {
