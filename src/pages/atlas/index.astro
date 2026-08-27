@@ -175,17 +175,15 @@ const clusterForTopic = (topic: string) => {
   return "vla";
 };
 
-const personalNodes = researchGraph.nodes.map((node, index) => {
+const personalPapers = researchGraph.nodes.filter((node) => node.type === "paper");
+const personalNodes = personalPapers.map((node, index) => {
   const fieldIds = [...new Set((node.topics?.length ? node.topics : ["vla"]).map(clusterForTopic))];
   const primaryCluster = clusters.find((cluster) => cluster.id === fieldIds[0]) ?? clusters[0];
   const secondaryCluster = clusters.find((cluster) => cluster.id === fieldIds[1]);
   const center = secondaryCluster
     ? primaryCluster.center.map((value, axis) => value * 0.72 + secondaryCluster.center[axis] * 0.28)
     : primaryCluster.center;
-  const isField = node.type === "field";
-  const isPaper = node.type === "paper";
-  const isConcept = node.type === "concept";
-  const spread = isField ? 0.08 : isPaper ? 1.2 : isConcept ? 1.7 : 2.45;
+  const spread = 1.45;
   const maturity = typeof node.maturity === "number" ? node.maturity : 35;
 
   return {
@@ -203,7 +201,7 @@ const personalNodes = researchGraph.nodes.map((node, index) => {
     x: center[0] + personalGaussian() * spread,
     y: center[1] + personalGaussian() * spread * 0.78,
     z: center[2] + personalGaussian() * spread * 0.58,
-    size: isField ? 1.12 : isPaper ? 0.68 + maturity * 0.0026 : isConcept ? 0.58 : 0.25 + Math.min(0.2, maturity * 0.0018),
+    size: 0.68 + maturity * 0.0026,
     year: node.year,
     kind: "personal",
     noteType: node.type,
@@ -211,16 +209,40 @@ const personalNodes = researchGraph.nodes.map((node, index) => {
     readingLevel: node.readingLevel,
     sourceUrl: node.sourceUrl,
     zoteroUri: node.zoteroUri,
-    signal: isField || isPaper || isConcept,
+    signal: true,
     fieldMode: "personal",
     phase: personalRandom() * Math.PI * 2 + index * 0.03
   };
 });
 
-const personalNodeById = new Map(personalNodes.map((node) => [String(node.id), node]));
-const personalEdges = researchGraph.edges
-  .filter((edge) => personalNodeById.has(edge.source) && personalNodeById.has(edge.target))
-  .map((edge) => ({ ...edge, fieldMode: "personal" }));
+const personalPaperIds = new Set(personalNodes.map((node) => String(node.id)));
+const personalRelationKeys = new Set<string>();
+const personalEdges: Array<{ source: string; target: string; kind: string; fieldMode: string }> = [];
+
+const addPersonalRelation = (source: string, target: string, kind: string) => {
+  if (source === target || !personalPaperIds.has(source) || !personalPaperIds.has(target)) return;
+  const [first, second] = [source, target].sort();
+  const key = `${first}::${second}`;
+  if (personalRelationKeys.has(key)) return;
+  personalRelationKeys.add(key);
+  personalEdges.push({ source: first, target: second, kind, fieldMode: "personal" });
+};
+
+researchGraph.edges.forEach((edge) => addPersonalRelation(edge.source, edge.target, "manual"));
+researchGraph.nodes
+  .filter((node) => node.type === "field" || node.type === "concept")
+  .forEach((connector) => {
+    const relatedPapers = researchGraph.edges.flatMap((edge) => {
+      if (edge.source === connector.id && personalPaperIds.has(edge.target)) return [edge.target];
+      if (edge.target === connector.id && personalPaperIds.has(edge.source)) return [edge.source];
+      return [];
+    });
+    for (let sourceIndex = 0; sourceIndex < relatedPapers.length; sourceIndex += 1) {
+      for (let targetIndex = sourceIndex + 1; targetIndex < relatedPapers.length; targetIndex += 1) {
+        addPersonalRelation(relatedPapers[sourceIndex], relatedPapers[targetIndex], connector.type === "field" ? "shared-field" : "shared-concept");
+      }
+    }
+  });
 
 const nodes = [...demoFieldNodes, ...personalNodes];
 const nodeById = new Map(nodes.map((node) => [String(node.id), node]));
@@ -623,7 +645,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               button.hidden = !availableClusters.has(button.dataset.cluster);
               button.setAttribute("aria-pressed", "false");
             });
-            if (nodeCount) nodeCount.textContent = `${currentNodes.length} NODES`;
+            if (nodeCount) nodeCount.textContent = activeFieldMode === "personal" ? `${currentNodes.length} PAPERS` : `${currentNodes.length} NODES`;
             atlas.dataset.fieldMode = activeFieldMode;
           };
 

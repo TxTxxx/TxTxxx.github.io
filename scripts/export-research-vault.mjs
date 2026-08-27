@@ -11,8 +11,7 @@ const outputPath = path.join(projectRoot, "src/data/researchGraph.json");
 const sources = [
   { folder: "10 领域", type: "field" },
   { folder: "20 论文", type: "paper" },
-  { folder: "30 概念", type: "concept" },
-  { folder: "embodied intelligence", type: "fragment" }
+  { folder: "30 概念", type: "concept" }
 ];
 
 const statusProgress = {
