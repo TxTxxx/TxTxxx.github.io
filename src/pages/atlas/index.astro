@@ -57,9 +57,13 @@ const demoNodes: Array<Record<string, unknown>> = [];
 clusters.forEach((cluster, clusterIndex) => {
   for (let index = 0; index < clusterCounts[clusterIndex]; index += 1) {
     const radialScale = index === 0 ? 0.2 : 1;
-    const x = cluster.center[0] + gaussian() * 2.55 * radialScale;
-    const y = cluster.center[1] + gaussian() * 2.05 * radialScale;
-    const z = cluster.center[2] + gaussian() * 1.5 * radialScale;
+    const secondaryCluster = index === 2 || index === 17 ? clusters[(clusterIndex + 1) % clusters.length] : null;
+    const center = secondaryCluster
+      ? cluster.center.map((value, axis) => value * 0.68 + secondaryCluster.center[axis] * 0.32)
+      : cluster.center;
+    const x = center[0] + gaussian() * 2.55 * radialScale;
+    const y = center[1] + gaussian() * 2.05 * radialScale;
+    const z = center[2] + gaussian() * 1.5 * radialScale;
     const displayName = clusterLandmarks[cluster.id]?.[index];
     const title = displayName
       ? displayName
@@ -72,6 +76,9 @@ clusters.forEach((cluster, clusterIndex) => {
       hasEssay: index === 1 && ["vla", "world", "reasoning"].includes(cluster.id),
       cluster: cluster.id,
       clusterLabel: cluster.label,
+      fields: secondaryCluster ? [cluster.id, secondaryCluster.id] : [cluster.id],
+      fieldLabels: secondaryCluster ? [cluster.label, secondaryCluster.label] : [cluster.label],
+      secondaryColor: secondaryCluster?.color || "",
       color: cluster.color,
       x,
       y,
@@ -102,6 +109,8 @@ const previewReadSignals = previewReadTitles.map((title, index) => {
     hasEssay: index === 0 || index === 2,
     cluster: cluster.id,
     clusterLabel: cluster.label,
+    fields: [cluster.id],
+    fieldLabels: [cluster.label],
     color: "#dffaff",
     accent: cluster.color,
     x: cluster.center[0] + Math.cos(angle) * 1.15,
@@ -120,7 +129,7 @@ const nodeById = new Map(nodes.map((node) => [String(node.id), node]));
 const edges: Array<{ source: string; target: string; kind: string }> = [];
 
 clusters.forEach((cluster) => {
-  const members = nodes.filter((node) => node.cluster === cluster.id);
+  const members = nodes.filter((node) => Array.isArray(node.fields) ? node.fields.includes(cluster.id) : node.cluster === cluster.id);
   const anchor = members.find((node) => String(node.id).endsWith("-0")) ?? members[0];
   members.forEach((node, index) => {
     if (node.id === anchor.id) return;
@@ -192,7 +201,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       </div>
 
       <div class="cluster-legend" aria-label="Research fields">
-        {clusters.map((cluster) => <button type="button" data-cluster={cluster.id}><i style={`--c:${cluster.color}`}></i>{cluster.label}</button>)}
+        {clusters.map((cluster) => <button type="button" data-cluster={cluster.id} aria-pressed="false"><i style={`--c:${cluster.color}`}></i>{cluster.label}</button>)}
       </div>
 
       <div class="field-status">
@@ -321,7 +330,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const controls = new OrbitControls(camera, renderer.domElement);
           controls.enableDamping = true;
           controls.dampingFactor = 0.045;
-          controls.enablePan = false;
+          controls.enablePan = true;
+          controls.screenSpacePanning = true;
+          controls.panSpeed = 0.42;
           controls.minDistance = 7;
           controls.maxDistance = 58;
           controls.rotateSpeed = 0.22;
@@ -347,7 +358,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             const sprite = new THREE.Sprite(material);
             sprite.position.set(node.x, node.y, node.z);
             sprite.scale.setScalar(node.size);
-            sprite.userData = { ...node, basePosition: sprite.position.clone(), baseScale: node.size };
+            sprite.userData = {
+              ...node,
+              basePosition: sprite.position.clone(),
+              baseScale: node.size,
+              targetOpacity: material.opacity,
+              targetScale: node.size
+            };
             universe.add(sprite);
             sprites.push(sprite);
             spriteById.set(node.id, sprite);
@@ -377,6 +394,22 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               sprite.userData.labelSprite = labelSprite;
             }
 
+            if (Array.isArray(node.fields) && node.fields.length > 1 && node.secondaryColor) {
+              const fieldRingMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(node.secondaryColor),
+                transparent: true,
+                opacity: 0.2,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                side: THREE.DoubleSide
+              });
+              const fieldRing = new THREE.Mesh(new THREE.RingGeometry(node.size * 0.68, node.size * 0.73, 64), fieldRingMaterial);
+              fieldRing.position.copy(sprite.position);
+              fieldRing.userData = { parentNode: node.id, targetOpacity: 0.2 };
+              universe.add(fieldRing);
+              sprite.userData.fieldRing = fieldRing;
+            }
+
             if (node.kind === "personal" || node.kind === "preview") {
               const ringMaterial = new THREE.MeshBasicMaterial({
                 color: new THREE.Color(node.accent || "#ffffff"),
@@ -388,7 +421,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               });
               const ring = new THREE.Mesh(new THREE.RingGeometry(node.size * 0.56, node.size * 0.62, 64), ringMaterial);
               ring.position.copy(sprite.position);
-              ring.userData.parentNode = node.id;
+              ring.userData = { parentNode: node.id, targetOpacity: 0.3 };
               universe.add(ring);
               sprite.userData.ring = ring;
             }
@@ -429,8 +462,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const pointerTarget = new THREE.Vector2();
           let hovered = null;
           let selected = null;
-          let focusCameraPosition = null;
-          let focusTarget = null;
+          let activeCluster = null;
+          let cameraTransition = null;
+          let cardHideTimer = null;
           let highlightedLines = null;
           let pointerDown = null;
 
@@ -453,17 +487,60 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             return ids;
           };
 
+          const belongsToCluster = (node, clusterId) => Array.isArray(node.fields)
+            ? node.fields.includes(clusterId)
+            : node.cluster === clusterId;
+
+          const scopeIds = () => activeCluster
+            ? new Set(data.nodes.filter((node) => belongsToCluster(node, activeCluster)).map((node) => node.id))
+            : null;
+
           const updateNodeOpacity = (activeIds = null) => {
             sprites.forEach((sprite) => {
               const isActive = !activeIds || activeIds.has(sprite.userData.id);
-              sprite.material.opacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 0.84 : sprite.userData.atlasLabel ? 0.74 : 0.62) : 0.045;
-              const scale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.24 : 1);
-              sprite.scale.setScalar(scale);
-              if (sprite.userData.ring) sprite.userData.ring.material.opacity = isActive ? 0.3 : 0.025;
+              sprite.userData.targetOpacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 0.84 : sprite.userData.atlasLabel ? 0.74 : 0.62) : 0.045;
+              sprite.userData.targetScale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.24 : 1);
+              if (sprite.userData.ring) sprite.userData.ring.userData.targetOpacity = isActive ? 0.3 : 0.025;
+              if (sprite.userData.fieldRing) sprite.userData.fieldRing.userData.targetOpacity = isActive ? 0.2 : 0.015;
               if (sprite.userData.labelSprite) {
                 sprite.userData.labelSprite.userData.baseOpacity = isActive ? (sprite.userData.id === selected ? 0.82 : 0.54) : 0.02;
               }
             });
+          };
+
+          const openFocusCard = () => {
+            if (cardHideTimer) window.clearTimeout(cardHideTimer);
+            focusCard.hidden = false;
+            requestAnimationFrame(() => focusCard.classList.add("is-open"));
+          };
+
+          const hideFocusCard = () => {
+            focusCard.classList.remove("is-open");
+            if (cardHideTimer) window.clearTimeout(cardHideTimer);
+            cardHideTimer = window.setTimeout(() => { focusCard.hidden = true; }, 340);
+          };
+
+          const easeInOutCubic = (value) => value < 0.5
+            ? 4 * value * value * value
+            : 1 - Math.pow(-2 * value + 2, 3) / 2;
+
+          const cancelCameraTransition = () => {
+            if (!cameraTransition) return;
+            cameraTransition = null;
+            controls.enabled = true;
+          };
+
+          const moveCameraTo = (position, target, duration = 820, onComplete = null) => {
+            cameraTransition = {
+              startedAt: performance.now(),
+              duration,
+              fromPosition: camera.position.clone(),
+              fromTarget: controls.target.clone(),
+              toPosition: position.clone(),
+              toTarget: target.clone(),
+              onComplete
+            };
+            controls.enabled = false;
           };
 
           const clearHighlightedLines = () => {
@@ -500,31 +577,41 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             updateNodeOpacity(connectedIds(nodeId));
             drawSelectedConnections(nodeId);
             const direction = camera.position.clone().sub(controls.target).normalize();
-            focusTarget = sprite.position.clone();
-            focusCameraPosition = sprite.position.clone().add(direction.multiplyScalar(6.5));
+            const nodeTarget = sprite.position.clone();
+            moveCameraTo(nodeTarget.clone().add(direction.multiplyScalar(6.5)), nodeTarget, 720);
             setText("[data-focus-kind]", node.kind === "personal" ? "PERSONAL / READ SIGNAL" : node.kind === "preview" ? "SIMULATED / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
             setText("[data-focus-title]", node.title);
             setText("[data-focus-year]", node.year ? String(node.year) : "—");
-            setText("[data-focus-cluster]", node.clusterLabel);
+            setText("[data-focus-cluster]", Array.isArray(node.fieldLabels) ? node.fieldLabels.join(" · ") : node.clusterLabel);
             const source = document.querySelector("[data-focus-source]");
             const zotero = document.querySelector("[data-focus-zotero]");
             source?.toggleAttribute("hidden", !node.sourceUrl);
             zotero?.toggleAttribute("hidden", !node.zoteroUri);
             if (source && node.sourceUrl) source.href = node.sourceUrl;
             if (zotero && node.zoteroUri) zotero.href = node.zoteroUri;
-            focusCard.hidden = false;
+            openFocusCard();
+          };
+
+          const closeSelection = () => {
+            cancelCameraTransition();
+            selected = null;
+            hideFocusCard();
+            clearHighlightedLines();
+            updateNodeOpacity(scopeIds());
+            controls.autoRotate = false;
           };
 
           const resetField = () => {
             selected = null;
-            focusCameraPosition = null;
-            focusTarget = null;
-            focusCard.hidden = true;
+            activeCluster = null;
+            hideFocusCard();
             clearHighlightedLines();
             updateNodeOpacity();
-            controls.autoRotate = true;
-            camera.position.set(0, 0.5, 34);
-            controls.target.set(0, 0, 0);
+            controls.autoRotate = false;
+            clusterButtons.forEach((button) => button.setAttribute("aria-pressed", "false"));
+            moveCameraTo(new THREE.Vector3(0, 0.5, 34), new THREE.Vector3(0, 0, 0), 940, () => {
+              controls.autoRotate = true;
+            });
           };
 
           const updatePointer = (event) => {
@@ -541,10 +628,14 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               tooltip.style.top = `${Math.min(window.innerHeight - 90, event.clientY + 18)}px`;
             }
           });
-          renderer.domElement.addEventListener("pointerdown", (event) => { pointerDown = { x: event.clientX, y: event.clientY }; });
+          renderer.domElement.addEventListener("pointerdown", (event) => {
+            cancelCameraTransition();
+            pointerDown = { x: event.clientX, y: event.clientY };
+          }, true);
           renderer.domElement.addEventListener("pointerup", (event) => {
             if (!pointerDown || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 6) return;
             if (hovered) showFocus(hovered.userData.id);
+            else if (selected) closeSelection();
           });
           renderer.domElement.addEventListener("pointerleave", () => {
             pointer.set(4, 4);
@@ -553,21 +644,32 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           });
 
           reset?.addEventListener("click", resetField);
-          closeFocus?.addEventListener("click", resetField);
-          window.addEventListener("keydown", (event) => { if (event.key === "Escape") resetField(); });
+          closeFocus?.addEventListener("click", closeSelection);
+          controls.addEventListener("start", () => {
+            cancelCameraTransition();
+            controls.autoRotate = false;
+          });
+          window.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+            if (selected || !focusCard.hidden) closeSelection();
+            else if (activeCluster) resetField();
+          });
 
           clusterButtons.forEach((button) => {
             button.addEventListener("click", () => {
               const cluster = data.clusters.find((item) => item.id === button.dataset.cluster);
               if (!cluster) return;
               selected = null;
-              focusCard.hidden = true;
+              activeCluster = cluster.id;
+              hideFocusCard();
               clearHighlightedLines();
-              const clusterIds = new Set(data.nodes.filter((node) => node.cluster === cluster.id).map((node) => node.id));
+              const clusterIds = scopeIds();
               updateNodeOpacity(clusterIds);
               controls.autoRotate = false;
-              focusTarget = new THREE.Vector3(...cluster.center);
-              focusCameraPosition = new THREE.Vector3(cluster.center[0], cluster.center[1], cluster.center[2] + 15);
+              clusterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+              const clusterTarget = new THREE.Vector3(...cluster.center);
+              const direction = camera.position.clone().sub(controls.target).normalize();
+              moveCameraTo(clusterTarget.clone().add(direction.multiplyScalar(15)), clusterTarget, 820);
             });
           });
 
@@ -615,10 +717,19 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
 
             sprites.forEach((sprite) => {
               const base = sprite.userData.basePosition;
+              sprite.material.opacity += (sprite.userData.targetOpacity - sprite.material.opacity) * 0.12;
+              const nextScale = sprite.scale.x + (sprite.userData.targetScale - sprite.scale.x) * 0.12;
+              sprite.scale.setScalar(nextScale);
               sprite.position.y = base.y + Math.sin(elapsed * 0.27 + sprite.userData.phase) * 0.035;
               if (sprite.userData.ring) {
                 sprite.userData.ring.position.copy(sprite.position);
                 sprite.userData.ring.rotation.z = elapsed * 0.08 + sprite.userData.phase;
+                sprite.userData.ring.material.opacity += (sprite.userData.ring.userData.targetOpacity - sprite.userData.ring.material.opacity) * 0.12;
+              }
+              if (sprite.userData.fieldRing) {
+                sprite.userData.fieldRing.position.copy(sprite.position);
+                sprite.userData.fieldRing.rotation.z = -elapsed * 0.055 + sprite.userData.phase;
+                sprite.userData.fieldRing.material.opacity += (sprite.userData.fieldRing.userData.targetOpacity - sprite.userData.fieldRing.material.opacity) * 0.12;
               }
               if (sprite.userData.labelSprite) {
                 const labelSprite = sprite.userData.labelSprite;
@@ -634,11 +745,21 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             universe.rotation.y += ((pointerTarget.x * 0.035) - universe.rotation.y) * 0.015;
             starField.rotation.y = elapsed * 0.0014;
 
-            if (focusTarget && focusCameraPosition) {
-              camera.position.lerp(focusCameraPosition, 0.055);
-              controls.target.lerp(focusTarget, 0.065);
+            if (cameraTransition) {
+              const progress = Math.min(1, (performance.now() - cameraTransition.startedAt) / cameraTransition.duration);
+              const eased = easeInOutCubic(progress);
+              camera.position.lerpVectors(cameraTransition.fromPosition, cameraTransition.toPosition, eased);
+              controls.target.lerpVectors(cameraTransition.fromTarget, cameraTransition.toTarget, eased);
+              if (progress >= 1) {
+                const completedTransition = cameraTransition;
+                cameraTransition = null;
+                controls.enabled = true;
+                controls.update();
+                completedTransition.onComplete?.();
+              }
+            } else {
+              controls.update();
             }
-            controls.update();
             updateLabels();
             composer.render();
           };
@@ -706,7 +827,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
 
   .cluster-legend { left: 2rem; bottom: 1.75rem; display: flex; gap: 0.4rem 1.1rem; flex-wrap: wrap; max-width: 42rem; }
   .cluster-legend button { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0; border: 0; color: #607984; background: transparent; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.11em; cursor: pointer; }
-  .cluster-legend button:hover, .cluster-legend button:focus-visible { color: #d9f8fd; outline: none; }
+  .cluster-legend button:hover, .cluster-legend button:focus-visible, .cluster-legend button[aria-pressed="true"] { color: #d9f8fd; outline: none; }
   .cluster-legend i { width: 0.38rem; height: 0.38rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0.75rem var(--c); }
 
   .field-status { right: 2rem; bottom: 1.75rem; display: flex; align-items: center; gap: 0.8rem; color: #4b626c; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.14em; }
@@ -717,7 +838,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
   .hover-label span { display: block; margin-bottom: 0.35rem; color: #65919d; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.12em; }
   .hover-label strong { display: block; color: #e8fbff; font-size: 0.72rem; font-weight: 400; line-height: 1.35; }
 
-  .focus-card { left: 2rem; top: 50%; width: min(23rem, calc(100vw - 4rem)); padding: 1.25rem 1.3rem 1.35rem; border: 1px solid rgba(177, 232, 243, 0.17); background: linear-gradient(135deg, rgba(9, 23, 31, 0.78), rgba(2, 8, 12, 0.62)); box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.38); transform: translateY(-50%); backdrop-filter: blur(24px) saturate(1.2); }
+  .focus-card { left: 2rem; top: 50%; width: min(23rem, calc(100vw - 4rem)); padding: 1.25rem 1.3rem 1.35rem; border: 1px solid rgba(177, 232, 243, 0.17); opacity: 0; pointer-events: none; background: linear-gradient(135deg, rgba(9, 23, 31, 0.78), rgba(2, 8, 12, 0.62)); box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.38); transform: translate(-0.8rem, -50%); transition: opacity 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1); backdrop-filter: blur(24px) saturate(1.2); }
+  .focus-card.is-open { opacity: 1; pointer-events: auto; transform: translate(0, -50%); }
   .focus-close { position: absolute; right: 0.7rem; top: 0.55rem; padding: 0.25rem; border: 0; color: #64808b; background: transparent; font-size: 1.1rem; cursor: pointer; }
   .focus-kind { color: #6f9aa5; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.13em; }
   .focus-card h1 { margin: 0.9rem 0 1.1rem; color: #f0fdff; font-size: clamp(1.25rem, 2.4vw, 1.85rem); font-weight: 400; line-height: 1.12; letter-spacing: -0.025em; }
@@ -742,7 +864,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
     .cluster-legend button { font-size: 0.43rem; }
     .field-status { right: 1rem; bottom: auto; top: 4.2rem; }
     .field-status b { display: none; }
-    .focus-card { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); transform: none; }
+    .focus-card { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); transform: translateY(0.7rem); }
+    .focus-card.is-open { transform: translateY(0); }
     .vignette { box-shadow: inset 0 0 5rem 1rem rgba(0, 0, 0, 0.72); }
     :global(.cluster-label) { font-size: 0.58rem; }
   }
