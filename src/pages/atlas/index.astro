@@ -1,4 +1,6 @@
 ---
+import researchGraph from "../../data/researchGraph.json";
+
 const clusters = [
   { id: "vla", label: "VLA", mapLabel: "VLA", color: "#6fe8ff", center: [-10, 4, 0] },
   { id: "world", label: "WORLD MODELS", mapLabel: "WORLD", color: "#8f84ff", center: [-4, -7, -2] },
@@ -87,6 +89,7 @@ clusters.forEach((cluster, clusterIndex) => {
       year: 2021 + Math.floor(random() * 6),
       kind: "context",
       demo: true,
+      fieldMode: "demo",
       phase: random() * Math.PI * 2
     });
   }
@@ -120,24 +123,25 @@ const previewReadSignals = previewReadTitles.map((title, index) => {
     year: 2026,
     kind: "preview",
     demo: true,
+    fieldMode: "demo",
     phase: index * 1.7
   };
 });
 
-const nodes = [...demoNodes, ...previewReadSignals];
-const nodeById = new Map(nodes.map((node) => [String(node.id), node]));
-const edges: Array<{ source: string; target: string; kind: string }> = [];
+const demoFieldNodes = [...demoNodes, ...previewReadSignals];
+const demoNodeById = new Map(demoFieldNodes.map((node) => [String(node.id), node]));
+const demoEdges: Array<{ source: string; target: string; kind: string; fieldMode: string }> = [];
 
 clusters.forEach((cluster) => {
-  const members = nodes.filter((node) => Array.isArray(node.fields) ? node.fields.includes(cluster.id) : node.cluster === cluster.id);
+  const members = demoFieldNodes.filter((node) => Array.isArray(node.fields) ? node.fields.includes(cluster.id) : node.cluster === cluster.id);
   const anchor = members.find((node) => String(node.id).endsWith("-0")) ?? members[0];
   members.forEach((node, index) => {
     if (node.id === anchor.id) return;
-    if (index < 12 || random() > 0.62) edges.push({ source: String(anchor.id), target: String(node.id), kind: "field" });
-    if (index > 1) edges.push({ source: String(members[index - 1].id), target: String(node.id), kind: "citation" });
+    if (index < 12 || random() > 0.62) demoEdges.push({ source: String(anchor.id), target: String(node.id), kind: "field", fieldMode: "demo" });
+    if (index > 1) demoEdges.push({ source: String(members[index - 1].id), target: String(node.id), kind: "citation", fieldMode: "demo" });
     if (index > 5 && random() > 0.55) {
       const target = members[Math.floor(random() * index)];
-      edges.push({ source: String(node.id), target: String(target.id), kind: "citation" });
+      demoEdges.push({ source: String(node.id), target: String(target.id), kind: "citation", fieldMode: "demo" });
     }
   });
 });
@@ -145,19 +149,94 @@ clusters.forEach((cluster) => {
 for (let index = 0; index < clusters.length; index += 1) {
   const current = `demo-${clusters[index].id}-0`;
   const next = `demo-${clusters[(index + 1) % clusters.length].id}-0`;
-  edges.push({ source: current, target: next, kind: "cross-field" });
+  demoEdges.push({ source: current, target: next, kind: "cross-field", fieldMode: "demo" });
 }
 
 previewReadSignals.forEach((node, index) => {
-  edges.push({ source: node.id, target: `demo-${node.cluster}-0`, kind: "preview" });
+  demoEdges.push({ source: node.id, target: `demo-${node.cluster}-0`, kind: "preview", fieldMode: "demo" });
   const nearby = demoNodes.filter((candidate) => candidate.cluster === node.cluster)[3 + index * 2];
-  if (nearby) edges.push({ source: node.id, target: String(nearby.id), kind: "preview" });
+  if (nearby) demoEdges.push({ source: node.id, target: String(nearby.id), kind: "preview", fieldMode: "demo" });
 });
+
+const personalRandom = mulberry32(260826);
+const personalGaussian = () => {
+  const u = Math.max(personalRandom(), 0.0001);
+  const v = Math.max(personalRandom(), 0.0001);
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+};
+
+const clusterForTopic = (topic: string) => {
+  const value = topic.toLowerCase();
+  if (/(world|dynamics|predict)/.test(value)) return "world";
+  if (/(action|diffusion|chunk|policy|control|replan|trajectory)/.test(value)) return "action";
+  if (/(reason|plan|language|memory)/.test(value)) return "reasoning";
+  if (/(data|scale|dataset|demonstration)/.test(value)) return "data";
+  if (/(eval|sim|benchmark|libero|calvin)/.test(value)) return "evaluation";
+  return "vla";
+};
+
+const personalNodes = researchGraph.nodes.map((node, index) => {
+  const fieldIds = [...new Set((node.topics?.length ? node.topics : ["vla"]).map(clusterForTopic))];
+  const primaryCluster = clusters.find((cluster) => cluster.id === fieldIds[0]) ?? clusters[0];
+  const secondaryCluster = clusters.find((cluster) => cluster.id === fieldIds[1]);
+  const center = secondaryCluster
+    ? primaryCluster.center.map((value, axis) => value * 0.72 + secondaryCluster.center[axis] * 0.28)
+    : primaryCluster.center;
+  const isField = node.type === "field";
+  const isPaper = node.type === "paper";
+  const isConcept = node.type === "concept";
+  const spread = isField ? 0.08 : isPaper ? 1.2 : isConcept ? 1.7 : 2.45;
+  const maturity = typeof node.maturity === "number" ? node.maturity : 35;
+
+  return {
+    id: node.id,
+    title: node.title,
+    atlasLabel: node.atlasLabel || "",
+    hasEssay: false,
+    cluster: primaryCluster.id,
+    clusterLabel: primaryCluster.label,
+    fields: fieldIds,
+    fieldLabels: fieldIds.map((id) => clusters.find((cluster) => cluster.id === id)?.label ?? id.toUpperCase()),
+    secondaryColor: secondaryCluster?.color || "",
+    color: primaryCluster.color,
+    accent: "#e8fbff",
+    x: center[0] + personalGaussian() * spread,
+    y: center[1] + personalGaussian() * spread * 0.78,
+    z: center[2] + personalGaussian() * spread * 0.58,
+    size: isField ? 1.12 : isPaper ? 0.68 + maturity * 0.0026 : isConcept ? 0.58 : 0.25 + Math.min(0.2, maturity * 0.0018),
+    year: node.year,
+    kind: "personal",
+    noteType: node.type,
+    status: node.status,
+    readingLevel: node.readingLevel,
+    sourceUrl: node.sourceUrl,
+    zoteroUri: node.zoteroUri,
+    signal: isField || isPaper || isConcept,
+    fieldMode: "personal",
+    phase: personalRandom() * Math.PI * 2 + index * 0.03
+  };
+});
+
+const personalNodeById = new Map(personalNodes.map((node) => [String(node.id), node]));
+const personalEdges = researchGraph.edges
+  .filter((edge) => personalNodeById.has(edge.source) && personalNodeById.has(edge.target))
+  .map((edge) => ({ ...edge, fieldMode: "personal" }));
+
+const nodes = [...demoFieldNodes, ...personalNodes];
+const nodeById = new Map(nodes.map((node) => [String(node.id), node]));
+const edges = [
+  ...demoEdges.filter((edge) => demoNodeById.has(edge.source) && demoNodeById.has(edge.target)),
+  ...personalEdges
+];
 
 const atlasData = {
   nodes,
   edges: edges.filter((edge) => nodeById.has(edge.source) && nodeById.has(edge.target)),
-  clusters
+  clusters,
+  counts: {
+    demo: demoFieldNodes.length,
+    personal: personalNodes.length
+  }
 };
 const atlasJson = JSON.stringify(atlasData).replaceAll("<", "\\u003c");
 const fallbackDots = nodes.slice(0, 150).map((node) => ({
@@ -205,8 +284,12 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       </div>
 
       <div class="field-status">
-        <span>DEMO FIELD</span>
-        <b>{nodes.length} NODES</b>
+        <div class="field-switch" aria-label="Atlas data field">
+          <button type="button" data-field-mode="demo" aria-pressed="true">DEMO FIELD</button>
+          <i aria-hidden="true"></i>
+          <button type="button" data-field-mode="personal" aria-pressed="false">MY FIELD</button>
+        </div>
+        <b data-node-count>{demoFieldNodes.length} NODES</b>
       </div>
 
       <div class="label-layer" data-label-layer aria-hidden="true"></div>
@@ -251,10 +334,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       const reset = document.querySelector("[data-reset]");
       const closeFocus = document.querySelector("[data-focus-close]");
       const clusterButtons = Array.from(document.querySelectorAll("[data-cluster]"));
+      const fieldModeButtons = Array.from(document.querySelectorAll("[data-field-mode]"));
+      const nodeCount = document.querySelector("[data-node-count]");
       const labelLayer = document.querySelector("[data-label-layer]");
       const data = dataElement ? JSON.parse(dataElement.textContent || "{}") : { nodes: [], edges: [], clusters: [] };
       const dataById = new Map(data.nodes.map((node) => [node.id, node]));
       const colorByCluster = new Map(data.clusters.map((cluster) => [cluster.id, cluster.color]));
+      let activeFieldMode = "demo";
 
       const setText = (selector, value) => {
         const element = document.querySelector(selector);
@@ -345,13 +431,19 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const glowTexture = makeGlowTexture();
           const sprites = [];
           const spriteById = new Map();
+          const spritesByField = new Map([["demo", []], ["personal", []]]);
+
+          const baseNodeOpacity = (node) => node.kind === "personal"
+            ? node.signal ? 0.88 : 0.58
+            : node.kind === "preview" ? 0.74 : node.atlasLabel ? 0.72 : 0.58;
 
           data.nodes.forEach((node) => {
+            const initialOpacity = node.fieldMode === activeFieldMode ? baseNodeOpacity(node) : 0;
             const material = new THREE.SpriteMaterial({
               map: glowTexture,
               color: new THREE.Color(node.color),
               transparent: true,
-              opacity: node.kind === "personal" ? 0.88 : node.kind === "preview" ? 0.74 : node.atlasLabel ? 0.72 : 0.58,
+              opacity: initialOpacity,
               blending: THREE.AdditiveBlending,
               depthWrite: false
             });
@@ -362,12 +454,14 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               ...node,
               basePosition: sprite.position.clone(),
               baseScale: node.size,
-              targetOpacity: material.opacity,
+              baseOpacity: baseNodeOpacity(node),
+              targetOpacity: initialOpacity,
               targetScale: node.size
             };
             universe.add(sprite);
             sprites.push(sprite);
             spriteById.set(node.id, sprite);
+            spritesByField.get(node.fieldMode)?.push(sprite);
 
             if (node.atlasLabel) {
               const labelTexture = makeLabelTexture(node.atlasLabel, node.color);
@@ -375,7 +469,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 map: labelTexture.texture,
                 color: new THREE.Color(node.color).lerp(new THREE.Color("#ffffff"), 0.58),
                 transparent: true,
-                opacity: 0.62,
+                opacity: node.fieldMode === activeFieldMode ? 0.62 : 0,
                 blending: THREE.AdditiveBlending,
                 depthTest: true,
                 depthWrite: false,
@@ -389,7 +483,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               labelSprite.position.copy(sprite.position);
               labelSprite.position.y += offsetY;
               labelSprite.renderOrder = 3;
-              labelSprite.userData = { parentNode: node.id, offsetY, baseOpacity: 0.54 };
+              labelSprite.userData = { parentNode: node.id, offsetY, baseOpacity: node.fieldMode === activeFieldMode ? 0.54 : 0 };
               universe.add(labelSprite);
               sprite.userData.labelSprite = labelSprite;
             }
@@ -398,47 +492,53 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               const fieldRingMaterial = new THREE.MeshBasicMaterial({
                 color: new THREE.Color(node.secondaryColor),
                 transparent: true,
-                opacity: 0.2,
+                opacity: node.fieldMode === activeFieldMode ? 0.2 : 0,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false,
                 side: THREE.DoubleSide
               });
               const fieldRing = new THREE.Mesh(new THREE.RingGeometry(node.size * 0.68, node.size * 0.73, 64), fieldRingMaterial);
               fieldRing.position.copy(sprite.position);
-              fieldRing.userData = { parentNode: node.id, targetOpacity: 0.2 };
+              fieldRing.userData = { parentNode: node.id, targetOpacity: node.fieldMode === activeFieldMode ? 0.2 : 0 };
               universe.add(fieldRing);
               sprite.userData.fieldRing = fieldRing;
             }
 
-            if (node.kind === "personal" || node.kind === "preview") {
+            if (node.kind === "preview" || (node.kind === "personal" && node.signal)) {
               const ringMaterial = new THREE.MeshBasicMaterial({
                 color: new THREE.Color(node.accent || "#ffffff"),
                 transparent: true,
-                opacity: 0.3,
+                opacity: node.fieldMode === activeFieldMode ? 0.3 : 0,
                 blending: THREE.AdditiveBlending,
                 depthWrite: false,
                 side: THREE.DoubleSide
               });
               const ring = new THREE.Mesh(new THREE.RingGeometry(node.size * 0.56, node.size * 0.62, 64), ringMaterial);
               ring.position.copy(sprite.position);
-              ring.userData = { parentNode: node.id, targetOpacity: 0.3 };
+              ring.userData = { parentNode: node.id, targetOpacity: node.fieldMode === activeFieldMode ? 0.3 : 0 };
               universe.add(ring);
               sprite.userData.ring = ring;
             }
           });
 
-          const linePositions = [];
-          data.edges.forEach((edge) => {
-            const source = dataById.get(edge.source);
-            const target = dataById.get(edge.target);
-            if (!source || !target) return;
-            linePositions.push(source.x, source.y, source.z, target.x, target.y, target.z);
+          const edgeFields = new Map();
+          ["demo", "personal"].forEach((fieldMode) => {
+            const linePositions = [];
+            data.edges.filter((edge) => edge.fieldMode === fieldMode).forEach((edge) => {
+              const source = dataById.get(edge.source);
+              const target = dataById.get(edge.target);
+              if (!source || !target) return;
+              linePositions.push(source.x, source.y, source.z, target.x, target.y, target.z);
+            });
+            const lineGeometry = new THREE.BufferGeometry();
+            lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+            const initialOpacity = fieldMode === activeFieldMode ? 0.16 : 0;
+            const lineMaterial = new THREE.LineBasicMaterial({ color: fieldMode === "personal" ? 0x4a8793 : 0x315d70, transparent: true, opacity: initialOpacity, blending: THREE.AdditiveBlending, depthWrite: false });
+            const edgeField = new THREE.LineSegments(lineGeometry, lineMaterial);
+            edgeField.userData.targetOpacity = initialOpacity;
+            universe.add(edgeField);
+            edgeFields.set(fieldMode, edgeField);
           });
-          const lineGeometry = new THREE.BufferGeometry();
-          lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
-          const lineMaterial = new THREE.LineBasicMaterial({ color: 0x315d70, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false });
-          const edgeField = new THREE.LineSegments(lineGeometry, lineMaterial);
-          universe.add(edgeField);
 
           const starCount = 1800;
           const starPositions = new Float32Array(starCount * 3);
@@ -481,6 +581,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const connectedIds = (nodeId) => {
             const ids = new Set([nodeId]);
             data.edges.forEach((edge) => {
+              if (edge.fieldMode !== activeFieldMode) return;
               if (edge.source === nodeId) ids.add(edge.target);
               if (edge.target === nodeId) ids.add(edge.source);
             });
@@ -491,21 +592,39 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             ? node.fields.includes(clusterId)
             : node.cluster === clusterId;
 
+          const activeNodes = () => data.nodes.filter((node) => node.fieldMode === activeFieldMode);
+
           const scopeIds = () => activeCluster
-            ? new Set(data.nodes.filter((node) => belongsToCluster(node, activeCluster)).map((node) => node.id))
+            ? new Set(activeNodes().filter((node) => belongsToCluster(node, activeCluster)).map((node) => node.id))
             : null;
 
           const updateNodeOpacity = (activeIds = null) => {
             sprites.forEach((sprite) => {
-              const isActive = !activeIds || activeIds.has(sprite.userData.id);
-              sprite.userData.targetOpacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 0.84 : sprite.userData.atlasLabel ? 0.74 : 0.62) : 0.045;
+              const isInField = sprite.userData.fieldMode === activeFieldMode;
+              const isActive = isInField && (!activeIds || activeIds.has(sprite.userData.id));
+              sprite.userData.targetOpacity = !isInField ? 0 : isActive ? sprite.userData.baseOpacity : 0.045;
               sprite.userData.targetScale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.24 : 1);
-              if (sprite.userData.ring) sprite.userData.ring.userData.targetOpacity = isActive ? 0.3 : 0.025;
-              if (sprite.userData.fieldRing) sprite.userData.fieldRing.userData.targetOpacity = isActive ? 0.2 : 0.015;
+              if (sprite.userData.ring) sprite.userData.ring.userData.targetOpacity = !isInField ? 0 : isActive ? 0.3 : 0.025;
+              if (sprite.userData.fieldRing) sprite.userData.fieldRing.userData.targetOpacity = !isInField ? 0 : isActive ? 0.2 : 0.015;
               if (sprite.userData.labelSprite) {
-                sprite.userData.labelSprite.userData.baseOpacity = isActive ? (sprite.userData.id === selected ? 0.82 : 0.54) : 0.02;
+                sprite.userData.labelSprite.userData.baseOpacity = !isInField ? 0 : isActive ? (sprite.userData.id === selected ? 0.82 : 0.54) : 0.02;
               }
             });
+            edgeFields.forEach((edgeField, fieldMode) => {
+              edgeField.userData.targetOpacity = fieldMode === activeFieldMode ? 0.16 : 0;
+            });
+          };
+
+          const refreshFieldInterface = () => {
+            const currentNodes = activeNodes();
+            const availableClusters = new Set(currentNodes.flatMap((node) => Array.isArray(node.fields) ? node.fields : [node.cluster]));
+            fieldModeButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.fieldMode === activeFieldMode)));
+            clusterButtons.forEach((button) => {
+              button.hidden = !availableClusters.has(button.dataset.cluster);
+              button.setAttribute("aria-pressed", "false");
+            });
+            if (nodeCount) nodeCount.textContent = `${currentNodes.length} NODES`;
+            atlas.dataset.fieldMode = activeFieldMode;
           };
 
           const openFocusCard = () => {
@@ -574,6 +693,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             const positions = [];
             const node = dataById.get(nodeId);
             data.edges.forEach((edge) => {
+              if (edge.fieldMode !== activeFieldMode) return;
               if (edge.source !== nodeId && edge.target !== nodeId) return;
               const target = dataById.get(edge.source === nodeId ? edge.target : edge.source);
               if (node && target) positions.push(node.x, node.y, node.z, target.x, target.y, target.z);
@@ -589,7 +709,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const showFocus = (nodeId) => {
             const node = dataById.get(nodeId);
             const sprite = spriteById.get(nodeId);
-            if (!node || !sprite) return;
+            if (!node || !sprite || node.fieldMode !== activeFieldMode) return;
             selected = nodeId;
             controls.autoRotate = false;
             updateNodeOpacity(connectedIds(nodeId));
@@ -599,7 +719,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             const nodeTarget = new THREE.Vector3();
             sprite.getWorldPosition(nodeTarget);
             moveCameraTo(nodeTarget.clone().add(direction.multiplyScalar(6.5)), nodeTarget, 780, null, "orbit", 0.07);
-            setText("[data-focus-kind]", node.kind === "personal" ? "PERSONAL / READ SIGNAL" : node.kind === "preview" ? "SIMULATED / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
+            const personalKind = node.noteType === "paper" ? "PERSONAL / PAPER" : node.noteType === "field" ? "PERSONAL / FIELD" : node.noteType === "concept" ? "PERSONAL / CONCEPT" : "PERSONAL / NOTE";
+            setText("[data-focus-kind]", node.kind === "personal" ? personalKind : node.kind === "preview" ? "SIMULATED / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
             setText("[data-focus-title]", node.title);
             setText("[data-focus-year]", node.year ? String(node.year) : "—");
             setText("[data-focus-cluster]", Array.isArray(node.fieldLabels) ? node.fieldLabels.join(" · ") : node.clusterLabel);
@@ -634,6 +755,24 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             }, "orbit", 0.26);
           };
 
+          const switchField = (nextFieldMode) => {
+            if (!(nextFieldMode in (data.counts || {})) || nextFieldMode === activeFieldMode) return;
+            cancelCameraTransition();
+            selected = null;
+            activeCluster = null;
+            activeFieldMode = nextFieldMode;
+            hovered = null;
+            tooltip.hidden = true;
+            hideFocusCard();
+            clearHighlightedLines();
+            updateNodeOpacity();
+            refreshFieldInterface();
+            controls.autoRotate = false;
+            moveCameraTo(new THREE.Vector3(0, 0.5, 34), new THREE.Vector3(0, 0, 0), 940, () => {
+              controls.autoRotate = true;
+            }, "orbit", 0.18);
+          };
+
           const updatePointer = (event) => {
             pointer.x = event.clientX / window.innerWidth * 2 - 1;
             pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -665,6 +804,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
 
           reset?.addEventListener("click", resetField);
           closeFocus?.addEventListener("click", closeSelection);
+          fieldModeButtons.forEach((button) => {
+            button.addEventListener("click", () => switchField(button.dataset.fieldMode));
+          });
           controls.addEventListener("start", () => {
             cancelCameraTransition();
             controls.autoRotate = false;
@@ -697,9 +839,11 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           search?.addEventListener("keydown", (event) => {
             if (event.key !== "Enter") return;
             const query = search.value.trim().toLowerCase();
-            const match = data.nodes.find((node) => node.title.toLowerCase().includes(query));
+            const match = activeNodes().find((node) => node.title.toLowerCase().includes(query));
             if (match) showFocus(match.id);
           });
+
+          refreshFieldInterface();
 
           const timer = new THREE.Timer();
           const clusterPosition = new THREE.Vector3();
@@ -712,6 +856,11 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             data.clusters.forEach((cluster) => {
               const element = clusterLabelElements.get(cluster.id);
               if (!element) return;
+              const hasActiveNodes = activeNodes().some((node) => belongsToCluster(node, cluster.id));
+              if (!hasActiveNodes) {
+                element.classList.remove("visible");
+                return;
+              }
               clusterPosition.set(...cluster.center).applyMatrix4(universe.matrixWorld).project(camera);
               const x = (clusterPosition.x * 0.5 + 0.5) * width;
               const y = (-clusterPosition.y * 0.5 + 0.5) * height;
@@ -726,7 +875,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             timer.update();
             const elapsed = timer.getElapsed();
             raycaster.setFromCamera(pointer, camera);
-            const intersections = raycaster.intersectObjects(sprites, false);
+            const intersections = raycaster.intersectObjects(spritesByField.get(activeFieldMode) || [], false);
             const nextHovered = intersections[0]?.object ?? null;
             if (nextHovered !== hovered) {
               hovered = nextHovered;
@@ -764,6 +913,10 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 const targetOpacity = Math.min(1, labelSprite.userData.baseOpacity * hoverBoost);
                 labelSprite.material.opacity += (targetOpacity - labelSprite.material.opacity) * 0.12;
               }
+            });
+
+            edgeFields.forEach((edgeField) => {
+              edgeField.material.opacity += (edgeField.userData.targetOpacity - edgeField.material.opacity) * 0.1;
             });
 
             if (!selected) {
@@ -871,7 +1024,12 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
   .cluster-legend i { width: 0.38rem; height: 0.38rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0.75rem var(--c); }
 
   .field-status { right: 2rem; bottom: 1.75rem; display: flex; align-items: center; gap: 0.8rem; color: #4b626c; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.14em; }
-  .field-status span { padding: 0.35rem 0.48rem; border: 1px solid rgba(255, 190, 114, 0.25); color: #b98d5c; }
+  .field-switch { display: flex; align-items: center; gap: 0.28rem; padding: 0.2rem; border: 1px solid rgba(177, 232, 243, 0.13); background: rgba(3, 10, 15, 0.38); backdrop-filter: blur(14px); }
+  .field-switch button { padding: 0.27rem 0.36rem; border: 0; color: #526a74; background: transparent; font-family: inherit; font-size: inherit; letter-spacing: inherit; cursor: pointer; transition: color 220ms ease, background 220ms ease, text-shadow 220ms ease; }
+  .field-switch button:hover, .field-switch button:focus-visible { color: #dff9fd; outline: none; }
+  .field-switch button[data-field-mode="demo"][aria-pressed="true"] { color: #d0a16b; background: rgba(255, 190, 114, 0.07); text-shadow: 0 0 0.8rem rgba(255, 190, 114, 0.38); }
+  .field-switch button[data-field-mode="personal"][aria-pressed="true"] { color: #a8edf6; background: rgba(111, 232, 255, 0.07); text-shadow: 0 0 0.8rem rgba(111, 232, 255, 0.4); }
+  .field-switch i { width: 1px; height: 0.7rem; background: rgba(177, 232, 243, 0.14); }
   .field-status b { color: #7c959f; font-weight: 400; }
 
   .hover-label { width: min(17rem, calc(100vw - 2rem)); padding: 0.7rem 0.8rem; border-left: 1px solid rgba(152, 234, 248, 0.52); background: rgba(2, 8, 12, 0.68); pointer-events: none; backdrop-filter: blur(12px); }
