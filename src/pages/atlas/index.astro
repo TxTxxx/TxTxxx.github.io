@@ -366,8 +366,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 toneMapped: false
               });
               const labelSprite = new THREE.Sprite(labelMaterial);
-              const labelHeight = 0.52;
-              const offsetY = node.size * 0.42 + 0.28;
+              const labelHeight = 0.26;
+              const offsetY = node.size * 0.18 + 0.12;
               labelSprite.scale.set(labelHeight * labelTexture.aspect, labelHeight, 1);
               labelSprite.position.copy(sprite.position);
               labelSprite.position.y += offsetY;
