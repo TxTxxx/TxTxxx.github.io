@@ -530,11 +530,15 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             controls.enabled = true;
           };
 
-          const moveCameraTo = (position, target, duration = 820, onComplete = null, path = "linear", orbitArc = 0) => {
+          const syncControls = () => {
             const damping = controls.enableDamping;
             controls.enableDamping = false;
             controls.update();
             controls.enableDamping = damping;
+          };
+
+          const moveCameraTo = (position, target, duration = 820, onComplete = null, path = "linear", orbitArc = 0) => {
+            syncControls();
             const fromSpherical = new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target)).makeSafe();
             const toSpherical = new THREE.Spherical().setFromVector3(position.clone().sub(target)).makeSafe();
             const rawThetaDelta = toSpherical.theta - fromSpherical.theta;
@@ -591,8 +595,10 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             updateNodeOpacity(connectedIds(nodeId));
             drawSelectedConnections(nodeId);
             const direction = camera.position.clone().sub(controls.target).normalize();
-            const nodeTarget = sprite.position.clone();
-            moveCameraTo(nodeTarget.clone().add(direction.multiplyScalar(6.5)), nodeTarget, 720);
+            universe.updateMatrixWorld(true);
+            const nodeTarget = new THREE.Vector3();
+            sprite.getWorldPosition(nodeTarget);
+            moveCameraTo(nodeTarget.clone().add(direction.multiplyScalar(6.5)), nodeTarget, 780, null, "orbit", 0.07);
             setText("[data-focus-kind]", node.kind === "personal" ? "PERSONAL / READ SIGNAL" : node.kind === "preview" ? "SIMULATED / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
             setText("[data-focus-title]", node.title);
             setText("[data-focus-year]", node.year ? String(node.year) : "—");
@@ -681,7 +687,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               updateNodeOpacity(clusterIds);
               controls.autoRotate = false;
               clusterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
-              const clusterTarget = new THREE.Vector3(...cluster.center);
+              universe.updateMatrixWorld(true);
+              const clusterTarget = new THREE.Vector3(...cluster.center).applyMatrix4(universe.matrixWorld);
               const direction = camera.position.clone().sub(controls.target).normalize();
               moveCameraTo(clusterTarget.clone().add(direction.multiplyScalar(15)), clusterTarget, 820);
             });
@@ -736,7 +743,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               sprite.material.opacity += (sprite.userData.targetOpacity - sprite.material.opacity) * 0.12;
               const nextScale = sprite.scale.x + (sprite.userData.targetScale - sprite.scale.x) * 0.12;
               sprite.scale.setScalar(nextScale);
-              sprite.position.y = base.y + Math.sin(elapsed * 0.27 + sprite.userData.phase) * 0.035;
+              if (sprite.userData.id !== selected) {
+                sprite.position.y = base.y + Math.sin(elapsed * 0.27 + sprite.userData.phase) * 0.035;
+              }
               if (sprite.userData.ring) {
                 sprite.userData.ring.position.copy(sprite.position);
                 sprite.userData.ring.rotation.z = elapsed * 0.08 + sprite.userData.phase;
@@ -757,8 +766,10 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               }
             });
 
-            universe.rotation.x += ((-pointerTarget.y * 0.025) - universe.rotation.x) * 0.015;
-            universe.rotation.y += ((pointerTarget.x * 0.035) - universe.rotation.y) * 0.015;
+            if (!selected) {
+              universe.rotation.x += ((-pointerTarget.y * 0.025) - universe.rotation.x) * 0.015;
+              universe.rotation.y += ((pointerTarget.x * 0.035) - universe.rotation.y) * 0.015;
+            }
             starField.rotation.y = elapsed * 0.0014;
 
             if (cameraTransition) {
@@ -779,6 +790,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 camera.position.lerpVectors(cameraTransition.fromPosition, cameraTransition.toPosition, eased);
               }
               camera.lookAt(controls.target);
+              syncControls();
               if (progress >= 1) {
                 const completedTransition = cameraTransition;
                 cameraTransition = null;
