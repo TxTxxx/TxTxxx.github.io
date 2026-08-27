@@ -530,14 +530,28 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             controls.enabled = true;
           };
 
-          const moveCameraTo = (position, target, duration = 820, onComplete = null) => {
+          const moveCameraTo = (position, target, duration = 820, onComplete = null, path = "linear", orbitArc = 0) => {
+            const damping = controls.enableDamping;
+            controls.enableDamping = false;
+            controls.update();
+            controls.enableDamping = damping;
+            const fromSpherical = new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target)).makeSafe();
+            const toSpherical = new THREE.Spherical().setFromVector3(position.clone().sub(target)).makeSafe();
+            const rawThetaDelta = toSpherical.theta - fromSpherical.theta;
+            const thetaDelta = Math.atan2(Math.sin(rawThetaDelta), Math.cos(rawThetaDelta));
             cameraTransition = {
               startedAt: performance.now(),
               duration,
+              path,
+              orbitArc,
+              orbitDirection: Math.abs(thetaDelta) < 0.001 ? 1 : Math.sign(thetaDelta),
               fromPosition: camera.position.clone(),
               fromTarget: controls.target.clone(),
               toPosition: position.clone(),
               toTarget: target.clone(),
+              fromSpherical,
+              toSpherical,
+              thetaDelta,
               onComplete
             };
             controls.enabled = false;
@@ -609,9 +623,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             updateNodeOpacity();
             controls.autoRotate = false;
             clusterButtons.forEach((button) => button.setAttribute("aria-pressed", "false"));
-            moveCameraTo(new THREE.Vector3(0, 0.5, 34), new THREE.Vector3(0, 0, 0), 940, () => {
+            moveCameraTo(new THREE.Vector3(0, 0.5, 34), new THREE.Vector3(0, 0, 0), 1080, () => {
               controls.autoRotate = true;
-            });
+            }, "orbit", 0.26);
           };
 
           const updatePointer = (event) => {
@@ -682,6 +696,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
 
           const timer = new THREE.Timer();
           const clusterPosition = new THREE.Vector3();
+          const transitionOffset = new THREE.Vector3();
+          const transitionSpherical = new THREE.Spherical();
 
           const updateLabels = () => {
             const width = window.innerWidth;
@@ -748,13 +764,25 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             if (cameraTransition) {
               const progress = Math.min(1, (performance.now() - cameraTransition.startedAt) / cameraTransition.duration);
               const eased = easeInOutCubic(progress);
-              camera.position.lerpVectors(cameraTransition.fromPosition, cameraTransition.toPosition, eased);
               controls.target.lerpVectors(cameraTransition.fromTarget, cameraTransition.toTarget, eased);
+              if (cameraTransition.path === "orbit") {
+                const theta = cameraTransition.fromSpherical.theta + cameraTransition.thetaDelta * eased +
+                  Math.sin(Math.PI * eased) * cameraTransition.orbitArc * cameraTransition.orbitDirection;
+                transitionSpherical.set(
+                  THREE.MathUtils.lerp(cameraTransition.fromSpherical.radius, cameraTransition.toSpherical.radius, eased),
+                  THREE.MathUtils.lerp(cameraTransition.fromSpherical.phi, cameraTransition.toSpherical.phi, eased),
+                  theta
+                );
+                transitionOffset.setFromSpherical(transitionSpherical);
+                camera.position.copy(controls.target).add(transitionOffset);
+              } else {
+                camera.position.lerpVectors(cameraTransition.fromPosition, cameraTransition.toPosition, eased);
+              }
+              camera.lookAt(controls.target);
               if (progress >= 1) {
                 const completedTransition = cameraTransition;
                 cameraTransition = null;
                 controls.enabled = true;
-                controls.update();
                 completedTransition.onComplete?.();
               }
             } else {
