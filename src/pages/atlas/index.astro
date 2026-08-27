@@ -34,6 +34,14 @@ const titleClosers = [
   "under Distribution Shift", "from Heterogeneous Demonstrations", "with Closed-Loop Reasoning",
   "across Robot Morphologies", "in Unstructured Environments", "via Hierarchical Representation Learning"
 ];
+const clusterLandmarks: Record<string, string[]> = {
+  vla: ["RT-2", "OpenVLA", "π0", "Octo", "RT-X"],
+  world: ["DreamerV3", "Genie 2", "V-JEPA", "GAIA-1", "World Models"],
+  action: ["Diffusion Policy", "ACT", "RDT-1B", "Gato", "VIMA"],
+  reasoning: ["SayCan", "PaLM-E", "Inner Monologue", "ReAct", "VLM-Eval"],
+  data: ["Open X-Embodiment", "DROID", "BridgeData V2", "RoboNet", "RH20T"],
+  evaluation: ["LIBERO", "CALVIN", "SIMPLER", "ManiSkill", "RoboSuite"]
+};
 const clusterCounts = [34, 32, 31, 31, 30, 38];
 const demoNodes: Array<Record<string, unknown>> = [];
 
@@ -43,13 +51,17 @@ clusters.forEach((cluster, clusterIndex) => {
     const x = cluster.center[0] + gaussian() * 2.55 * radialScale;
     const y = cluster.center[1] + gaussian() * 2.05 * radialScale;
     const z = cluster.center[2] + gaussian() * 1.5 * radialScale;
-    const title = index === 0
-      ? `${cluster.label} / FIELD ANCHOR`
+    const displayName = clusterLandmarks[cluster.id]?.[index];
+    const title = displayName
+      ? displayName
       : `${titleOpeners[(index + clusterIndex * 3) % titleOpeners.length]} ${titleClosers[(index * 2 + clusterIndex) % titleClosers.length]}`;
 
     demoNodes.push({
       id: `demo-${cluster.id}-${index}`,
       title,
+      displayName: displayName || title.split(" ").slice(0, 4).join(" "),
+      labelPriority: index < 2 ? 3 : index < 5 ? 2 : index < 10 ? 1 : 0,
+      hasEssay: index === 1 && ["vla", "world", "reasoning"].includes(cluster.id),
       cluster: cluster.id,
       clusterLabel: cluster.label,
       color: cluster.color,
@@ -78,6 +90,9 @@ const previewReadSignals = previewReadTitles.map((title, index) => {
   return {
     id: `preview-read-${index}`,
     title,
+    displayName: ["Embodied Transfer", "Closed-Loop Reasoning", "Open-World Control", "Interaction Data"][index],
+    labelPriority: 4,
+    hasEssay: index === 0 || index === 2,
     cluster: cluster.id,
     clusterLabel: cluster.label,
     color: "#ffffff",
@@ -166,6 +181,12 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           <span>⌕</span>
           <input type="search" placeholder="SEARCH" autocomplete="off" data-atlas-search />
         </label>
+        <div class="label-modes" role="group" aria-label="Label visibility">
+          <span>LABELS</span>
+          <button type="button" data-label-mode="key" aria-pressed="false">KEY</button>
+          <button type="button" data-label-mode="local" aria-pressed="true">LOCAL</button>
+          <button type="button" data-label-mode="all" aria-pressed="false">ALL</button>
+        </div>
         <button type="button" data-reset>RESET</button>
       </div>
 
@@ -177,6 +198,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
         <span>DEMO FIELD</span>
         <b>{nodes.length} NODES</b>
       </div>
+
+      <div class="label-layer" data-label-layer aria-hidden="true"></div>
 
       <div class="hover-label" data-hover-label hidden>
         <span data-hover-index></span>
@@ -218,6 +241,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       const reset = document.querySelector("[data-reset]");
       const closeFocus = document.querySelector("[data-focus-close]");
       const clusterButtons = Array.from(document.querySelectorAll("[data-cluster]"));
+      const labelLayer = document.querySelector("[data-label-layer]");
+      const labelModeButtons = Array.from(document.querySelectorAll("[data-label-mode]"));
       const data = dataElement ? JSON.parse(dataElement.textContent || "{}") : { nodes: [], edges: [], clusters: [] };
       const dataById = new Map(data.nodes.map((node) => [node.id, node]));
       const colorByCluster = new Map(data.clusters.map((cluster) => [cluster.id, cluster.color]));
@@ -357,6 +382,36 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           let focusTarget = null;
           let highlightedLines = null;
           let pointerDown = null;
+          let pointerClient = { x: -1000, y: -1000, active: false };
+          let labelMode = "local";
+
+          const nodeLabelElements = new Map();
+          data.nodes.forEach((node) => {
+            const element = document.createElement("span");
+            element.className = `node-label${node.hasEssay ? " has-essay" : ""}${node.labelPriority >= 3 ? " landmark" : ""}`;
+            element.dataset.nodeLabel = node.id;
+            element.style.setProperty("--label-color", colorByCluster.get(node.cluster) || "#dffbff");
+            const title = document.createElement("b");
+            title.textContent = node.displayName || node.title;
+            element.appendChild(title);
+            if (node.hasEssay) {
+              const essayMark = document.createElement("i");
+              essayMark.textContent = "↗";
+              element.appendChild(essayMark);
+            }
+            labelLayer.appendChild(element);
+            nodeLabelElements.set(node.id, element);
+          });
+
+          const clusterLabelElements = new Map();
+          data.clusters.forEach((cluster) => {
+            const element = document.createElement("span");
+            element.className = "cluster-label";
+            element.textContent = cluster.label;
+            element.style.setProperty("--label-color", cluster.color);
+            labelLayer.appendChild(element);
+            clusterLabelElements.set(cluster.id, element);
+          });
 
           const connectedIds = (nodeId) => {
             const ids = new Set([nodeId]);
@@ -443,6 +498,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
             pointerTarget.x = pointer.x;
             pointerTarget.y = pointer.y;
+            pointerClient = { x: event.clientX, y: event.clientY, active: true };
           };
 
           renderer.domElement.addEventListener("pointermove", (event) => {
@@ -459,13 +515,25 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           });
           renderer.domElement.addEventListener("pointerleave", () => {
             pointer.set(4, 4);
+            pointerClient.active = false;
             hovered = null;
             tooltip.hidden = true;
           });
 
+          const setLabelMode = (mode) => {
+            labelMode = mode;
+            labelModeButtons.forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.labelMode === mode)));
+          };
+          labelModeButtons.forEach((button) => button.addEventListener("click", () => setLabelMode(button.dataset.labelMode || "local")));
+
           reset?.addEventListener("click", resetField);
           closeFocus?.addEventListener("click", resetField);
-          window.addEventListener("keydown", (event) => { if (event.key === "Escape") resetField(); });
+          window.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") resetField();
+            if (event.key.toLowerCase() === "l" && !["INPUT", "TEXTAREA"].includes(document.activeElement?.tagName || "")) {
+              setLabelMode(labelMode === "key" ? "local" : labelMode === "local" ? "all" : "key");
+            }
+          });
 
           clusterButtons.forEach((button) => {
             button.addEventListener("click", () => {
@@ -490,6 +558,84 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           });
 
           const timer = new THREE.Timer();
+          const projected = new THREE.Vector3();
+          const worldPosition = new THREE.Vector3();
+          const clusterPosition = new THREE.Vector3();
+
+          const overlaps = (rect, accepted) => accepted.some((other) => !(
+            rect.right + 5 < other.left || rect.left - 5 > other.right ||
+            rect.bottom + 4 < other.top || rect.top - 4 > other.bottom
+          ));
+
+          const updateLabels = () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const cameraDistance = camera.position.distanceTo(controls.target);
+            const closeView = cameraDistance < 16;
+            const activeConnections = selected ? connectedIds(selected) : null;
+            const candidates = [];
+
+            sprites.forEach((sprite) => {
+              sprite.getWorldPosition(worldPosition);
+              projected.copy(worldPosition).project(camera);
+              if (projected.z < -1 || projected.z > 1) return;
+              const x = (projected.x * 0.5 + 0.5) * width;
+              const y = (-projected.y * 0.5 + 0.5) * height;
+              if (x < 28 || x > width - 28 || y < 56 || y > height - 44) return;
+              const node = sprite.userData;
+              const pointerDistance = pointerClient.active ? Math.hypot(x - pointerClient.x, y - pointerClient.y) : Infinity;
+              const isKey = node.labelPriority >= 3 || node.hasEssay;
+              const isRelated = activeConnections?.has(node.id) || false;
+              const isLocal = labelMode === "local" && pointerDistance < 172;
+              const isClose = labelMode === "local" && closeView && node.labelPriority >= 1;
+              const shouldShow = node.id === selected || isRelated || isKey ||
+                (labelMode === "local" && (isLocal || isClose)) || labelMode === "all";
+              if (!shouldShow) return;
+              const priority = (node.id === selected ? 100 : 0) + (isRelated ? 30 : 0) + node.labelPriority * 8 +
+                (node.hasEssay ? 9 : 0) + (isLocal ? Math.max(0, 12 - pointerDistance / 18) : 0);
+              candidates.push({ node, x, y, priority, pointerDistance });
+            });
+
+            candidates.sort((a, b) => b.priority - a.priority || a.pointerDistance - b.pointerDistance);
+            const accepted = [];
+            const visibleIds = new Set();
+            const maxLabels = labelMode === "key" ? 24 : labelMode === "local" ? (closeView ? 54 : 42) : 92;
+
+            candidates.slice(0, maxLabels * 2).forEach((candidate) => {
+              if (visibleIds.size >= maxLabels) return;
+              const element = nodeLabelElements.get(candidate.node.id);
+              if (!element) return;
+              const name = candidate.node.displayName || candidate.node.title;
+              const labelWidth = Math.min(188, 25 + String(name).length * 6.4 + (candidate.node.hasEssay ? 16 : 0));
+              const rect = { left: candidate.x + 9, right: candidate.x + 9 + labelWidth, top: candidate.y - 10, bottom: candidate.y + 10 };
+              const forced = candidate.node.id === selected;
+              if (!forced && overlaps(rect, accepted)) return;
+              accepted.push(rect);
+              visibleIds.add(candidate.node.id);
+              element.style.transform = `translate3d(${candidate.x + 9}px, ${candidate.y}px, 0)`;
+              element.style.setProperty("--label-opacity", String(
+                candidate.node.id === selected ? 1 : candidate.pointerDistance < 172 ? 0.96 : candidate.node.labelPriority >= 3 ? 0.74 : 0.58
+              ));
+              element.classList.toggle("selected", candidate.node.id === selected);
+              element.classList.add("visible");
+            });
+
+            nodeLabelElements.forEach((element, nodeId) => {
+              if (!visibleIds.has(nodeId)) element.classList.remove("visible", "selected");
+            });
+
+            data.clusters.forEach((cluster) => {
+              const element = clusterLabelElements.get(cluster.id);
+              if (!element) return;
+              clusterPosition.set(...cluster.center).applyMatrix4(universe.matrixWorld).project(camera);
+              const x = (clusterPosition.x * 0.5 + 0.5) * width;
+              const y = (-clusterPosition.y * 0.5 + 0.5) * height;
+              const visible = clusterPosition.z > -1 && clusterPosition.z < 1 && x > 70 && x < width - 70 && y > 85 && y < height - 70;
+              element.classList.toggle("visible", visible);
+              if (visible) element.style.transform = `translate3d(${x}px, ${y - 27}px, 0)`;
+            });
+          };
+
           const animate = () => {
             requestAnimationFrame(animate);
             timer.update();
@@ -525,6 +671,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               controls.target.lerp(focusTarget, 0.065);
             }
             controls.update();
+            updateLabels();
             composer.render();
           };
 
@@ -584,6 +731,23 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
   .atlas-tools button { height: 2.15rem; padding: 0 0.75rem; border: 1px solid rgba(196, 239, 248, 0.16); color: #6f8c96; background: rgba(3, 10, 15, 0.46); font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.54rem; letter-spacing: 0.12em; cursor: pointer; backdrop-filter: blur(14px); }
   .atlas-tools button:hover, .atlas-tools button:focus-visible { border-color: rgba(196, 239, 248, 0.42); color: #e7fbff; }
 
+  .label-modes { display: flex; height: 2.15rem; align-items: center; padding: 0 0.34rem 0 0.68rem; border: 1px solid rgba(196, 239, 248, 0.16); background: rgba(3, 10, 15, 0.46); backdrop-filter: blur(14px); }
+  .label-modes span { margin-right: 0.35rem; color: #4e6974; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.47rem; letter-spacing: 0.12em; }
+  .atlas-tools .label-modes button { height: 1.45rem; padding: 0 0.36rem; border: 0; color: #4f6872; background: transparent; backdrop-filter: none; }
+  .atlas-tools .label-modes button[aria-pressed="true"] { color: #c9f5fb; background: rgba(123, 222, 239, 0.08); }
+
+  .label-layer { position: absolute; z-index: 5; inset: 0; overflow: hidden; pointer-events: none; }
+  .node-label, .cluster-label { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; will-change: transform, opacity; transition: opacity 180ms ease; }
+  .node-label { display: flex; align-items: center; gap: 0.32rem; color: rgba(214, 242, 247, var(--label-opacity, 0.66)); font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.55rem; letter-spacing: 0.025em; transform-origin: left center; }
+  .node-label::before { width: 0.22rem; height: 0.22rem; border-radius: 50%; background: var(--label-color); box-shadow: 0 0 0.6rem var(--label-color); content: ""; opacity: 0.78; }
+  .node-label b { max-width: 12rem; overflow: hidden; font-weight: 400; text-overflow: ellipsis; }
+  .node-label i { color: var(--label-color); font-size: 0.57rem; font-style: normal; text-shadow: 0 0 0.8rem var(--label-color); }
+  .node-label.visible, .cluster-label.visible { opacity: 1; }
+  .node-label.landmark { font-size: 0.59rem; letter-spacing: 0.045em; }
+  .node-label.has-essay { color: rgba(235, 253, 255, var(--label-opacity, 0.86)); }
+  .node-label.selected { color: #fff; font-size: 0.67rem; text-shadow: 0 0 1rem rgba(165, 239, 249, 0.5); }
+  .cluster-label { color: var(--label-color); font-family: "Helvetica Neue", "Avenir Next", sans-serif; font-size: clamp(0.63rem, 0.8vw, 0.76rem); font-weight: 300; letter-spacing: 0.24em; text-shadow: 0 0 1.4rem color-mix(in srgb, var(--label-color) 62%, transparent); transform-origin: center bottom; }
+
   .cluster-legend { left: 2rem; bottom: 1.75rem; display: flex; gap: 0.4rem 1.1rem; flex-wrap: wrap; max-width: 42rem; }
   .cluster-legend button { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0; border: 0; color: #607984; background: transparent; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.11em; cursor: pointer; }
   .cluster-legend button:hover, .cluster-legend button:focus-visible { color: #d9f8fd; outline: none; }
@@ -618,11 +782,16 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
     .atlas-mark { left: 1rem; top: 1rem; }
     .atlas-tools { right: 1rem; top: 1rem; }
     .atlas-search { display: none; }
+    .label-modes { padding-left: 0.4rem; }
+    .label-modes span, .atlas-tools .label-modes button[data-label-mode="all"] { display: none; }
+    .atlas-tools .label-modes button { padding: 0 0.3rem; }
     .cluster-legend { left: 1rem; right: 1rem; bottom: 1rem; max-width: none; gap: 0.45rem 0.8rem; }
     .cluster-legend button { font-size: 0.43rem; }
     .field-status { right: 1rem; bottom: auto; top: 4.2rem; }
     .field-status b { display: none; }
     .focus-card { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); transform: none; }
     .vignette { box-shadow: inset 0 0 5rem 1rem rgba(0, 0, 0, 0.72); }
+    .node-label { font-size: 0.5rem; }
+    .cluster-label { font-size: 0.58rem; }
   }
 </style>
