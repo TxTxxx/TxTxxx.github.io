@@ -1,0 +1,20 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import PaperDeepDive from "../../../components/PaperDeepDive.astro";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("paperDeepDives", ({ data }) => !data.draft);
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry }
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<"paperDeepDives">;
+}
+
+const { entry } = Astro.props;
+---
+
+<PaperDeepDive entry={entry} />

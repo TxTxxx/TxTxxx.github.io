@@ -1,0 +1,116 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+
+const entries = (await getCollection("paperDeepDives", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+---
+
+<BaseLayout
+  title="今日主推归档 | Paper Radar"
+  description="VLA、World Model 与 WAM 今日主推论文的初读导览"
+  pathname="/papers"
+  canonicalPath="/papers/deep-dive/"
+>
+  <header class="archive-hero">
+    <a href="/papers/">← 返回每日论文雷达</a>
+    <div class="eyebrow">Paper Radar · Deep dives</div>
+    <h1>今日主推归档</h1>
+    <p>每期只展开一篇：方法图、关键实验、可信边界和原文阅读路线。</p>
+  </header>
+
+  <section class="deep-archive">
+    {entries.map((entry) => (
+      <a class="deep-card" href={`/papers/deep-dive/${entry.id}/`}>
+        <img src={entry.data.hero_image} alt={entry.data.hero_alt} />
+        <div>
+          <span>{entry.data.date.toISOString().slice(0, 10)} · {entry.data.reading_time}</span>
+          <h2>{entry.data.title}</h2>
+          <p>{entry.data.paper_title}</p>
+        </div>
+      </a>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .archive-hero {
+    max-width: 50rem;
+  }
+
+  .archive-hero > a {
+    display: inline-flex;
+    margin-bottom: 2rem;
+    color: var(--muted);
+  }
+
+  .archive-hero h1 {
+    margin: 0.5rem 0 0.8rem;
+    font-family: var(--serif);
+    font-size: clamp(3rem, 7vw, 5.6rem);
+    line-height: 0.95;
+  }
+
+  .archive-hero p {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .deep-archive {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .deep-card {
+    display: grid;
+    grid-template-columns: minmax(16rem, 0.8fr) minmax(0, 1.2fr);
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 1.6rem;
+    background: var(--bg-elevated);
+    box-shadow: 0 16px 38px rgba(33, 26, 15, 0.07);
+    transition: transform 180ms ease, border-color 180ms ease;
+  }
+
+  .deep-card:hover,
+  .deep-card:focus-visible {
+    transform: translateY(-3px);
+    border-color: rgba(178, 76, 44, 0.34);
+  }
+
+  .deep-card img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 1rem;
+    background: #fff;
+  }
+
+  .deep-card span {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+  }
+
+  .deep-card h2 {
+    margin: 0.55rem 0;
+    font-family: var(--serif);
+    font-size: clamp(1.7rem, 4vw, 2.7rem);
+  }
+
+  .deep-card p {
+    margin: 0;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  @media (max-width: 720px) {
+    .deep-card {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

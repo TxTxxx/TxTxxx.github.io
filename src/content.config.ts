@@ -30,4 +30,23 @@ const paperRadar = defineCollection({
   })
 });
 
-export const collections = { blog, paperRadar };
+const paperDeepDives = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/paper-deep-dives" }),
+  schema: z.object({
+    title: z.string(),
+    paper_title: z.string(),
+    date: z.coerce.date(),
+    authors: z.string(),
+    institutions: z.string(),
+    venue: z.string(),
+    summary: z.string(),
+    reading_time: z.string(),
+    paper_url: z.string().url(),
+    project_url: z.string().url().optional(),
+    hero_image: z.string(),
+    hero_alt: z.string(),
+    draft: z.boolean().default(false)
+  })
+});
+
+export const collections = { blog, paperRadar, paperDeepDives };

@@ -294,6 +294,26 @@ const formatDate = (date: Date) =>
     line-height: 1.65;
   }
 
+  .edition-copy :global(.deep-dive-link) {
+    margin: -0.35rem 0 1.5rem;
+  }
+
+  .edition-copy :global(.deep-dive-link a) {
+    display: inline-flex;
+    padding: 0.75rem 1rem;
+    border-radius: 999px;
+    background: var(--text);
+    color: #fff8f0;
+    font-weight: 700;
+    transition: transform 180ms ease, opacity 180ms ease;
+  }
+
+  .edition-copy :global(.deep-dive-link a:hover),
+  .edition-copy :global(.deep-dive-link a:focus-visible) {
+    transform: translateY(-2px);
+    opacity: 0.9;
+  }
+
   .edition-copy :global(.brief-grid) {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));

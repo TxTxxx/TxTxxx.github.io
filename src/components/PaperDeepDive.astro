@@ -1,0 +1,374 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+  entry: CollectionEntry<"paperDeepDives">;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const editionDate = entry.data.date.toISOString().slice(0, 10);
+const canonicalPath = `/papers/deep-dive/${entry.id}/`;
+const formattedDate = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "Asia/Shanghai"
+}).format(entry.data.date);
+---
+
+<BaseLayout
+  title={`${entry.data.title} | Paper Radar`}
+  description={entry.data.summary}
+  pathname="/papers"
+  canonicalPath={canonicalPath}
+  image={entry.data.hero_image}
+>
+  <header class="deep-hero">
+    <a class="back-link" href="/papers/">← 返回今日论文雷达</a>
+    <div class="deep-label">TODAY'S DEEP DIVE · {entry.data.venue}</div>
+    <h1>{entry.data.title}</h1>
+    <p class="paper-title">{entry.data.paper_title}</p>
+    <p class="hero-summary">{entry.data.summary}</p>
+    <div class="hero-meta">
+      <time datetime={editionDate}>{formattedDate}</time>
+      <span>{entry.data.reading_time}</span>
+      <span>{entry.data.authors}</span>
+      <span>{entry.data.institutions}</span>
+    </div>
+    <div class="source-actions">
+      <a class="button-link" href={entry.data.paper_url} target="_blank" rel="noreferrer">打开原论文 PDF</a>
+      {entry.data.project_url && (
+        <a class="button-link ghost" href={entry.data.project_url} target="_blank" rel="noreferrer">项目主页</a>
+      )}
+    </div>
+  </header>
+
+  <div class="deep-layout">
+    <aside class="deep-nav">
+      <div class="eyebrow">阅读路线</div>
+      <nav aria-label="主推导读目录">
+        <a href="#verdict">30 秒判断</a>
+        <a href="#problem">它解决什么</a>
+        <a href="#method">方法怎么工作</a>
+        <a href="#evidence">证据是否够硬</a>
+        <a href="#limits">可信边界</a>
+        <a href="#reading">如何读原文</a>
+      </nav>
+      <p>页面中的论文图片均标注 Figure 编号、PDF 页码和原始来源。</p>
+    </aside>
+
+    <article class="deep-copy">
+      <Content />
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .deep-hero {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.7rem, 5vw, 4rem);
+    border: 1px solid var(--line);
+    border-radius: 2.2rem;
+    background:
+      radial-gradient(circle at 85% 15%, rgba(178, 76, 44, 0.2), transparent 18rem),
+      linear-gradient(145deg, rgba(255, 252, 245, 0.94), rgba(247, 236, 220, 0.82));
+    box-shadow: var(--shadow);
+  }
+
+  .back-link {
+    display: inline-flex;
+    margin-bottom: 2.2rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .back-link:hover,
+  .back-link:focus-visible {
+    color: var(--accent);
+  }
+
+  .deep-label {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+  }
+
+  .deep-hero h1 {
+    max-width: 12ch;
+    margin: 0.65rem 0 0.75rem;
+    font-family: var(--serif);
+    font-size: clamp(3rem, 7vw, 6.2rem);
+    font-weight: 600;
+    line-height: 0.92;
+  }
+
+  .paper-title {
+    max-width: 54rem;
+    margin: 0;
+    color: var(--muted);
+    font-family: var(--serif);
+    font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+    line-height: 1.45;
+  }
+
+  .hero-summary {
+    max-width: 46rem;
+    margin: 1.6rem 0 0;
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-size: 0.84rem;
+  }
+
+  .hero-meta span:not(:last-child)::after,
+  .hero-meta time::after {
+    content: "·";
+    margin-left: 0.55rem;
+    color: rgba(31, 30, 26, 0.28);
+  }
+
+  .source-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 1.7rem;
+  }
+
+  .deep-layout {
+    display: grid;
+    grid-template-columns: 13rem minmax(0, 1fr);
+    gap: clamp(2rem, 6vw, 5rem);
+    align-items: start;
+    max-width: 66rem;
+    margin: 3rem auto 0;
+  }
+
+  .deep-nav {
+    position: sticky;
+    top: 6.5rem;
+    padding: 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: 1.2rem;
+    background: rgba(255, 252, 245, 0.68);
+  }
+
+  .deep-nav nav {
+    display: grid;
+    gap: 0.25rem;
+    margin-top: 0.8rem;
+  }
+
+  .deep-nav nav a {
+    padding: 0.45rem 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .deep-nav nav a:hover,
+  .deep-nav nav a:focus-visible {
+    color: var(--accent);
+  }
+
+  .deep-nav p {
+    margin: 1rem 0 0;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.75rem;
+    line-height: 1.55;
+  }
+
+  .deep-copy {
+    min-width: 0;
+  }
+
+  .deep-copy :global(.deep-section) {
+    scroll-margin-top: 7rem;
+    margin: 0 0 4rem;
+  }
+
+  .deep-copy :global(.section-index) {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+
+  .deep-copy :global(h2) {
+    margin: 0.45rem 0 1rem;
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 600;
+    line-height: 1.08;
+  }
+
+  .deep-copy :global(h3) {
+    margin: 1.8rem 0 0.55rem;
+    font-family: var(--serif);
+    font-size: 1.45rem;
+  }
+
+  .deep-copy :global(p),
+  .deep-copy :global(li) {
+    line-height: 1.85;
+  }
+
+  .deep-copy :global(.verdict-box) {
+    padding: 1.35rem 1.5rem;
+    border: 1px solid rgba(178, 76, 44, 0.24);
+    border-radius: 1.3rem;
+    background: linear-gradient(145deg, rgba(178, 76, 44, 0.1), rgba(255, 252, 245, 0.8));
+  }
+
+  .deep-copy :global(.verdict-box strong) {
+    display: block;
+    margin-bottom: 0.45rem;
+    color: var(--accent);
+    font-family: var(--serif);
+    font-size: 1.3rem;
+  }
+
+  .deep-copy :global(.verdict-box p) {
+    margin: 0;
+  }
+
+  .deep-copy :global(.question-grid),
+  .deep-copy :global(.mechanism-grid),
+  .deep-copy :global(.metric-grid) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+    margin-top: 1.2rem;
+  }
+
+  .deep-copy :global(.question-grid > div),
+  .deep-copy :global(.mechanism-grid > div),
+  .deep-copy :global(.metric-grid > div) {
+    padding: 1rem;
+    border: 1px solid var(--line);
+    border-radius: 1.1rem;
+    background: rgba(255, 252, 245, 0.68);
+  }
+
+  .deep-copy :global(.question-grid strong),
+  .deep-copy :global(.mechanism-grid strong),
+  .deep-copy :global(.metric-grid strong) {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--accent);
+  }
+
+  .deep-copy :global(.question-grid p),
+  .deep-copy :global(.mechanism-grid p),
+  .deep-copy :global(.metric-grid p) {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .deep-copy :global(.paper-figure) {
+    margin: 1.7rem 0;
+    padding: 0.8rem;
+    border: 1px solid var(--line);
+    border-radius: 1.3rem;
+    background: #fff;
+    box-shadow: 0 16px 38px rgba(33, 26, 15, 0.08);
+  }
+
+  .deep-copy :global(.paper-figure img) {
+    width: 100%;
+    border-radius: 0.8rem;
+  }
+
+  .deep-copy :global(.paper-figure figcaption) {
+    padding: 0.85rem 0.25rem 0.15rem;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .deep-copy :global(.paper-figure figcaption a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.16em;
+  }
+
+  .deep-copy :global(.signal-note) {
+    padding: 1rem 1.15rem;
+    border-left: 0.28rem solid var(--accent);
+    border-radius: 0 1rem 1rem 0;
+    background: rgba(255, 252, 245, 0.72);
+  }
+
+  .deep-copy :global(.signal-note p) {
+    margin: 0;
+  }
+
+  .deep-copy :global(.reading-list) {
+    display: grid;
+    gap: 0.75rem;
+    padding: 0;
+    list-style: none;
+    counter-reset: reading-step;
+  }
+
+  .deep-copy :global(.reading-list li) {
+    counter-increment: reading-step;
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: start;
+  }
+
+  .deep-copy :global(.reading-list li::before) {
+    content: counter(reading-step, decimal-leading-zero);
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .deep-copy :global(.source-list) {
+    display: grid;
+    gap: 0.6rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .deep-copy :global(.source-list a) {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+
+  @media (max-width: 850px) {
+    .deep-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .deep-nav {
+      position: static;
+    }
+
+    .deep-nav nav {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .deep-copy :global(.question-grid),
+    .deep-copy :global(.mechanism-grid),
+    .deep-copy :global(.metric-grid) {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

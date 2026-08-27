@@ -8,14 +8,21 @@ interface Props {
   description?: string;
   variant?: "blog" | "academic";
   pathname?: string;
+  canonicalPath?: string;
+  image?: string;
 }
 
 const {
   title = siteMeta.title,
   description = siteMeta.description,
   variant = "blog",
-  pathname = Astro.url.pathname
+  pathname = Astro.url.pathname,
+  canonicalPath = pathname,
+  image
 } = Astro.props;
+
+const canonicalUrl = new URL(canonicalPath, Astro.site);
+const imageUrl = image ? new URL(image, Astro.site) : undefined;
 
 const navItems = [
   { href: "/", label: "Blog" },
@@ -32,6 +39,16 @@ const navItems = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    {imageUrl && <meta property="og:image" content={imageUrl} />}
+    <meta name="twitter:card" content={imageUrl ? "summary_large_image" : "summary"} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    {imageUrl && <meta name="twitter:image" content={imageUrl} />}
   </head>
   <body class:list={["site-root", "blog-surface", variant === "academic" ? "academic-content" : undefined]}>
     <header class="site-header">
