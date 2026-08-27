@@ -375,6 +375,17 @@ const graph = {
   edges
 };
 
+try {
+  const previousGraph = JSON.parse(await fs.readFile(outputPath, "utf8"));
+  const previousComparable = { ...previousGraph, generatedAt: "" };
+  const nextComparable = { ...graph, generatedAt: "" };
+  if (JSON.stringify(previousComparable) === JSON.stringify(nextComparable)) {
+    graph.generatedAt = previousGraph.generatedAt;
+  }
+} catch {
+  // The first export has no previous snapshot to compare against.
+}
+
 await fs.mkdir(path.dirname(outputPath), { recursive: true });
 await fs.writeFile(outputPath, `${JSON.stringify(graph, null, 2)}\n`, "utf8");
 console.log(`Research graph: ${nodes.length} nodes, ${edges.length} connections → ${outputPath}`);

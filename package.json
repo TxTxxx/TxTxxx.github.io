@@ -7,7 +7,8 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "sync:research": "node scripts/export-research-vault.mjs"
+    "sync:research": "node scripts/export-research-vault.mjs",
+    "atlas:publish": "node scripts/publish-research-atlas.mjs"
   },
   "repository": {
     "type": "git",
