@@ -270,6 +270,32 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
         return texture;
       };
 
+      const makeLabelTexture = (label, glowColor) => {
+        const probe = document.createElement("canvas");
+        const probeContext = probe.getContext("2d");
+        const font = '500 54px "SFMono-Regular", Menlo, Consolas, monospace';
+        probeContext.font = font;
+        const width = Math.ceil(Math.min(720, Math.max(150, probeContext.measureText(label).width + 68)));
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = 96;
+        const context = canvas.getContext("2d");
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.font = font;
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.shadowColor = glowColor;
+        context.shadowBlur = 18;
+        context.fillStyle = "rgba(238, 253, 255, 0.96)";
+        context.fillText(label, canvas.width / 2, canvas.height / 2 + 1);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.minFilter = THREE.LinearFilter;
+        texture.magFilter = THREE.LinearFilter;
+        texture.generateMipmaps = false;
+        return { texture, aspect: canvas.width / canvas.height };
+      };
+
       if (atlas && mount && data.nodes.length) {
         try {
           const scene = new THREE.Scene();
@@ -314,7 +340,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               map: glowTexture,
               color: new THREE.Color(node.color),
               transparent: true,
-              opacity: node.kind === "personal" ? 1 : 0.66,
+              opacity: node.kind === "personal" ? 1 : node.atlasLabel ? 0.8 : 0.66,
               blending: THREE.AdditiveBlending,
               depthWrite: false
             });
@@ -325,6 +351,31 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             universe.add(sprite);
             sprites.push(sprite);
             spriteById.set(node.id, sprite);
+
+            if (node.atlasLabel) {
+              const labelTexture = makeLabelTexture(node.atlasLabel, node.color);
+              const labelMaterial = new THREE.SpriteMaterial({
+                map: labelTexture.texture,
+                color: new THREE.Color(node.color).lerp(new THREE.Color("#ffffff"), 0.58),
+                transparent: true,
+                opacity: 0.62,
+                blending: THREE.AdditiveBlending,
+                depthTest: true,
+                depthWrite: false,
+                fog: true,
+                toneMapped: false
+              });
+              const labelSprite = new THREE.Sprite(labelMaterial);
+              const labelHeight = 0.76;
+              const offsetY = node.size * 0.5 + 0.5;
+              labelSprite.scale.set(labelHeight * labelTexture.aspect, labelHeight, 1);
+              labelSprite.position.copy(sprite.position);
+              labelSprite.position.y += offsetY;
+              labelSprite.renderOrder = 3;
+              labelSprite.userData = { parentNode: node.id, offsetY, baseOpacity: 0.62 };
+              universe.add(labelSprite);
+              sprite.userData.labelSprite = labelSprite;
+            }
 
             if (node.kind === "personal" || node.kind === "preview") {
               const ringMaterial = new THREE.MeshBasicMaterial({
@@ -383,19 +434,6 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           let highlightedLines = null;
           let pointerDown = null;
 
-          const nodeLabelElements = new Map();
-          data.nodes.filter((node) => node.atlasLabel).forEach((node) => {
-            const element = document.createElement("span");
-            element.className = `node-label${node.hasEssay ? " has-essay" : ""}`;
-            element.dataset.nodeLabel = node.id;
-            element.style.setProperty("--label-color", colorByCluster.get(node.cluster) || "#dffbff");
-            const title = document.createElement("b");
-            title.textContent = node.atlasLabel;
-            element.appendChild(title);
-            labelLayer.appendChild(element);
-            nodeLabelElements.set(node.id, element);
-          });
-
           const clusterLabelElements = new Map();
           data.clusters.forEach((cluster) => {
             const element = document.createElement("span");
@@ -418,10 +456,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const updateNodeOpacity = (activeIds = null) => {
             sprites.forEach((sprite) => {
               const isActive = !activeIds || activeIds.has(sprite.userData.id);
-              sprite.material.opacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 1 : 0.72) : 0.055;
+              sprite.material.opacity = isActive ? (["personal", "preview"].includes(sprite.userData.kind) ? 1 : sprite.userData.atlasLabel ? 0.82 : 0.72) : 0.055;
               const scale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.42 : 1);
               sprite.scale.setScalar(scale);
               if (sprite.userData.ring) sprite.userData.ring.material.opacity = isActive ? 0.46 : 0.04;
+              if (sprite.userData.labelSprite) {
+                sprite.userData.labelSprite.userData.baseOpacity = isActive ? (sprite.userData.id === selected ? 0.96 : 0.62) : 0.025;
+              }
             });
           };
 
@@ -538,58 +579,11 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           });
 
           const timer = new THREE.Timer();
-          const projected = new THREE.Vector3();
-          const worldPosition = new THREE.Vector3();
           const clusterPosition = new THREE.Vector3();
-
-          const overlaps = (rect, accepted) => accepted.some((other) => !(
-            rect.right + 5 < other.left || rect.left - 5 > other.right ||
-            rect.bottom + 4 < other.top || rect.top - 4 > other.bottom
-          ));
 
           const updateLabels = () => {
             const width = window.innerWidth;
             const height = window.innerHeight;
-            const candidates = [];
-
-            sprites.forEach((sprite) => {
-              if (!sprite.userData.atlasLabel) return;
-              sprite.getWorldPosition(worldPosition);
-              projected.copy(worldPosition).project(camera);
-              if (projected.z < -1 || projected.z > 1) return;
-              const x = (projected.x * 0.5 + 0.5) * width;
-              const y = (-projected.y * 0.5 + 0.5) * height;
-              if (x < 28 || x > width - 28 || y < 56 || y > height - 44) return;
-              const node = sprite.userData;
-              const priority = (node.id === selected ? 100 : 0) + (node.hasEssay ? 9 : 0);
-              candidates.push({ node, x, y, priority });
-            });
-
-            candidates.sort((a, b) => b.priority - a.priority);
-            const accepted = [];
-            const visibleIds = new Set();
-            const maxLabels = 24;
-
-            candidates.slice(0, maxLabels * 2).forEach((candidate) => {
-              if (visibleIds.size >= maxLabels) return;
-              const element = nodeLabelElements.get(candidate.node.id);
-              if (!element) return;
-              const labelWidth = Math.min(96, 18 + String(candidate.node.atlasLabel).length * 6.4);
-              const rect = { left: candidate.x + 9, right: candidate.x + 9 + labelWidth, top: candidate.y - 10, bottom: candidate.y + 10 };
-              const forced = candidate.node.id === selected;
-              if (!forced && overlaps(rect, accepted)) return;
-              accepted.push(rect);
-              visibleIds.add(candidate.node.id);
-              element.style.transform = `translate3d(${candidate.x + 9}px, ${candidate.y}px, 0)`;
-              element.style.setProperty("--label-opacity", candidate.node.id === selected ? "1" : "0.72");
-              element.classList.toggle("selected", candidate.node.id === selected);
-              element.classList.add("visible");
-            });
-
-            nodeLabelElements.forEach((element, nodeId) => {
-              if (!visibleIds.has(nodeId)) element.classList.remove("visible", "selected");
-            });
-
             data.clusters.forEach((cluster) => {
               const element = clusterLabelElements.get(cluster.id);
               if (!element) return;
@@ -625,6 +619,14 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               if (sprite.userData.ring) {
                 sprite.userData.ring.position.copy(sprite.position);
                 sprite.userData.ring.rotation.z = elapsed * 0.08 + sprite.userData.phase;
+              }
+              if (sprite.userData.labelSprite) {
+                const labelSprite = sprite.userData.labelSprite;
+                labelSprite.position.copy(sprite.position);
+                labelSprite.position.y += labelSprite.userData.offsetY;
+                const hoverBoost = hovered === sprite ? 1.46 : 1;
+                const targetOpacity = Math.min(1, labelSprite.userData.baseOpacity * hoverBoost);
+                labelSprite.material.opacity += (targetOpacity - labelSprite.material.opacity) * 0.12;
               }
             });
 
@@ -698,13 +700,8 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
   .atlas-tools button:hover, .atlas-tools button:focus-visible { border-color: rgba(196, 239, 248, 0.42); color: #e7fbff; }
 
   .label-layer { position: absolute; z-index: 5; inset: 0; overflow: hidden; pointer-events: none; }
-  :global(.node-label), :global(.cluster-label) { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; will-change: transform, opacity; transition: opacity 180ms ease; }
-  :global(.node-label) { display: flex; align-items: center; gap: 0.32rem; color: rgba(214, 242, 247, var(--label-opacity, 0.66)); font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.55rem; letter-spacing: 0.025em; transform-origin: left center; }
-  :global(.node-label)::before { width: 0.22rem; height: 0.22rem; border-radius: 50%; background: var(--label-color); box-shadow: 0 0 0.6rem var(--label-color); content: ""; opacity: 0.78; }
-  :global(.node-label b) { max-width: 12rem; overflow: hidden; font-weight: 400; text-overflow: ellipsis; }
-  :global(.node-label.visible), :global(.cluster-label.visible) { opacity: 1; }
-  :global(.node-label.has-essay) { color: rgba(235, 253, 255, var(--label-opacity, 0.86)); }
-  :global(.node-label.selected) { color: #fff; font-size: 0.67rem; text-shadow: 0 0 1rem rgba(165, 239, 249, 0.5); }
+  :global(.cluster-label) { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; will-change: transform, opacity; transition: opacity 180ms ease; }
+  :global(.cluster-label.visible) { opacity: 1; }
   :global(.cluster-label) { color: var(--label-color); font-family: "Helvetica Neue", "Avenir Next", sans-serif; font-size: clamp(0.63rem, 0.8vw, 0.76rem); font-weight: 300; letter-spacing: 0.24em; text-shadow: 0 0 1.4rem color-mix(in srgb, var(--label-color) 62%, transparent); transform-origin: center bottom; }
 
   .cluster-legend { left: 2rem; bottom: 1.75rem; display: flex; gap: 0.4rem 1.1rem; flex-wrap: wrap; max-width: 42rem; }
@@ -747,7 +744,6 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
     .field-status b { display: none; }
     .focus-card { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); transform: none; }
     .vignette { box-shadow: inset 0 0 5rem 1rem rgba(0, 0, 0, 0.72); }
-    :global(.node-label) { font-size: 0.5rem; }
     :global(.cluster-label) { font-size: 0.58rem; }
   }
 </style>
