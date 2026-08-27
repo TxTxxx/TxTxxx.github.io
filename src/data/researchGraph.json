@@ -1,0 +1,756 @@
+{
+  "generatedAt": "2026-08-27T07:19:19.013Z",
+  "source": "Obsidian Vault · privacy-filtered metadata snapshot",
+  "stats": {
+    "nodes": 27,
+    "papers": 4,
+    "concepts": 1,
+    "fields": 1,
+    "fragments": 21,
+    "connections": 23,
+    "evidenceSignals": 21
+  },
+  "nodes": [
+    {
+      "id": "field-e8aefa3d89",
+      "path": "10 领域/具身智能与 VLA",
+      "title": "具身智能与 VLA",
+      "type": "field",
+      "citekey": "",
+      "status": "developing",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai",
+        "vla"
+      ],
+      "created": "2026-08-26",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 44,
+      "evidenceCount": 0,
+      "maturity": 100
+    },
+    {
+      "id": "paper-87c0882e55",
+      "path": "20 论文/blackP05VisionLanguageActionModel",
+      "title": "π0.5: a Vision-Language-Action Model with Open-World Generalization",
+      "type": "paper",
+      "citekey": "blackP05VisionLanguageActionModel",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": 2025,
+      "authors": "Kevin Black, Noah Brown, James Darpinian, Karan Dhabalia, Danny Driess, Adnan Esmail, Michael Equi, Chelsea Finn, Niccolo Fusai, Manuel Y Galliker, Dibya Ghosh, Lachy Groom, Karol Hausman, Brian Ichter, Szymon Jakubczak, Tim Jones, Liyiming Ke, Devin LeBlanc, Sergey Levine, Adrian Li-Bell, Mohith Mothukuri, Suraj Nair, Karl Pertsch, Allen Z Ren, Lucy Xiaoyang Shi, Laura Smith, Jost Tobias Springenberg, Kyle Stachowicz, James Tanner, Quan Vuong, Homer Walke, Anna Walling, Haohuan Wang, Lili Yu, Ury Zhilinsky",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-08-26",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2504.16054",
+      "sourceUrl": "https://arxiv.org/abs/2504.16054",
+      "zoteroUri": "zotero://select/library/items/ITSIWBDA",
+      "noteDensity": 18,
+      "evidenceCount": 0,
+      "maturity": 47
+    },
+    {
+      "id": "paper-e943cce3a1",
+      "path": "20 论文/chenSteerableVisionLanguageActionPolicies2026",
+      "title": "Steerable Vision-Language-Action Policies for Embodied Reasoning and Hierarchical Control",
+      "type": "paper",
+      "citekey": "chenSteerableVisionLanguageActionPolicies2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "方法",
+      "year": 2026,
+      "authors": "William Chen, Jagdeep Singh Bhatia, Catherine Glossop, Nikhil Mathihalli, Ria Doshi, Andy Tang, Danny Driess, Karl Pertsch, Sergey Levine",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-08-26",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "https://arxiv.org/abs/2602.13193v3",
+      "zoteroUri": "zotero://select/library/items/GNUVIYID",
+      "noteDensity": 31,
+      "evidenceCount": 10,
+      "maturity": 81
+    },
+    {
+      "id": "paper-8bad68c87a",
+      "path": "20 论文/kimOpenVLAOpenSourceVisionLanguageAction2024",
+      "title": "OpenVLA: An Open-Source Vision-Language-Action Model",
+      "type": "paper",
+      "citekey": "kimOpenVLAOpenSourceVisionLanguageAction2024",
+      "status": "inbox",
+      "readingLevel": "deep",
+      "paperRole": "基础模型",
+      "year": 2024,
+      "authors": "Moo Jin Kim, Karl Pertsch, Siddharth Karamcheti, Ted Xiao, Ashwin Balakrishna, Suraj Nair, Rafael Rafailov, Ethan Foster, Grace Lam, Pannag Sanketi, Quan Vuong, Thomas Kollar, Benjamin Burchfiel, Russ Tedrake, Dorsa Sadigh, Sergey Levine, Percy Liang, Chelsea Finn",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-08-26",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2406.09246",
+      "sourceUrl": "http://arxiv.org/abs/2406.09246",
+      "zoteroUri": "zotero://select/library/items/QWBLPCWX",
+      "noteDensity": 31,
+      "evidenceCount": 9,
+      "maturity": 91
+    },
+    {
+      "id": "paper-e73f5eec2a",
+      "path": "20 论文/wuPragmaticVLAFoundation2026",
+      "title": "A Pragmatic VLA Foundation Model",
+      "type": "paper",
+      "citekey": "wuPragmaticVLAFoundation2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": 2026,
+      "authors": "Wei Wu, Fan Lu, Yunnan Wang, Shuai Yang, Shi Liu, Fangjing Wang, Qian Zhu, He Sun, Yong Wang, Shuailei Ma, Yiyu Ren, Kejia Zhang, Hui Yu, Jingmei Zhao, Shuai Zhou, Zhenqi Qiu, Houlong Xiong, Ziyu Wang, Zechen Wang, Ran Cheng, Yong-Lu Li, Yongtao Huang, Xing Zhu, Yujun Shen, Kecheng Zheng",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-08-26",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2601.18692",
+      "sourceUrl": "http://arxiv.org/abs/2601.18692",
+      "zoteroUri": "zotero://select/library/items/KC7GZU4H",
+      "noteDensity": 18,
+      "evidenceCount": 2,
+      "maturity": 49
+    },
+    {
+      "id": "concept-facd23940b",
+      "path": "30 概念/Action Chunk 与重规划边界",
+      "title": "Action Chunk 与重规划边界",
+      "type": "concept",
+      "citekey": "",
+      "status": "developing",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "action-chunking",
+        "replanning",
+        "vla"
+      ],
+      "created": "2026-08-26",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 12,
+      "evidenceCount": 0,
+      "maturity": 64
+    },
+    {
+      "id": "fragment-261580d716",
+      "path": "embodied intelligence/B-Spline Policy",
+      "title": "B-Spline Policy",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-d471107842",
+      "path": "embodied intelligence/BCP：学习“当前动作序列应该执行到哪里，然后重新看一眼并规划",
+      "title": "BCP：学习“当前动作序列应该执行到哪里，然后重新看一眼并规划",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 9,
+      "evidenceCount": 0,
+      "maturity": 37
+    },
+    {
+      "id": "fragment-80e666cd56",
+      "path": "embodied intelligence/DeVA(世界模型的动作模型的解耦)",
+      "title": "DeVA(世界模型的动作模型的解耦)",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-b38037ee1a",
+      "path": "embodied intelligence/Dreamer",
+      "title": "Dreamer",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-40bdb0478f",
+      "path": "embodied intelligence/EgoWAM",
+      "title": "EgoWAM",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-75f486c5bc",
+      "path": "embodied intelligence/Ego数据（天蓝具身智能      ）",
+      "title": "Ego数据（天蓝具身智能      ）",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-440b5c8dcc",
+      "path": "embodied intelligence/ICRA WBCD分享（总结与反思）",
+      "title": "ICRA WBCD分享（总结与反思）",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-3bfc862eb8",
+      "path": "embodied intelligence/INTACT",
+      "title": "INTACT",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-4a5743d321",
+      "path": "embodied intelligence/JEPA",
+      "title": "JEPA",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-26d5a0b79c",
+      "path": "embodied intelligence/MuJoCo，Gazebo，Isaac sim，Issac Lab",
+      "title": "MuJoCo，Gazebo，Isaac sim，Issac Lab",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-8172f88994",
+      "path": "embodied intelligence/Patch Policy",
+      "title": "Patch Policy",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 8,
+      "evidenceCount": 0,
+      "maturity": 36
+    },
+    {
+      "id": "fragment-cf74ba3ebd",
+      "path": "embodied intelligence/RL-2-VLA：VLA可能失败时，RL-2就在必要的时候改变动作分布",
+      "title": "RL-2-VLA：VLA可能失败时，RL-2就在必要的时候改变动作分布",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-39f68071e4",
+      "path": "embodied intelligence/ROBOCHRONO",
+      "title": "ROBOCHRONO",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-8f75503324",
+      "path": "embodied intelligence/Teaching Tiny VLA Models Where to Look and How to Move（小模型VLA）",
+      "title": "Teaching Tiny VLA Models Where to Look and How to Move（小模型VLA）",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-7cbd123d45",
+      "path": "embodied intelligence/VLASH",
+      "title": "VLASH",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-f034bafa12",
+      "path": "embodied intelligence/zju",
+      "title": "zju",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-414ef76e3c",
+      "path": "embodied intelligence/大模型去直接做操作的难度所在",
+      "title": "大模型去直接做操作的难度所在",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-f32806fbe2",
+      "path": "embodied intelligence/强化学习（还是得从项目中去练习代码，就光看太抽象了）",
+      "title": "强化学习（还是得从项目中去练习代码，就光看太抽象了）",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-9f38a13949",
+      "path": "embodied intelligence/未命名",
+      "title": "未命名",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-eac472b555",
+      "path": "embodied intelligence/雅可比矩阵",
+      "title": "雅可比矩阵",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    },
+    {
+      "id": "fragment-d6cdf264cc",
+      "path": "embodied intelligence/零碎",
+      "title": "零碎",
+      "type": "fragment",
+      "citekey": "",
+      "status": "legacy",
+      "readingLevel": "",
+      "paperRole": "",
+      "year": null,
+      "authors": "",
+      "topics": [
+        "embodied-ai"
+      ],
+      "created": "",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "",
+      "noteDensity": 0,
+      "evidenceCount": 0,
+      "maturity": 22
+    }
+  ],
+  "edges": [
+    {
+      "source": "field-e8aefa3d89",
+      "target": "paper-8bad68c87a",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-261580d716",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "paper-e943cce3a1",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-d471107842",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-cf74ba3ebd",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-8172f88994",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-7cbd123d45",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-b38037ee1a",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-4a5743d321",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-80e666cd56",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-40bdb0478f",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-75f486c5bc",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-f32806fbe2",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-26d5a0b79c",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-eac472b555",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-8f75503324",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-3bfc862eb8",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-39f68071e4",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-414ef76e3c",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "fragment-d6cdf264cc",
+      "kind": "manual"
+    },
+    {
+      "source": "field-e8aefa3d89",
+      "target": "concept-facd23940b",
+      "kind": "manual"
+    },
+    {
+      "source": "concept-facd23940b",
+      "target": "fragment-d471107842",
+      "kind": "manual"
+    },
+    {
+      "source": "concept-facd23940b",
+      "target": "fragment-cf74ba3ebd",
+      "kind": "manual"
+    }
+  ]
+}
