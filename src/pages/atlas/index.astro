@@ -1,0 +1,630 @@
+---
+import researchGraph from "../../data/researchGraph.json";
+
+const clusters = [
+  { id: "vla", label: "VLA", color: "#6fe8ff", center: [-10, 4, 0] },
+  { id: "world", label: "WORLD MODELS", color: "#8f84ff", center: [-4, -7, -2] },
+  { id: "action", label: "ACTION", color: "#ffbe72", center: [7, -6, 1] },
+  { id: "reasoning", label: "REASONING", color: "#ff78b7", center: [11, 4, -2] },
+  { id: "data", label: "DATA + SCALE", color: "#72f0b1", center: [1, 9, -1] },
+  { id: "evaluation", label: "EVAL + SIM", color: "#ff765f", center: [-13, -5, -3] }
+];
+
+function mulberry32(seed: number) {
+  return () => {
+    let value = seed += 0x6d2b79f5;
+    value = Math.imul(value ^ value >>> 15, value | 1);
+    value ^= value + Math.imul(value ^ value >>> 7, value | 61);
+    return ((value ^ value >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+const random = mulberry32(20260827);
+const gaussian = () => {
+  const u = Math.max(random(), 0.0001);
+  const v = Math.max(random(), 0.0001);
+  return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+};
+
+const titleOpeners = [
+  "Latent Action Priors", "Embodied Memory", "Cross-Embodiment Transfer", "Open-World Manipulation",
+  "Predictive Robot Control", "Language-Grounded Planning", "Visual Foresight", "Scalable Robot Learning",
+  "Adaptive Action Chunking", "Compositional Skill Learning", "Long-Horizon Control", "Generative Policy Learning"
+];
+const titleClosers = [
+  "for Generalist Robots", "with Multimodal World Models", "through Self-Supervised Interaction",
+  "under Distribution Shift", "from Heterogeneous Demonstrations", "with Closed-Loop Reasoning",
+  "across Robot Morphologies", "in Unstructured Environments", "via Hierarchical Representation Learning"
+];
+const clusterCounts = [34, 32, 31, 31, 30, 38];
+const demoNodes: Array<Record<string, unknown>> = [];
+
+clusters.forEach((cluster, clusterIndex) => {
+  for (let index = 0; index < clusterCounts[clusterIndex]; index += 1) {
+    const radialScale = index === 0 ? 0.2 : 1;
+    const x = cluster.center[0] + gaussian() * 2.55 * radialScale;
+    const y = cluster.center[1] + gaussian() * 2.05 * radialScale;
+    const z = cluster.center[2] + gaussian() * 1.5 * radialScale;
+    const title = index === 0
+      ? `${cluster.label} / FIELD ANCHOR`
+      : `${titleOpeners[(index + clusterIndex * 3) % titleOpeners.length]} ${titleClosers[(index * 2 + clusterIndex) % titleClosers.length]}`;
+
+    demoNodes.push({
+      id: `demo-${cluster.id}-${index}`,
+      title,
+      cluster: cluster.id,
+      clusterLabel: cluster.label,
+      color: cluster.color,
+      x,
+      y,
+      z,
+      size: index === 0 ? 0.82 : 0.26 + random() * 0.36,
+      year: 2021 + Math.floor(random() * 6),
+      kind: "context",
+      demo: true,
+      phase: random() * Math.PI * 2
+    });
+  }
+});
+
+const personalPapers = researchGraph.nodes.filter((node) => node.type === "paper");
+const personalClusterIds = ["vla", "reasoning", "vla", "data"];
+const personalNodes = personalPapers.map((paper, index) => {
+  const cluster = clusters.find((item) => item.id === personalClusterIds[index]) ?? clusters[0];
+  const angle = (index / Math.max(personalPapers.length, 1)) * Math.PI * 2;
+  return {
+    id: `personal-${paper.id}`,
+    title: paper.title,
+    cluster: cluster.id,
+    clusterLabel: cluster.label,
+    color: "#ffffff",
+    accent: cluster.color,
+    x: cluster.center[0] + Math.cos(angle) * 1.15,
+    y: cluster.center[1] + Math.sin(angle) * 1.15,
+    z: cluster.center[2] + 1.1,
+    size: 1.05 + paper.maturity / 175,
+    year: paper.year,
+    kind: "personal",
+    demo: false,
+    phase: index * 1.7,
+    status: paper.status,
+    sourceUrl: paper.sourceUrl,
+    zoteroUri: paper.zoteroUri,
+    noteDensity: paper.noteDensity,
+    evidenceCount: paper.evidenceCount
+  };
+});
+
+const nodes = [...demoNodes, ...personalNodes];
+const nodeById = new Map(nodes.map((node) => [String(node.id), node]));
+const edges: Array<{ source: string; target: string; kind: string }> = [];
+
+clusters.forEach((cluster) => {
+  const members = nodes.filter((node) => node.cluster === cluster.id);
+  const anchor = members.find((node) => String(node.id).endsWith("-0")) ?? members[0];
+  members.forEach((node, index) => {
+    if (node.id === anchor.id) return;
+    if (index < 12 || random() > 0.62) edges.push({ source: String(anchor.id), target: String(node.id), kind: "field" });
+    if (index > 1) edges.push({ source: String(members[index - 1].id), target: String(node.id), kind: "citation" });
+    if (index > 5 && random() > 0.55) {
+      const target = members[Math.floor(random() * index)];
+      edges.push({ source: String(node.id), target: String(target.id), kind: "citation" });
+    }
+  });
+});
+
+for (let index = 0; index < clusters.length; index += 1) {
+  const current = `demo-${clusters[index].id}-0`;
+  const next = `demo-${clusters[(index + 1) % clusters.length].id}-0`;
+  edges.push({ source: current, target: next, kind: "cross-field" });
+}
+
+personalNodes.forEach((node, index) => {
+  edges.push({ source: node.id, target: `demo-${node.cluster}-0`, kind: "personal" });
+  const nearby = demoNodes.filter((candidate) => candidate.cluster === node.cluster)[3 + index * 2];
+  if (nearby) edges.push({ source: node.id, target: String(nearby.id), kind: "personal" });
+});
+
+const atlasData = {
+  nodes,
+  edges: edges.filter((edge) => nodeById.has(edge.source) && nodeById.has(edge.target)),
+  clusters
+};
+const atlasJson = JSON.stringify(atlasData).replaceAll("<", "\\u003c");
+const fallbackDots = nodes.slice(0, 150).map((node) => ({
+  left: Math.min(96, Math.max(4, 50 + Number(node.x) * 2.7)),
+  top: Math.min(94, Math.max(6, 50 - Number(node.y) * 3.4)),
+  size: Number(node.size) * 7,
+  color: String(node.color)
+}));
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#020508" />
+    <title>ATLAS / TxTxx</title>
+    <meta name="description" content="An experimental research constellation." />
+  </head>
+  <body>
+    <main class="atlas" data-atlas>
+      <div class="fallback-field" aria-hidden="true">
+        {fallbackDots.map((dot) => <i style={`--x:${dot.left}%;--y:${dot.top}%;--s:${dot.size}px;--c:${dot.color}`}></i>)}
+      </div>
+      <div class="webgl-mount" data-webgl-mount aria-label="Interactive research constellation"></div>
+      <div class="grain" aria-hidden="true"></div>
+      <div class="vignette" aria-hidden="true"></div>
+
+      <header class="atlas-mark">
+        <a href="/" aria-label="返回 TxTxx 网站">TX</a>
+        <span></span>
+        <b>ATLAS</b>
+      </header>
+
+      <div class="atlas-tools">
+        <label class="atlas-search">
+          <span>⌕</span>
+          <input type="search" placeholder="SEARCH" autocomplete="off" data-atlas-search />
+        </label>
+        <button type="button" data-reset>RESET</button>
+      </div>
+
+      <div class="cluster-legend" aria-label="Research fields">
+        {clusters.map((cluster) => <button type="button" data-cluster={cluster.id}><i style={`--c:${cluster.color}`}></i>{cluster.label}</button>)}
+      </div>
+
+      <div class="field-status">
+        <span>DEMO FIELD</span>
+        <b>{nodes.length} NODES</b>
+      </div>
+
+      <div class="hover-label" data-hover-label hidden>
+        <span data-hover-index></span>
+        <strong data-hover-title></strong>
+      </div>
+
+      <aside class="focus-card" data-focus-card hidden>
+        <button type="button" class="focus-close" data-focus-close aria-label="关闭">×</button>
+        <span class="focus-kind" data-focus-kind></span>
+        <h1 data-focus-title></h1>
+        <div class="focus-meta">
+          <span data-focus-year></span>
+          <span data-focus-cluster></span>
+        </div>
+        <div class="focus-actions">
+          <a data-focus-source target="_blank" rel="noreferrer" hidden>OPEN PAPER ↗</a>
+          <a data-focus-zotero hidden>ZOTERO ↗</a>
+        </div>
+      </aside>
+
+      <div class="loading-mark" data-loading><i></i><span>FORMING FIELD</span></div>
+      <script id="atlas-data" type="application/json" set:html={atlasJson}></script>
+    </main>
+
+    <script>
+      import * as THREE from "three";
+      import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
+      import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+      import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+      import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+
+      const atlas = document.querySelector("[data-atlas]");
+      const mount = document.querySelector("[data-webgl-mount]");
+      const dataElement = document.querySelector("#atlas-data");
+      const loading = document.querySelector("[data-loading]");
+      const tooltip = document.querySelector("[data-hover-label]");
+      const focusCard = document.querySelector("[data-focus-card]");
+      const search = document.querySelector("[data-atlas-search]");
+      const reset = document.querySelector("[data-reset]");
+      const closeFocus = document.querySelector("[data-focus-close]");
+      const clusterButtons = Array.from(document.querySelectorAll("[data-cluster]"));
+      const data = dataElement ? JSON.parse(dataElement.textContent || "{}") : { nodes: [], edges: [], clusters: [] };
+      const dataById = new Map(data.nodes.map((node) => [node.id, node]));
+      const colorByCluster = new Map(data.clusters.map((cluster) => [cluster.id, cluster.color]));
+
+      const setText = (selector, value) => {
+        const element = document.querySelector(selector);
+        if (element) element.textContent = value || "—";
+      };
+
+      const makeGlowTexture = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = 128;
+        canvas.height = 128;
+        const context = canvas.getContext("2d");
+        const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
+        gradient.addColorStop(0, "rgba(255,255,255,1)");
+        gradient.addColorStop(0.08, "rgba(255,255,255,0.98)");
+        gradient.addColorStop(0.24, "rgba(255,255,255,0.5)");
+        gradient.addColorStop(0.58, "rgba(255,255,255,0.12)");
+        gradient.addColorStop(1, "rgba(255,255,255,0)");
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 128, 128);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+      };
+
+      if (atlas && mount && data.nodes.length) {
+        try {
+          const scene = new THREE.Scene();
+          scene.background = new THREE.Color(0x020508);
+          scene.fog = new THREE.FogExp2(0x020508, 0.018);
+
+          const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 150);
+          camera.position.set(0, 0.5, 34);
+
+          const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+          renderer.setSize(window.innerWidth, window.innerHeight);
+          renderer.outputColorSpace = THREE.SRGBColorSpace;
+          renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          renderer.toneMappingExposure = 1.12;
+          mount.appendChild(renderer.domElement);
+
+          const composer = new EffectComposer(renderer);
+          composer.addPass(new RenderPass(scene, camera));
+          const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.18, 0.78, 0.12);
+          composer.addPass(bloom);
+
+          const controls = new OrbitControls(camera, renderer.domElement);
+          controls.enableDamping = true;
+          controls.dampingFactor = 0.045;
+          controls.enablePan = false;
+          controls.minDistance = 7;
+          controls.maxDistance = 58;
+          controls.rotateSpeed = 0.22;
+          controls.zoomSpeed = 0.65;
+          controls.autoRotate = true;
+          controls.autoRotateSpeed = 0.12;
+
+          const universe = new THREE.Group();
+          scene.add(universe);
+          const glowTexture = makeGlowTexture();
+          const sprites = [];
+          const spriteById = new Map();
+
+          data.nodes.forEach((node) => {
+            const material = new THREE.SpriteMaterial({
+              map: glowTexture,
+              color: new THREE.Color(node.color),
+              transparent: true,
+              opacity: node.kind === "personal" ? 1 : 0.66,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false
+            });
+            const sprite = new THREE.Sprite(material);
+            sprite.position.set(node.x, node.y, node.z);
+            sprite.scale.setScalar(node.size);
+            sprite.userData = { ...node, basePosition: sprite.position.clone(), baseScale: node.size };
+            universe.add(sprite);
+            sprites.push(sprite);
+            spriteById.set(node.id, sprite);
+
+            if (node.kind === "personal") {
+              const ringMaterial = new THREE.MeshBasicMaterial({
+                color: new THREE.Color(node.accent || "#ffffff"),
+                transparent: true,
+                opacity: 0.46,
+                blending: THREE.AdditiveBlending,
+                depthWrite: false,
+                side: THREE.DoubleSide
+              });
+              const ring = new THREE.Mesh(new THREE.RingGeometry(node.size * 0.56, node.size * 0.62, 64), ringMaterial);
+              ring.position.copy(sprite.position);
+              ring.userData.parentNode = node.id;
+              universe.add(ring);
+              sprite.userData.ring = ring;
+            }
+          });
+
+          const linePositions = [];
+          data.edges.forEach((edge) => {
+            const source = dataById.get(edge.source);
+            const target = dataById.get(edge.target);
+            if (!source || !target) return;
+            linePositions.push(source.x, source.y, source.z, target.x, target.y, target.z);
+          });
+          const lineGeometry = new THREE.BufferGeometry();
+          lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
+          const lineMaterial = new THREE.LineBasicMaterial({ color: 0x315d70, transparent: true, opacity: 0.16, blending: THREE.AdditiveBlending, depthWrite: false });
+          const edgeField = new THREE.LineSegments(lineGeometry, lineMaterial);
+          universe.add(edgeField);
+
+          const starCount = 1800;
+          const starPositions = new Float32Array(starCount * 3);
+          const starRandom = (index) => {
+            const value = Math.sin(index * 12.9898 + 78.233) * 43758.5453;
+            return value - Math.floor(value);
+          };
+          for (let index = 0; index < starCount; index += 1) {
+            starPositions[index * 3] = (starRandom(index) - 0.5) * 85;
+            starPositions[index * 3 + 1] = (starRandom(index + 1900) - 0.5) * 52;
+            starPositions[index * 3 + 2] = (starRandom(index + 3900) - 0.5) * 48 - 7;
+          }
+          const starGeometry = new THREE.BufferGeometry();
+          starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
+          const starMaterial = new THREE.PointsMaterial({ color: 0x8fb5c6, size: 0.045, transparent: true, opacity: 0.42, depthWrite: false });
+          const starField = new THREE.Points(starGeometry, starMaterial);
+          scene.add(starField);
+
+          const raycaster = new THREE.Raycaster();
+          const pointer = new THREE.Vector2(4, 4);
+          const pointerTarget = new THREE.Vector2();
+          let hovered = null;
+          let selected = null;
+          let focusCameraPosition = null;
+          let focusTarget = null;
+          let highlightedLines = null;
+          let pointerDown = null;
+
+          const connectedIds = (nodeId) => {
+            const ids = new Set([nodeId]);
+            data.edges.forEach((edge) => {
+              if (edge.source === nodeId) ids.add(edge.target);
+              if (edge.target === nodeId) ids.add(edge.source);
+            });
+            return ids;
+          };
+
+          const updateNodeOpacity = (activeIds = null) => {
+            sprites.forEach((sprite) => {
+              const isActive = !activeIds || activeIds.has(sprite.userData.id);
+              sprite.material.opacity = isActive ? (sprite.userData.kind === "personal" ? 1 : 0.72) : 0.055;
+              const scale = sprite.userData.baseScale * (sprite.userData.id === selected ? 1.42 : 1);
+              sprite.scale.setScalar(scale);
+              if (sprite.userData.ring) sprite.userData.ring.material.opacity = isActive ? 0.46 : 0.04;
+            });
+          };
+
+          const clearHighlightedLines = () => {
+            if (!highlightedLines) return;
+            universe.remove(highlightedLines);
+            highlightedLines.geometry.dispose();
+            highlightedLines.material.dispose();
+            highlightedLines = null;
+          };
+
+          const drawSelectedConnections = (nodeId) => {
+            clearHighlightedLines();
+            const positions = [];
+            const node = dataById.get(nodeId);
+            data.edges.forEach((edge) => {
+              if (edge.source !== nodeId && edge.target !== nodeId) return;
+              const target = dataById.get(edge.source === nodeId ? edge.target : edge.source);
+              if (node && target) positions.push(node.x, node.y, node.z, target.x, target.y, target.z);
+            });
+            if (!positions.length) return;
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+            const material = new THREE.LineBasicMaterial({ color: new THREE.Color(colorByCluster.get(node.cluster) || "#ffffff"), transparent: true, opacity: 0.82, blending: THREE.AdditiveBlending, depthWrite: false });
+            highlightedLines = new THREE.LineSegments(geometry, material);
+            universe.add(highlightedLines);
+          };
+
+          const showFocus = (nodeId) => {
+            const node = dataById.get(nodeId);
+            const sprite = spriteById.get(nodeId);
+            if (!node || !sprite) return;
+            selected = nodeId;
+            controls.autoRotate = false;
+            updateNodeOpacity(connectedIds(nodeId));
+            drawSelectedConnections(nodeId);
+            const direction = camera.position.clone().sub(controls.target).normalize();
+            focusTarget = sprite.position.clone();
+            focusCameraPosition = sprite.position.clone().add(direction.multiplyScalar(6.5));
+            setText("[data-focus-kind]", node.kind === "personal" ? "PERSONAL / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
+            setText("[data-focus-title]", node.title);
+            setText("[data-focus-year]", node.year ? String(node.year) : "—");
+            setText("[data-focus-cluster]", node.clusterLabel);
+            const source = document.querySelector("[data-focus-source]");
+            const zotero = document.querySelector("[data-focus-zotero]");
+            source?.toggleAttribute("hidden", !node.sourceUrl);
+            zotero?.toggleAttribute("hidden", !node.zoteroUri);
+            if (source && node.sourceUrl) source.href = node.sourceUrl;
+            if (zotero && node.zoteroUri) zotero.href = node.zoteroUri;
+            focusCard.hidden = false;
+          };
+
+          const resetField = () => {
+            selected = null;
+            focusCameraPosition = null;
+            focusTarget = null;
+            focusCard.hidden = true;
+            clearHighlightedLines();
+            updateNodeOpacity();
+            controls.autoRotate = true;
+            camera.position.set(0, 0.5, 34);
+            controls.target.set(0, 0, 0);
+          };
+
+          const updatePointer = (event) => {
+            pointer.x = event.clientX / window.innerWidth * 2 - 1;
+            pointer.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            pointerTarget.x = pointer.x;
+            pointerTarget.y = pointer.y;
+          };
+
+          renderer.domElement.addEventListener("pointermove", (event) => {
+            updatePointer(event);
+            if (!tooltip.hidden) {
+              tooltip.style.left = `${Math.min(window.innerWidth - 290, event.clientX + 18)}px`;
+              tooltip.style.top = `${Math.min(window.innerHeight - 90, event.clientY + 18)}px`;
+            }
+          });
+          renderer.domElement.addEventListener("pointerdown", (event) => { pointerDown = { x: event.clientX, y: event.clientY }; });
+          renderer.domElement.addEventListener("pointerup", (event) => {
+            if (!pointerDown || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 6) return;
+            if (hovered) showFocus(hovered.userData.id);
+          });
+          renderer.domElement.addEventListener("pointerleave", () => {
+            pointer.set(4, 4);
+            hovered = null;
+            tooltip.hidden = true;
+          });
+
+          reset?.addEventListener("click", resetField);
+          closeFocus?.addEventListener("click", resetField);
+          window.addEventListener("keydown", (event) => { if (event.key === "Escape") resetField(); });
+
+          clusterButtons.forEach((button) => {
+            button.addEventListener("click", () => {
+              const cluster = data.clusters.find((item) => item.id === button.dataset.cluster);
+              if (!cluster) return;
+              selected = null;
+              focusCard.hidden = true;
+              clearHighlightedLines();
+              const clusterIds = new Set(data.nodes.filter((node) => node.cluster === cluster.id).map((node) => node.id));
+              updateNodeOpacity(clusterIds);
+              controls.autoRotate = false;
+              focusTarget = new THREE.Vector3(...cluster.center);
+              focusCameraPosition = new THREE.Vector3(cluster.center[0], cluster.center[1], cluster.center[2] + 15);
+            });
+          });
+
+          search?.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter") return;
+            const query = search.value.trim().toLowerCase();
+            const match = data.nodes.find((node) => node.title.toLowerCase().includes(query));
+            if (match) showFocus(match.id);
+          });
+
+          const timer = new THREE.Timer();
+          const animate = () => {
+            requestAnimationFrame(animate);
+            timer.update();
+            const elapsed = timer.getElapsed();
+            raycaster.setFromCamera(pointer, camera);
+            const intersections = raycaster.intersectObjects(sprites, false);
+            const nextHovered = intersections[0]?.object ?? null;
+            if (nextHovered !== hovered) {
+              hovered = nextHovered;
+              tooltip.hidden = !hovered;
+              renderer.domElement.style.cursor = hovered ? "pointer" : "grab";
+              if (hovered) {
+                setText("[data-hover-index]", hovered.userData.kind === "personal" ? "PERSONAL" : hovered.userData.clusterLabel);
+                setText("[data-hover-title]", hovered.userData.title);
+              }
+            }
+
+            sprites.forEach((sprite) => {
+              const base = sprite.userData.basePosition;
+              sprite.position.y = base.y + Math.sin(elapsed * 0.27 + sprite.userData.phase) * 0.035;
+              if (sprite.userData.ring) {
+                sprite.userData.ring.position.copy(sprite.position);
+                sprite.userData.ring.rotation.z = elapsed * 0.08 + sprite.userData.phase;
+              }
+            });
+
+            universe.rotation.x += ((-pointerTarget.y * 0.025) - universe.rotation.x) * 0.015;
+            universe.rotation.y += ((pointerTarget.x * 0.035) - universe.rotation.y) * 0.015;
+            starField.rotation.y = elapsed * 0.0014;
+
+            if (focusTarget && focusCameraPosition) {
+              camera.position.lerp(focusCameraPosition, 0.055);
+              controls.target.lerp(focusTarget, 0.065);
+            }
+            controls.update();
+            composer.render();
+          };
+
+          const onResize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+          };
+          window.addEventListener("resize", onResize);
+          animate();
+
+          requestAnimationFrame(() => {
+            atlas.classList.add("atlas-ready");
+            loading.classList.add("leaving");
+            setTimeout(() => { loading.hidden = true; }, 800);
+          });
+        } catch (error) {
+          console.error("Atlas WebGL initialization failed", error);
+          loading.hidden = true;
+          atlas.classList.add("atlas-fallback");
+        }
+      }
+    </script>
+  </body>
+</html>
+
+<style>
+  :global(*) { box-sizing: border-box; }
+  :global(html) { width: 100%; height: 100%; overflow: hidden; background: #020508; color-scheme: dark; }
+  :global(body) { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #020508; color: #eafcff; font-family: "Helvetica Neue", "Avenir Next", sans-serif; }
+  :global(button), :global(input) { font: inherit; }
+  :global(button), :global(a) { -webkit-tap-highlight-color: transparent; }
+
+  .atlas { position: relative; width: 100%; height: 100%; overflow: hidden; background: radial-gradient(circle at 50% 50%, #08131d 0%, #020508 66%); }
+  .webgl-mount { position: absolute; inset: 0; z-index: 2; opacity: 0; transition: opacity 1.6s ease; }
+  .atlas-ready .webgl-mount { opacity: 1; }
+  .webgl-mount :global(canvas) { display: block; width: 100%; height: 100%; outline: none; }
+  .fallback-field { position: absolute; z-index: 1; inset: 0; overflow: hidden; background: radial-gradient(circle at 50% 50%, rgba(43, 93, 116, 0.16), transparent 42%); transition: opacity 1.4s ease; }
+  .atlas-ready .fallback-field { opacity: 0; pointer-events: none; }
+  .fallback-field i { position: absolute; left: var(--x); top: var(--y); width: max(2px, var(--s)); height: max(2px, var(--s)); border-radius: 50%; background: var(--c); box-shadow: 0 0 calc(var(--s) * 2.8) var(--c); opacity: 0.55; transform: translate(-50%, -50%); }
+  .grain { position: absolute; z-index: 4; inset: -25%; opacity: 0.16; pointer-events: none; background-image: radial-gradient(circle at 30% 20%, rgb(255 255 255 / 5%) 0 0.6px, transparent 0.8px), radial-gradient(circle at 70% 80%, rgb(255 255 255 / 4%) 0 0.5px, transparent 0.8px); background-size: 5px 5px, 7px 7px; animation: grain 0.7s steps(2) infinite; mix-blend-mode: soft-light; }
+  .vignette { position: absolute; z-index: 3; inset: 0; pointer-events: none; box-shadow: inset 0 0 11rem 2rem rgba(0, 0, 0, 0.78); background: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 25%, transparent 72%, rgba(0, 0, 0, 0.35)); }
+
+  .atlas-mark, .atlas-tools, .cluster-legend, .field-status, .hover-label, .focus-card, .loading-mark { position: absolute; z-index: 6; }
+  .atlas-mark { left: 2rem; top: 1.8rem; display: flex; align-items: center; gap: 0.75rem; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.62rem; letter-spacing: 0.22em; }
+  .atlas-mark a { display: grid; width: 2.15rem; height: 2.15rem; place-items: center; border: 1px solid rgba(196, 239, 248, 0.28); color: #e7fcff; text-decoration: none; }
+  .atlas-mark span { width: 2.4rem; height: 1px; background: rgba(190, 231, 239, 0.25); }
+  .atlas-mark b { color: #78919c; font-weight: 400; }
+
+  .atlas-tools { right: 2rem; top: 1.8rem; display: flex; gap: 0.55rem; }
+  .atlas-search { display: flex; height: 2.15rem; align-items: center; gap: 0.55rem; padding: 0 0.75rem; border: 1px solid rgba(196, 239, 248, 0.16); background: rgba(3, 10, 15, 0.46); backdrop-filter: blur(14px); }
+  .atlas-search span { color: #81adba; }
+  .atlas-search input { width: 7rem; padding: 0; border: 0; outline: none; color: #dffbff; background: transparent; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.58rem; letter-spacing: 0.12em; }
+  .atlas-search input::placeholder { color: #526c76; }
+  .atlas-tools button { height: 2.15rem; padding: 0 0.75rem; border: 1px solid rgba(196, 239, 248, 0.16); color: #6f8c96; background: rgba(3, 10, 15, 0.46); font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.54rem; letter-spacing: 0.12em; cursor: pointer; backdrop-filter: blur(14px); }
+  .atlas-tools button:hover, .atlas-tools button:focus-visible { border-color: rgba(196, 239, 248, 0.42); color: #e7fbff; }
+
+  .cluster-legend { left: 2rem; bottom: 1.75rem; display: flex; gap: 0.4rem 1.1rem; flex-wrap: wrap; max-width: 42rem; }
+  .cluster-legend button { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0; border: 0; color: #607984; background: transparent; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.11em; cursor: pointer; }
+  .cluster-legend button:hover, .cluster-legend button:focus-visible { color: #d9f8fd; outline: none; }
+  .cluster-legend i { width: 0.38rem; height: 0.38rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0.75rem var(--c); }
+
+  .field-status { right: 2rem; bottom: 1.75rem; display: flex; align-items: center; gap: 0.8rem; color: #4b626c; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.14em; }
+  .field-status span { padding: 0.35rem 0.48rem; border: 1px solid rgba(255, 190, 114, 0.25); color: #b98d5c; }
+  .field-status b { color: #7c959f; font-weight: 400; }
+
+  .hover-label { width: min(17rem, calc(100vw - 2rem)); padding: 0.7rem 0.8rem; border-left: 1px solid rgba(152, 234, 248, 0.52); background: rgba(2, 8, 12, 0.68); pointer-events: none; backdrop-filter: blur(12px); }
+  .hover-label span { display: block; margin-bottom: 0.35rem; color: #65919d; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.12em; }
+  .hover-label strong { display: block; color: #e8fbff; font-size: 0.72rem; font-weight: 400; line-height: 1.35; }
+
+  .focus-card { left: 2rem; top: 50%; width: min(23rem, calc(100vw - 4rem)); padding: 1.25rem 1.3rem 1.35rem; border: 1px solid rgba(177, 232, 243, 0.17); background: linear-gradient(135deg, rgba(9, 23, 31, 0.78), rgba(2, 8, 12, 0.62)); box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.38); transform: translateY(-50%); backdrop-filter: blur(24px) saturate(1.2); }
+  .focus-close { position: absolute; right: 0.7rem; top: 0.55rem; padding: 0.25rem; border: 0; color: #64808b; background: transparent; font-size: 1.1rem; cursor: pointer; }
+  .focus-kind { color: #6f9aa5; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.13em; }
+  .focus-card h1 { margin: 0.9rem 0 1.1rem; color: #f0fdff; font-size: clamp(1.25rem, 2.4vw, 1.85rem); font-weight: 400; line-height: 1.12; letter-spacing: -0.025em; }
+  .focus-meta, .focus-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
+  .focus-meta span { padding: 0.32rem 0.42rem; border: 1px solid rgba(177, 232, 243, 0.13); color: #6e8993; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.08em; }
+  .focus-actions { margin-top: 1.15rem; }
+  .focus-actions a { color: #a9e9f2; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.52rem; letter-spacing: 0.08em; text-decoration: none; }
+
+  .loading-mark { left: 50%; top: 50%; display: flex; align-items: center; gap: 0.7rem; color: #607b86; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.52rem; letter-spacing: 0.16em; transform: translate(-50%, -50%); transition: opacity 0.8s ease; }
+  .loading-mark i { width: 0.55rem; height: 0.55rem; border: 1px solid #7edbeb; border-radius: 50%; box-shadow: 0 0 1rem rgba(126, 219, 235, 0.55); animation: pulse 1.2s ease-in-out infinite; }
+  .loading-mark.leaving { opacity: 0; }
+
+  @keyframes pulse { 0%, 100% { opacity: 0.25; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1); } }
+  @keyframes grain { 0% { transform: translate(0, 0); } 25% { transform: translate(2%, -3%); } 50% { transform: translate(-3%, 2%); } 75% { transform: translate(3%, 4%); } 100% { transform: translate(-2%, -2%); } }
+
+  @media (prefers-reduced-motion: reduce) { .grain, .loading-mark i { animation: none; } }
+  @media (max-width: 720px) {
+    .atlas-mark { left: 1rem; top: 1rem; }
+    .atlas-tools { right: 1rem; top: 1rem; }
+    .atlas-search { display: none; }
+    .cluster-legend { left: 1rem; right: 1rem; bottom: 1rem; max-width: none; gap: 0.45rem 0.8rem; }
+    .cluster-legend button { font-size: 0.43rem; }
+    .field-status { right: 1rem; bottom: auto; top: 4.2rem; }
+    .field-status b { display: none; }
+    .focus-card { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); transform: none; }
+    .vignette { box-shadow: inset 0 0 5rem 1rem rgba(0, 0, 0, 0.72); }
+  }
+</style>
