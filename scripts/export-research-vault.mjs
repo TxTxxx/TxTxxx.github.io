@@ -3,10 +3,15 @@ import { promises as fs } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { marked } from "marked";
+import sanitizeHtml from "sanitize-html";
 
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const vaultRoot = process.env.RESEARCH_VAULT_PATH || path.join(os.homedir(), "Documents", "Obsidian Vault");
 const outputPath = path.join(projectRoot, "src/data/researchGraph.json");
+const atlasImageOutput = path.join(projectRoot, "public", "images", "atlas-cards");
+const atlasImagePublicPath = "/images/atlas-cards";
+const publicImageExtensions = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
 
 const sources = [
   { folder: "10 领域", type: "field" },
@@ -101,6 +106,134 @@ function getNoteDensity(markdown) {
   return { filledBullets, evidenceQuotes };
 }
 
+function getAtlasCard(markdown) {
+  const htmlComment = markdown.match(/<!--\s*atlas-card:start\s*-->([\s\S]*?)<!--\s*atlas-card:end\s*-->/i);
+  if (htmlComment) return htmlComment[1].trim();
+  const obsidianComment = markdown.match(/%%\s*atlas-card:start\s*%%([\s\S]*?)%%\s*atlas-card:end\s*%%/i);
+  return obsidianComment?.[1]?.trim() || "";
+}
+
+async function collectImages(folder = vaultRoot) {
+  const entries = await fs.readdir(folder, { withFileTypes: true });
+  const images = [];
+
+  for (const entry of entries) {
+    if (entry.name.startsWith(".")) continue;
+    const entryPath = path.join(folder, entry.name);
+    if (entry.isDirectory()) images.push(...await collectImages(entryPath));
+    else if (entry.isFile() && publicImageExtensions.has(path.extname(entry.name).toLowerCase())) images.push(entryPath);
+  }
+
+  return images;
+}
+
+const vaultImages = await collectImages();
+const imagesByBasename = new Map();
+for (const imagePath of vaultImages) {
+  const basename = path.basename(imagePath).toLowerCase();
+  const matches = imagesByBasename.get(basename) || [];
+  matches.push(imagePath);
+  imagesByBasename.set(basename, matches);
+}
+
+function withinVault(candidate) {
+  const relative = path.relative(vaultRoot, candidate);
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+}
+
+async function resolveCardImage(target, notePath, noteId) {
+  const rawTarget = target.trim().replace(/^<|>$/g, "").split("#")[0];
+  let cleanTarget = rawTarget;
+  try {
+    cleanTarget = decodeURIComponent(rawTarget);
+  } catch {
+    // Keep the literal Obsidian path when it contains an unmatched percent sign.
+  }
+  if (!cleanTarget) return "";
+  if (/^https:\/\//i.test(cleanTarget)) return cleanTarget;
+  if (cleanTarget.startsWith(atlasImagePublicPath)) return cleanTarget;
+
+  const basenameMatches = imagesByBasename.get(path.basename(cleanTarget).toLowerCase()) || [];
+  const candidates = [
+    path.resolve(path.dirname(notePath), cleanTarget),
+    path.resolve(vaultRoot, cleanTarget.replace(/^\/+/, "")),
+    ...(basenameMatches.length === 1 ? basenameMatches : [])
+  ];
+
+  let sourcePath = null;
+  for (const candidate of candidates) {
+    if (!withinVault(candidate) || !publicImageExtensions.has(path.extname(candidate).toLowerCase())) continue;
+    try {
+      if ((await fs.stat(candidate)).isFile()) {
+        sourcePath = candidate;
+        break;
+      }
+    } catch {
+      // Keep trying Obsidian's basename-based attachment resolution.
+    }
+  }
+  if (!sourcePath) return "";
+
+  const bytes = await fs.readFile(sourcePath);
+  const digest = createHash("sha1").update(bytes).digest("hex").slice(0, 12);
+  const extension = path.extname(sourcePath).toLowerCase();
+  const filename = `${noteId}-${digest}${extension}`;
+  await fs.mkdir(atlasImageOutput, { recursive: true });
+  await fs.copyFile(sourcePath, path.join(atlasImageOutput, filename));
+  return `${atlasImagePublicPath}/${filename}`;
+}
+
+async function replaceAsync(value, pattern, replacer) {
+  const matches = [...value.matchAll(pattern)];
+  if (!matches.length) return value;
+  const replacements = await Promise.all(matches.map((match) => replacer(...match)));
+  let output = "";
+  let cursor = 0;
+  matches.forEach((match, index) => {
+    output += value.slice(cursor, match.index) + replacements[index];
+    cursor = match.index + match[0].length;
+  });
+  return output + value.slice(cursor);
+}
+
+async function renderAtlasCard(cardMarkdown, notePath, noteId) {
+  if (!cardMarkdown) return { html: "", imageCount: 0 };
+  let imageCount = 0;
+  let processed = await replaceAsync(cardMarkdown, /!\[([^\]]*)\]\(([^)]+)\)/g, async (match, alt, rawTarget) => {
+    const target = rawTarget.trim().replace(/\s+["'][^"']*["']\s*$/, "");
+    const resolved = await resolveCardImage(target, notePath, noteId);
+    if (!resolved) return "";
+    imageCount += 1;
+    return `![${alt}](${resolved})`;
+  });
+  processed = await replaceAsync(processed, /!\[\[([^\]]+)\]\]/g, async (match, rawEmbed) => {
+    const [target, display = ""] = rawEmbed.split("|");
+    const resolved = await resolveCardImage(target, notePath, noteId);
+    if (!resolved) return "";
+    imageCount += 1;
+    const alt = display && !/^\d+(?:x\d+)?$/i.test(display.trim()) ? display.trim() : path.basename(target, path.extname(target));
+    return `![${alt.replaceAll("]", "\\]")}](${resolved})`;
+  });
+
+  const unsafeHtml = await marked.parse(processed, { gfm: true, breaks: true });
+  const html = sanitizeHtml(unsafeHtml, {
+    allowedTags: ["p", "br", "strong", "em", "s", "blockquote", "ul", "ol", "li", "h2", "h3", "h4", "code", "pre", "a", "img", "hr", "figure", "figcaption"],
+    allowedAttributes: {
+      a: ["href", "title", "target", "rel"],
+      img: ["src", "alt", "title", "loading", "decoding"],
+      code: ["class"]
+    },
+    allowedSchemes: ["http", "https", "mailto"],
+    allowProtocolRelative: false,
+    transformTags: {
+      a: (tagName, attributes) => ({ tagName, attribs: { ...attributes, target: "_blank", rel: "noreferrer" } }),
+      img: (tagName, attributes) => ({ tagName, attribs: { ...attributes, loading: "lazy", decoding: "async" } })
+    }
+  }).trim();
+
+  return { html, imageCount };
+}
+
 function normalizeYear(value) {
   if (typeof value === "number" && value > 1900 && value < 2100) return value;
   if (typeof value !== "string" || value.includes("Error")) return null;
@@ -160,9 +293,13 @@ for (const source of sources) {
       100,
       Math.round(progressBase + density.filledBullets * 1.7 + density.evidenceQuotes * 1.2 + (metadata.reading_level === "deep" ? 12 : 0))
     );
+    const noteId = stableId(source.type, relativePath);
+    const atlasCard = source.type === "paper"
+      ? await renderAtlasCard(getAtlasCard(markdown), absolutePath, noteId)
+      : { html: "", imageCount: 0 };
 
     rawNodes.push({
-      id: stableId(source.type, relativePath),
+      id: noteId,
       path: relativePath,
       title: getTitle(markdown, fallbackTitle),
       type: source.type,
@@ -182,6 +319,8 @@ for (const source of sources) {
       noteDensity: density.filledBullets,
       evidenceCount: density.evidenceQuotes,
       maturity,
+      atlasCardHtml: atlasCard.html,
+      atlasCardImages: atlasCard.imageCount,
       links: getWikiLinks(markdown)
     });
   }

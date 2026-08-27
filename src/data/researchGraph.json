@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-27T13:20:51.504Z",
+  "generatedAt": "2026-08-27T13:30:19.851Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
     "nodes": 6,
@@ -34,7 +34,9 @@
       "zoteroUri": "",
       "noteDensity": 44,
       "evidenceCount": 0,
-      "maturity": 100
+      "maturity": 100,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     },
     {
       "id": "paper-87c0882e55",
@@ -58,7 +60,9 @@
       "zoteroUri": "zotero://select/library/items/ITSIWBDA",
       "noteDensity": 18,
       "evidenceCount": 0,
-      "maturity": 47
+      "maturity": 47,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     },
     {
       "id": "paper-e943cce3a1",
@@ -82,7 +86,9 @@
       "zoteroUri": "zotero://select/library/items/GNUVIYID",
       "noteDensity": 31,
       "evidenceCount": 10,
-      "maturity": 81
+      "maturity": 81,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     },
     {
       "id": "paper-8bad68c87a",
@@ -106,7 +112,9 @@
       "zoteroUri": "zotero://select/library/items/QWBLPCWX",
       "noteDensity": 31,
       "evidenceCount": 9,
-      "maturity": 91
+      "maturity": 91,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     },
     {
       "id": "paper-e73f5eec2a",
@@ -130,7 +138,9 @@
       "zoteroUri": "zotero://select/library/items/KC7GZU4H",
       "noteDensity": 18,
       "evidenceCount": 2,
-      "maturity": 49
+      "maturity": 49,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     },
     {
       "id": "concept-facd23940b",
@@ -156,7 +166,9 @@
       "zoteroUri": "",
       "noteDensity": 12,
       "evidenceCount": 0,
-      "maturity": 64
+      "maturity": 64,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     }
   ],
   "edges": [

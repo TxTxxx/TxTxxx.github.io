@@ -75,6 +75,10 @@ clusters.forEach((cluster, clusterIndex) => {
       id: `demo-${cluster.id}-${index}`,
       title,
       atlasLabel: clusterAtlasLabels[cluster.id]?.[index] || "",
+      cardHtml: title === "OpenVLA"
+        ? '<figure><img src="/images/openvla-overview.png" alt="OpenVLA architecture overview" loading="lazy" decoding="async"><figcaption>OpenVLA · architecture overview</figcaption></figure>'
+        : "",
+      cardImageCount: title === "OpenVLA" ? 1 : 0,
       hasEssay: index === 1 && ["vla", "world", "reasoning"].includes(cluster.id),
       cluster: cluster.id,
       clusterLabel: cluster.label,
@@ -209,6 +213,8 @@ const personalNodes = personalPapers.map((node, index) => {
     readingLevel: node.readingLevel,
     sourceUrl: node.sourceUrl,
     zoteroUri: node.zoteroUri,
+    cardHtml: node.atlasCardHtml,
+    cardImageCount: node.atlasCardImages,
     signal: true,
     fieldMode: "personal",
     phase: personalRandom() * Math.PI * 2 + index * 0.03
@@ -329,11 +335,17 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           <span data-focus-year></span>
           <span data-focus-cluster></span>
         </div>
+        <div class="focus-body" data-focus-body hidden></div>
         <div class="focus-actions">
           <a data-focus-source target="_blank" rel="noreferrer" hidden>OPEN PAPER ↗</a>
           <a data-focus-zotero hidden>ZOTERO ↗</a>
         </div>
       </aside>
+
+      <div class="media-lightbox" data-media-lightbox hidden>
+        <button type="button" data-media-close aria-label="关闭图片">×</button>
+        <img data-media-image alt="" />
+      </div>
 
       <div class="loading-mark" data-loading><i></i><span>FORMING FIELD</span></div>
       <script id="atlas-data" type="application/json" set:html={atlasJson}></script>
@@ -352,6 +364,10 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       const loading = document.querySelector("[data-loading]");
       const tooltip = document.querySelector("[data-hover-label]");
       const focusCard = document.querySelector("[data-focus-card]");
+      const focusBody = document.querySelector("[data-focus-body]");
+      const mediaLightbox = document.querySelector("[data-media-lightbox]");
+      const mediaImage = document.querySelector("[data-media-image]");
+      const mediaClose = document.querySelector("[data-media-close]");
       const search = document.querySelector("[data-atlas-search]");
       const reset = document.querySelector("[data-reset]");
       const closeFocus = document.querySelector("[data-focus-close]");
@@ -661,6 +677,36 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             cardHideTimer = window.setTimeout(() => { focusCard.hidden = true; }, 340);
           };
 
+          const closeMedia = () => {
+            if (!mediaLightbox || mediaLightbox.hidden) return;
+            mediaLightbox.classList.remove("is-open");
+            window.setTimeout(() => {
+              mediaLightbox.hidden = true;
+              if (mediaImage) mediaImage.removeAttribute("src");
+            }, 220);
+          };
+
+          const openMedia = (image) => {
+            if (!mediaLightbox || !mediaImage || !image?.src) return;
+            mediaImage.src = image.currentSrc || image.src;
+            mediaImage.alt = image.alt || "Atlas card image";
+            mediaLightbox.hidden = false;
+            requestAnimationFrame(() => mediaLightbox.classList.add("is-open"));
+          };
+
+          const updateFocusBody = (node) => {
+            if (!focusBody) return;
+            const hasCard = Boolean(node.cardHtml);
+            focusCard.classList.toggle("has-content", hasCard);
+            focusBody.hidden = !hasCard;
+            focusBody.innerHTML = hasCard ? node.cardHtml : "";
+            focusBody.querySelectorAll("img").forEach((image) => {
+              image.tabIndex = 0;
+              image.setAttribute("role", "button");
+              image.setAttribute("aria-label", image.alt ? `查看大图：${image.alt}` : "查看大图");
+            });
+          };
+
           const easeInOutCubic = (value) => value < 0.5
             ? 4 * value * value * value
             : 1 - Math.pow(-2 * value + 2, 3) / 2;
@@ -752,12 +798,14 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             zotero?.toggleAttribute("hidden", !node.zoteroUri);
             if (source && node.sourceUrl) source.href = node.sourceUrl;
             if (zotero && node.zoteroUri) zotero.href = node.zoteroUri;
+            updateFocusBody(node);
             openFocusCard();
           };
 
           const closeSelection = () => {
             cancelCameraTransition();
             selected = null;
+            closeMedia();
             hideFocusCard();
             clearHighlightedLines();
             updateNodeOpacity(scopeIds());
@@ -767,6 +815,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const resetField = () => {
             selected = null;
             activeCluster = null;
+            closeMedia();
             hideFocusCard();
             clearHighlightedLines();
             updateNodeOpacity();
@@ -783,6 +832,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             selected = null;
             activeCluster = null;
             activeFieldMode = nextFieldMode;
+            closeMedia();
             hovered = null;
             tooltip.hidden = true;
             hideFocusCard();
@@ -826,6 +876,21 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
 
           reset?.addEventListener("click", resetField);
           closeFocus?.addEventListener("click", closeSelection);
+          mediaClose?.addEventListener("click", closeMedia);
+          mediaLightbox?.addEventListener("click", (event) => {
+            if (event.target === mediaLightbox) closeMedia();
+          });
+          focusBody?.addEventListener("click", (event) => {
+            const image = event.target.closest("img");
+            if (image) openMedia(image);
+          });
+          focusBody?.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter" && event.key !== " ") return;
+            const image = event.target.closest("img");
+            if (!image) return;
+            event.preventDefault();
+            openMedia(image);
+          });
           fieldModeButtons.forEach((button) => {
             button.addEventListener("click", () => switchField(button.dataset.fieldMode));
           });
@@ -835,6 +900,10 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           });
           window.addEventListener("keydown", (event) => {
             if (event.key !== "Escape") return;
+            if (mediaLightbox && !mediaLightbox.hidden) {
+              closeMedia();
+              return;
+            }
             if (selected || !focusCard.hidden) closeSelection();
             else if (activeCluster) resetField();
           });
@@ -1058,15 +1127,35 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
   .hover-label span { display: block; margin-bottom: 0.35rem; color: #65919d; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.12em; }
   .hover-label strong { display: block; color: #e8fbff; font-size: 0.72rem; font-weight: 400; line-height: 1.35; }
 
-  .focus-card { left: 2rem; top: 50%; width: min(23rem, calc(100vw - 4rem)); padding: 1.25rem 1.3rem 1.35rem; border: 1px solid rgba(177, 232, 243, 0.17); opacity: 0; pointer-events: none; background: linear-gradient(135deg, rgba(9, 23, 31, 0.78), rgba(2, 8, 12, 0.62)); box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.38); transform: translate(-0.8rem, -50%); transition: opacity 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1); backdrop-filter: blur(24px) saturate(1.2); }
+  .focus-card { left: 2rem; top: 50%; display: flex; flex-direction: column; width: min(23rem, calc(100vw - 4rem)); max-height: min(84vh, 56rem); padding: 1.25rem 1.3rem 1.35rem; border: 1px solid rgba(177, 232, 243, 0.17); opacity: 0; pointer-events: none; background: linear-gradient(135deg, rgba(9, 23, 31, 0.82), rgba(2, 8, 12, 0.68)); box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.38); transform: translate(-0.8rem, -50%); transition: width 360ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1); backdrop-filter: blur(24px) saturate(1.2); }
   .focus-card.is-open { opacity: 1; pointer-events: auto; transform: translate(0, -50%); }
+  .focus-card.has-content { width: min(36rem, calc(100vw - 4rem)); }
   .focus-close { position: absolute; right: 0.7rem; top: 0.55rem; padding: 0.25rem; border: 0; color: #64808b; background: transparent; font-size: 1.1rem; cursor: pointer; }
   .focus-kind { color: #6f9aa5; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.13em; }
   .focus-card h1 { margin: 0.9rem 0 1.1rem; color: #f0fdff; font-size: clamp(1.25rem, 2.4vw, 1.85rem); font-weight: 400; line-height: 1.12; letter-spacing: -0.025em; }
   .focus-meta, .focus-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
   .focus-meta span { padding: 0.32rem 0.42rem; border: 1px solid rgba(177, 232, 243, 0.13); color: #6e8993; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.08em; }
+  .focus-body { margin-top: 1rem; padding: 0.1rem 0.25rem 0.2rem 0; overflow-y: auto; color: #acc4ca; font-size: 0.76rem; line-height: 1.65; scrollbar-width: thin; scrollbar-color: rgba(133, 196, 209, 0.28) transparent; }
+  .focus-body :global(h2), .focus-body :global(h3), .focus-body :global(h4) { margin: 1rem 0 0.45rem; color: #e9fbfd; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.01em; }
+  .focus-body :global(p) { margin: 0.55rem 0; }
+  .focus-body :global(ul), .focus-body :global(ol) { margin: 0.65rem 0; padding-left: 1.2rem; }
+  .focus-body :global(blockquote) { margin: 0.8rem 0; padding: 0.05rem 0 0.05rem 0.75rem; border-left: 1px solid rgba(111, 232, 255, 0.38); color: #8eabb3; }
+  .focus-body :global(a) { color: #a9e9f2; text-underline-offset: 0.2em; }
+  .focus-body :global(code) { color: #c7eef3; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.7rem; }
+  .focus-body :global(pre) { padding: 0.7rem; overflow-x: auto; background: rgba(1, 7, 10, 0.62); }
+  .focus-body :global(figure) { margin: 0.8rem 0; }
+  .focus-body :global(img) { display: block; width: 100%; max-height: 44vh; border: 1px solid rgba(177, 232, 243, 0.12); object-fit: contain; cursor: zoom-in; background: rgba(0, 0, 0, 0.24); transition: border-color 180ms ease, filter 180ms ease; }
+  .focus-body :global(img:hover), .focus-body :global(img:focus-visible) { border-color: rgba(177, 232, 243, 0.42); filter: brightness(1.06); outline: none; }
+  .focus-body :global(figcaption) { margin-top: 0.45rem; color: #59737c; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.07em; }
   .focus-actions { margin-top: 1.15rem; }
   .focus-actions a { color: #a9e9f2; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.52rem; letter-spacing: 0.08em; text-decoration: none; }
+
+  .media-lightbox { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; padding: 4vw; opacity: 0; background: rgba(0, 3, 6, 0.9); pointer-events: none; transition: opacity 220ms ease; backdrop-filter: blur(18px); }
+  .media-lightbox.is-open { opacity: 1; pointer-events: auto; }
+  .media-lightbox[hidden] { display: none; }
+  .media-lightbox img { display: block; max-width: 92vw; max-height: 88vh; object-fit: contain; box-shadow: 0 2rem 7rem rgba(0, 0, 0, 0.6); transform: scale(0.985); transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .media-lightbox.is-open img { transform: scale(1); }
+  .media-lightbox button { position: absolute; right: 1.5rem; top: 1.2rem; padding: 0.4rem; border: 0; color: #91aeb6; background: transparent; font-size: 1.4rem; cursor: pointer; }
 
   .loading-mark { left: 50%; top: 50%; display: flex; align-items: center; gap: 0.7rem; color: #607b86; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.52rem; letter-spacing: 0.16em; transform: translate(-50%, -50%); transition: opacity 0.8s ease; }
   .loading-mark i { width: 0.55rem; height: 0.55rem; border: 1px solid #7edbeb; border-radius: 50%; box-shadow: 0 0 1rem rgba(126, 219, 235, 0.55); animation: pulse 1.2s ease-in-out infinite; }
@@ -1084,8 +1173,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
     .cluster-legend button { font-size: 0.43rem; }
     .field-status { right: 1rem; bottom: auto; top: 4.2rem; }
     .field-status b { display: none; }
-    .focus-card { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); transform: translateY(0.7rem); }
+    .focus-card, .focus-card.has-content { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); max-height: 70vh; transform: translateY(0.7rem); }
     .focus-card.is-open { transform: translateY(0); }
+    .focus-body :global(img) { max-height: 32vh; }
     .vignette { box-shadow: inset 0 0 5rem 1rem rgba(0, 0, 0, 0.72); }
     :global(.cluster-label) { font-size: 0.58rem; }
   }
