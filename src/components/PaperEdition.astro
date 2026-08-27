@@ -1,0 +1,384 @@
+---
+import { render, type CollectionEntry } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+interface Props {
+  edition: CollectionEntry<"paperRadar">;
+  allEditions: CollectionEntry<"paperRadar">[];
+  isLatest?: boolean;
+}
+
+const { edition, allEditions, isLatest = false } = Astro.props;
+const { Content } = await render(edition);
+const editionDate = edition.data.date.toISOString().slice(0, 10);
+const formatDate = (date: Date) =>
+  new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: "Asia/Shanghai"
+  }).format(date);
+---
+
+<BaseLayout
+  title={`${edition.data.title} | Paper Radar`}
+  description={edition.data.summary}
+  pathname="/papers"
+>
+  <section class="edition-hero">
+    <div class="edition-identity">
+      <div class="eyebrow">Paper Radar · {edition.data.focus}</div>
+      <h1>{edition.data.title}</h1>
+      <p>{edition.data.summary}</p>
+      <div class="edition-meta">
+        <time datetime={editionDate}>{formatDate(edition.data.date)}</time>
+        <span>{edition.data.paper_count} 篇达到门槛</span>
+        {isLatest && <span class="latest-mark">今日更新</span>}
+      </div>
+    </div>
+    <aside class="reading-rule">
+      <span class="rule-label">今日配额</span>
+      <div><strong>1</strong><span>今日主推</span></div>
+      <div><strong>2</strong><span>前沿观察</span></div>
+      <div><strong>1</strong><span>遗漏补全</span></div>
+      <small>最多四篇 · 宁缺毋滥</small>
+    </aside>
+  </section>
+
+  <nav class="archive-strip" aria-label="论文雷达归档">
+    <span>历史归档</span>
+    {
+      allEditions.map((item, index) => {
+        const itemDate = item.data.date.toISOString().slice(0, 10);
+        const href = index === 0 ? "/papers" : `/papers/${item.id}`;
+        return (
+          <a href={href} aria-current={item.id === edition.id ? "page" : undefined}>
+            {itemDate}
+          </a>
+        );
+      })
+    }
+  </nav>
+
+  <article class="edition-copy">
+    <Content />
+  </article>
+
+  <footer class="best-first">
+    <span>今日最值得先读什么</span>
+    <strong>{edition.data.best_first}</strong>
+  </footer>
+</BaseLayout>
+
+<style>
+  .edition-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.65fr);
+    gap: 1rem;
+  }
+
+  .edition-identity,
+  .reading-rule {
+    border: 1px solid var(--line);
+    border-radius: 2rem;
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
+  }
+
+  .edition-identity {
+    padding: clamp(1.7rem, 5vw, 3.5rem);
+  }
+
+  .edition-identity h1 {
+    max-width: 15ch;
+    margin: 0.55rem 0 1rem;
+    font-family: var(--serif);
+    font-size: clamp(2.7rem, 6vw, 5.2rem);
+    font-weight: 600;
+    line-height: 0.98;
+  }
+
+  .edition-identity > p {
+    max-width: 46rem;
+    margin: 0;
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.8;
+  }
+
+  .edition-meta {
+    display: flex;
+    gap: 0.65rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .edition-meta span:not(:last-child)::after,
+  .edition-meta time::after {
+    content: "·";
+    margin-left: 0.65rem;
+    color: rgba(31, 30, 26, 0.28);
+  }
+
+  .edition-meta .latest-mark {
+    padding: 0.3rem 0.55rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .reading-rule {
+    display: grid;
+    align-content: center;
+    gap: 0.7rem;
+    padding: clamp(1.4rem, 3vw, 2.2rem);
+    background:
+      linear-gradient(155deg, rgba(178, 76, 44, 0.14), rgba(255, 252, 245, 0.86)),
+      var(--bg-elevated);
+  }
+
+  .rule-label,
+  .reading-rule small {
+    color: var(--muted);
+    font-size: 0.76rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .reading-rule div {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    gap: 0.7rem;
+    align-items: baseline;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .reading-rule strong {
+    color: var(--accent);
+    font-family: var(--serif);
+    font-size: 1.8rem;
+  }
+
+  .reading-rule small {
+    justify-self: end;
+    margin-top: 0.35rem;
+  }
+
+  .archive-strip {
+    display: flex;
+    gap: 0.55rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 1.35rem 0 3rem;
+    color: var(--muted);
+  }
+
+  .archive-strip > span {
+    margin-right: 0.2rem;
+    font-size: 0.85rem;
+  }
+
+  .archive-strip a {
+    padding: 0.48rem 0.72rem;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.55);
+    font-family: var(--mono);
+    font-size: 0.8rem;
+  }
+
+  .archive-strip a[aria-current="page"],
+  .archive-strip a:hover {
+    border-color: rgba(178, 76, 44, 0.34);
+    background: var(--accent-soft);
+    color: var(--text);
+  }
+
+  .edition-copy {
+    max-width: 58rem;
+    margin: 0 auto;
+  }
+
+  .edition-copy :global(.opening-note) {
+    margin: 0 0 3rem;
+    padding: 1.25rem 1.4rem;
+    border-left: 0.28rem solid var(--accent);
+    border-radius: 0 1.2rem 1.2rem 0;
+    background: rgba(255, 252, 245, 0.7);
+    color: var(--muted);
+    font-size: 1.05rem;
+    line-height: 1.75;
+  }
+
+  .edition-copy :global(.slot-intro) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    align-items: baseline;
+    margin: 3.4rem 0 1.1rem;
+  }
+
+  .edition-copy :global(.slot-intro span) {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+  }
+
+  .edition-copy :global(.slot-intro h2) {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 600;
+  }
+
+  .edition-copy :global(.slot-intro p) {
+    grid-column: 2;
+    margin: -0.5rem 0 0;
+    color: var(--muted);
+  }
+
+  .edition-copy :global(.paper-brief) {
+    margin-top: 1rem;
+    padding: clamp(1.35rem, 4vw, 2.25rem);
+    border: 1px solid var(--line);
+    border-radius: 1.7rem;
+    background: rgba(255, 252, 245, 0.78);
+    box-shadow: 0 16px 42px rgba(33, 26, 15, 0.07);
+  }
+
+  .edition-copy :global(.paper-brief.primary) {
+    border-color: rgba(178, 76, 44, 0.32);
+    background:
+      linear-gradient(150deg, rgba(178, 76, 44, 0.09), transparent 44%),
+      rgba(255, 252, 245, 0.88);
+  }
+
+  .edition-copy :global(.paper-kicker) {
+    color: var(--accent);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .edition-copy :global(.paper-brief h3) {
+    margin: 0.5rem 0 0.65rem;
+    font-family: var(--serif);
+    font-size: clamp(1.65rem, 4vw, 2.5rem);
+    line-height: 1.16;
+  }
+
+  .edition-copy :global(.paper-brief h3 a:hover) {
+    color: var(--accent);
+  }
+
+  .edition-copy :global(.paper-byline) {
+    margin: 0 0 1.5rem;
+    color: var(--muted);
+    line-height: 1.65;
+  }
+
+  .edition-copy :global(.editorial-take) {
+    margin: 0 0 1.5rem;
+    padding: 1rem 1.15rem;
+    border-radius: 1rem;
+    background: rgba(31, 30, 26, 0.055);
+    font-family: var(--serif);
+    font-size: 1.18rem;
+    line-height: 1.65;
+  }
+
+  .edition-copy :global(.brief-grid) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem 1.5rem;
+  }
+
+  .edition-copy :global(.brief-grid h4) {
+    margin: 0 0 0.35rem;
+    color: var(--muted);
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .edition-copy :global(.brief-grid p) {
+    margin: 0;
+    line-height: 1.7;
+  }
+
+  .edition-copy :global(.reading-decision) {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .edition-copy :global(.reading-decision strong) {
+    padding: 0.35rem 0.6rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .edition-copy :global(.empty-note) {
+    margin: 1rem 0 0;
+    padding: 1rem 1.2rem;
+    border: 1px dashed var(--line);
+    border-radius: 1.1rem;
+    color: var(--muted);
+  }
+
+  .best-first {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    align-items: baseline;
+    max-width: 58rem;
+    margin: 2.5rem auto 0;
+    padding: 1.3rem 1.5rem;
+    border-radius: 1.3rem;
+    background: var(--text);
+    color: #fff8f0;
+  }
+
+  .best-first span {
+    color: rgba(255, 248, 240, 0.62);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 760px) {
+    .edition-hero,
+    .edition-copy :global(.brief-grid) {
+      grid-template-columns: 1fr;
+    }
+
+    .edition-copy :global(.slot-intro) {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+
+    .edition-copy :global(.slot-intro p) {
+      grid-column: 1;
+      margin: 0;
+    }
+
+    .best-first {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

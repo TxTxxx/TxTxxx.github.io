@@ -17,4 +17,17 @@ const blog = defineCollection({
   })
 });
 
-export const collections = { blog };
+const paperRadar = defineCollection({
+  loader: glob({ pattern: "**/*.md", base: "./src/content/paper-radar" }),
+  schema: z.object({
+    title: z.string(),
+    date: z.coerce.date(),
+    summary: z.string(),
+    focus: z.string(),
+    best_first: z.string(),
+    paper_count: z.number().int().min(0).max(4),
+    draft: z.boolean().default(false)
+  })
+});
+
+export const collections = { blog, paperRadar };

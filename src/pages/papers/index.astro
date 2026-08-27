@@ -1,0 +1,15 @@
+---
+import { getCollection } from "astro:content";
+import PaperEdition from "../../components/PaperEdition.astro";
+
+const editions = (await getCollection("paperRadar", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+const latestEdition = editions[0];
+
+if (!latestEdition) {
+  throw new Error("Paper Radar requires at least one published edition.");
+}
+---
+
+<PaperEdition edition={latestEdition} allEditions={editions} isLatest />

@@ -1,0 +1,24 @@
+---
+import { getCollection, type CollectionEntry } from "astro:content";
+import PaperEdition from "../../components/PaperEdition.astro";
+
+export async function getStaticPaths() {
+  const editions = (await getCollection("paperRadar", ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+  );
+
+  return editions.map((edition) => ({
+    params: { date: edition.id },
+    props: { edition, editions }
+  }));
+}
+
+interface Props {
+  edition: CollectionEntry<"paperRadar">;
+  editions: CollectionEntry<"paperRadar">[];
+}
+
+const { edition, editions } = Astro.props;
+---
+
+<PaperEdition edition={edition} allEditions={editions} />
