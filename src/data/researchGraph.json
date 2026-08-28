@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-08-27T14:36:59.344Z",
+  "generatedAt": "2026-08-28T15:31:32.879Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 3,
-    "papers": 1,
+    "nodes": 4,
+    "papers": 2,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 12
+    "evidenceSignals": 21
   },
   "nodes": [
     {
@@ -36,6 +36,32 @@
       "evidenceCount": 0,
       "maturity": 100,
       "atlasCardHtml": "",
+      "atlasCardImages": 0
+    },
+    {
+      "id": "paper-10edc29447",
+      "path": "20 论文/kingmaAutoEncodingVariationalBayes2022",
+      "title": "Auto-Encoding Variational Bayes",
+      "type": "paper",
+      "citekey": "kingmaAutoEncodingVariationalBayes2022",
+      "status": "inbox",
+      "readingLevel": "normal",
+      "paperRole": "方法",
+      "atlasLabel": "VAE",
+      "year": 2022,
+      "authors": "Diederik P. Kingma, Max Welling",
+      "topics": [
+        "basic"
+      ],
+      "created": "2026-08-28",
+      "readDate": "2026-08-28",
+      "doi": "10.48550/arXiv.1312.6114",
+      "sourceUrl": "http://arxiv.org/abs/1312.6114",
+      "zoteroUri": "zotero://select/library/items/KV4QLMEP",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>ELBO(Evidence Lower Bound)</li>\n<li>蒙特卡洛估计（用样本平均（真实采样）近似真实期望）</li>\n<li>SGVB（Stochastic Gradient Variational Bayes 随机梯度变分贝叶斯）：用随机样本估计变分目标及其梯度，再用梯度优化模型</li>\n<li>MAP（最大后验估计）：与最大似然（只考虑数据）不同， MAP不仅考虑数据，还考虑我们对参数的先验认识---起到一个正则化的作用</li>\n<li>有一个看不见的生成过程，先生成隐藏元素z，再根据z生成我们看到的数据。我们看到许多x，想反过来学习z（有点世界模型的味道）</li>\n<li>重参数化仍然有随机性，但它让模型能够直接观察：对于同一个噪声 (\\epsilon)，(\\mu) 或 (\\sigma) 改变一点，会让 (z) 和损失怎样变化？</li>\n<li>VAE的三个假设：先验是标准正态分布，对角高斯近似后验（z之间相互独立），用神经网络实现</li>\n<li>VAE 单独blog 缓慢推进中</li>\n</ol>",
       "atlasCardImages": 0
     },
     {
