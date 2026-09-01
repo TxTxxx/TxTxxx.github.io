@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">Human to Robot Transfer editorial cover</title>
+  <desc id="desc">An original editorial cover made of amber and blue particles converging across a dark field. It is not a figure from the paper.</desc>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="45%" r="80%">
+      <stop offset="0" stop-color="#172337"/>
+      <stop offset="0.62" stop-color="#0a111d"/>
+      <stop offset="1" stop-color="#04070c"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" x2="1">
+      <stop offset="0" stop-color="#f3b33d"/>
+      <stop offset="0.5" stop-color="#f6d27c"/>
+      <stop offset="1" stop-color="#79b9ff"/>
+    </linearGradient>
+    <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <g opacity=".22" stroke="#91a7c3" stroke-width="1">
+    <path d="M0 180H1600M0 360H1600M0 540H1600M0 720H1600"/>
+    <path d="M320 0V900M640 0V900M960 0V900M1280 0V900"/>
+  </g>
+  <path d="M280 480C490 285 690 300 800 450S1110 620 1320 410" fill="none" stroke="url(#line)" stroke-width="3" opacity=".66"/>
+  <g filter="url(#glow)">
+    <circle cx="280" cy="480" r="16" fill="#f3b33d"/>
+    <circle cx="800" cy="450" r="18" fill="#f6d27c"/>
+    <circle cx="1320" cy="410" r="16" fill="#79b9ff"/>
+  </g>
+  <g fill="#f3b33d" opacity=".72">
+    <circle cx="200" cy="380" r="5"/><circle cx="238" cy="574" r="4"/><circle cx="375" cy="345" r="6"/><circle cx="430" cy="548" r="4"/><circle cx="525" cy="305" r="3"/>
+  </g>
+  <g fill="#79b9ff" opacity=".72">
+    <circle cx="1070" cy="605" r="5"/><circle cx="1168" cy="330" r="4"/><circle cx="1250" cy="544" r="6"/><circle cx="1395" cy="355" r="4"/><circle cx="1450" cy="492" r="3"/>
+  </g>
+  <text x="100" y="122" fill="#f2f5f8" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="28" letter-spacing="5">PAPER RADAR / 2026.09.02</text>
+  <text x="100" y="748" fill="#f7f8fa" font-family="Inter, Helvetica, Arial, sans-serif" font-size="72" font-weight="600">HUMAN → ROBOT</text>
+  <text x="104" y="810" fill="#9fb0c6" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="26" letter-spacing="3">TRANSFER EMERGES AFTER DIVERSE PRETRAINING</text>
+</svg>
