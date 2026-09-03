@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title desc">
+  <title id="title">VLA co-training editorial cover</title>
+  <desc id="desc">Five data streams pass through three training stages and converge into a compact VLA core. This is an original editorial graphic, not a figure from the paper.</desc>
+  <defs>
+    <radialGradient id="bg" cx="78%" cy="20%" r="95%">
+      <stop offset="0" stop-color="#182c35"/>
+      <stop offset="0.55" stop-color="#0b171d"/>
+      <stop offset="1" stop-color="#05090c"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" x2="1">
+      <stop offset="0" stop-color="#8ee3d1" stop-opacity="0.12"/>
+      <stop offset="0.58" stop-color="#8ee3d1" stop-opacity="0.82"/>
+      <stop offset="1" stop-color="#f2b36f" stop-opacity="0.95"/>
+    </linearGradient>
+    <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="grid" width="80" height="80" patternUnits="userSpaceOnUse">
+      <path d="M80 0H0V80" fill="none" stroke="#9bc8c1" stroke-opacity="0.055"/>
+    </pattern>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <rect width="1600" height="900" fill="url(#grid)"/>
+  <g fill="none" stroke-linecap="round">
+    <path d="M120 230 C420 230 560 368 855 430 S1180 450 1395 450" stroke="#73d9c5" stroke-opacity="0.72" stroke-width="7"/>
+    <path d="M120 340 C410 340 585 395 855 438 S1190 450 1395 450" stroke="#a8d888" stroke-opacity="0.65" stroke-width="7"/>
+    <path d="M120 450 C430 450 600 430 855 446 S1190 450 1395 450" stroke="#f0d27a" stroke-opacity="0.72" stroke-width="7"/>
+    <path d="M120 560 C410 560 580 472 855 454 S1190 450 1395 450" stroke="#f0a56f" stroke-opacity="0.68" stroke-width="7"/>
+    <path d="M120 670 C420 670 560 510 855 462 S1180 450 1395 450" stroke="#db7c7c" stroke-opacity="0.65" stroke-width="7"/>
+  </g>
+  <g fill="#cfece7" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" letter-spacing="3">
+    <text x="120" y="188">VISION · LANGUAGE</text>
+    <text x="120" y="298">ROBOT · ANNOTATION</text>
+    <text x="120" y="408">CROSS · EMBODIMENT</text>
+    <text x="120" y="518">HUMAN · VIDEO</text>
+    <text x="120" y="628">ACTION · TOKEN</text>
+  </g>
+  <g transform="translate(600 270)">
+    <rect x="0" y="0" width="350" height="360" rx="34" fill="#0d1c22" stroke="#cfece7" stroke-opacity="0.16"/>
+    <path d="M70 84H280M70 180H280M70 276H280" stroke="url(#beam)" stroke-width="9" stroke-linecap="round"/>
+    <circle cx="70" cy="84" r="11" fill="#8ee3d1" filter="url(#glow)"/>
+    <circle cx="175" cy="180" r="11" fill="#d9d979" filter="url(#glow)"/>
+    <circle cx="280" cy="276" r="11" fill="#f2a26f" filter="url(#glow)"/>
+    <g fill="#8ba29f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="20" letter-spacing="2">
+      <text x="70" y="122">PHASE 01</text>
+      <text x="70" y="218">PHASE 02</text>
+      <text x="70" y="314">DEPLOY</text>
+    </g>
+  </g>
+  <circle cx="1395" cy="450" r="84" fill="#f2b36f" fill-opacity="0.08" stroke="#f2b36f" stroke-opacity="0.38"/>
+  <circle cx="1395" cy="450" r="19" fill="#f2b36f" filter="url(#glow)"/>
+  <text x="1120" y="732" fill="#f3eee5" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif" font-size="58" font-weight="600" letter-spacing="-1">CO-TRAINING</text>
+  <text x="1123" y="780" fill="#8ba29f" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="22" letter-spacing="5">89 POLICIES / 5 SIGNALS</text>
+  <text x="120" y="810" fill="#6f8583" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" letter-spacing="4">PAPER RADAR · 2026.09.03 · EDITORIAL GRAPHIC</text>
+</svg>
