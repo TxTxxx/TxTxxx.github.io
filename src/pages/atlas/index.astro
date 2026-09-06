@@ -343,7 +343,6 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
         <div class="focus-meta">
           <span data-focus-year></span>
           <span data-focus-cluster></span>
-          <span data-focus-status></span>
         </div>
         <div class="focus-relations" data-focus-relations hidden></div>
         <div class="focus-body" data-focus-body hidden></div>
@@ -387,7 +386,6 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
       const colorByCluster = new Map(data.clusters.map((cluster) => [cluster.id, cluster.color]));
       let activeFieldMode = "personal";
       const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-      const statusLabel = (node) => node.kind !== "personal" ? "演示数据" : ({ inbox: "待阅", skimmed: "初读", reading: "在读", digested: "精读", archived: "归档" }[node.status] || "未标注状态");
 
       // Both the interactive graph and static fallback read the same exported paper data.
       const populateCard = (node) => {
@@ -395,7 +393,6 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
         setText("[data-focus-title]", node.title);
         setText("[data-focus-year]", node.year ? String(node.year) : "年份未标注");
         setText("[data-focus-cluster]", node.fieldLabels?.join(" · ") || node.clusterLabel);
-        setText("[data-focus-status]", statusLabel(node));
         for (const [selector, url] of [["[data-focus-source]", node.sourceUrl], ["[data-focus-zotero]", node.zoteroUri]]) {
           const link = document.querySelector(selector);
           link?.toggleAttribute("hidden", !url);
@@ -676,9 +673,7 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
             button.setAttribute("aria-label", node.title);
             const title = document.createElement("strong");
             title.textContent = node.atlasLabel || node.title;
-            const meta = document.createElement("span");
-            meta.textContent = `${node.year || "—"} · ${statusLabel(node)}`;
-            button.append(title, meta);
+            button.append(title);
             button.addEventListener("click", () => focusNode(node.id));
             labelLayer.appendChild(button);
             paperLabelElements.set(node.id, button);
@@ -1235,7 +1230,6 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
   .label-layer { position: absolute; z-index: 5; inset: 0; overflow: hidden; pointer-events: none; }
   :global(.paper-map-label) { position: absolute; top: 0; left: 0; padding: 0.35rem 0.55rem; color: var(--atlas-ink); border: 0; background: transparent; text-align: center; cursor: pointer; pointer-events: auto; transition: color 180ms; }
   :global(.paper-map-label strong) { display: block; font: 400 1.25rem/1.35 "Iowan Old Style", "Palatino Linotype", Georgia, serif; letter-spacing: -0.015em; overflow-wrap: anywhere; }
-  :global(.paper-map-label span) { display: none; }
   :global(.paper-map-label::after) { content: ""; display: block; height: 1px; width: 1.5rem; margin: 0.45rem auto 0; background: var(--node-color); opacity: 0.3; transform: scaleX(0.55); transition: transform 180ms, opacity 180ms; }
   :global(.paper-map-label:hover), :global(.paper-map-label[aria-pressed="true"]) { color: var(--node-color); }
   :global(.paper-map-label:hover::after), :global(.paper-map-label[aria-pressed="true"]::after) { transform: scaleX(1); opacity: 0.8; }

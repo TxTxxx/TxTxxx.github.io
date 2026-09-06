@@ -5,6 +5,7 @@
 Atlas renders the existing `src/data/researchGraph.json` export. Obsidian and Zotero remain the source of truth. Website presentation changes must not modify the Vault, the Zotero database, export scope, synchronization commands, or publishing scripts.
 
 - Preserve node IDs, WikiLink relationships, `status`, `readingLevel`, `sourceUrl`, and `zoteroUri` from the export.
+- Do not show reading-status badges in Atlas cards or map labels. The user confirmed that these papers have been read; `status: inbox` is not reliable evidence of being unread. Preserve the original metadata without relabeling it, rewriting local notes, or inventing a replacement status.
 - `atlasLabel` follows Obsidian's `atlas_label`: a blank value means no persistent map label. Hovering or opening a paper may still display its full title.
 - Atlas is a single, minimal constellation view on desktop and mobile. Do not add a search box, a paper list, or view-switch controls. Keep interaction on the graph and the existing paper reader.
 - Only render the existing exported `atlasCardHtml` and `atlasCardImages`. Do not import additional private notes or annotations into the public site.

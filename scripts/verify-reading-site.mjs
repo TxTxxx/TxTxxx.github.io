@@ -21,6 +21,12 @@ for (const node of personal) {
 }
 assert.ok(atlas.includes('data-field-mode="personal"'));
 assert.ok(!/data-atlas-search|data-view-mode|data-results/.test(atlas), "Atlas should remain a single constellation view");
+assert.ok(!atlas.includes("data-focus-status"), "Atlas must not display an inferred reading-status badge");
+const atlasClient = read("src/pages/atlas/index.astro").split("<script>")[1].split("</script>")[0];
+assert.ok(!/statusLabel|data-focus-status|node\.(status|readingLevel)\b/.test(atlasClient), "Preserve reading metadata without turning it into public status labels");
+for (const [, src] of atlas.matchAll(/<script[^>]+src="(\/_astro\/[^"?#]+\.js)"/g)) {
+  assert.ok(!/待阅|未标注状态|data-focus-status/.test(read(`dist${src}`)), "Published Atlas script must not contain the removed status UI");
+}
 
 const radar = read("dist/papers/index.html");
 assert.ok(!radar.includes("今日更新"));
