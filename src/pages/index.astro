@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import PostCard from "../components/PostCard.astro";
+import NowNote from "../components/NowNote.astro";
 
 const categoryLabels = {
   "embodied-ai": "具身智能",
@@ -47,6 +48,8 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
       机器人学习、技术笔记，以及球场和生活里的记录。
     </p>
   </section>
+
+  <NowNote />
 
   <section class="featured-grid">
     {featuredPosts.map((post) => <PostCard post={post} variant="featured" />)}

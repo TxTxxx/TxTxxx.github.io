@@ -15,6 +15,8 @@ Atlas renders the existing `src/data/researchGraph.json` export. Obsidian and Zo
 
 ## Site-wide appearance
 
+The homepage Now note and optional Blog addenda are handwritten-only features; see `docs/writing.md`. Automatic content runs must not update `src/content/now.md`, add personal addenda, or rewrite Blog prose. The addenda renderer applies only to explicitly marked Blog blocks, not Radar or Atlas.
+
 `ThemeHead` and `ThemeToggle` are shared by `BaseLayout` and the standalone Atlas page. Colors live in `src/styles/theme.css`. The first visit follows the system appearance; an explicit light/dark choice is saved under `txtxx-theme` in local storage and shared across same-origin pages and tabs. Storage restrictions must not disable the toggle.
 
 Atlas listens for `txtxx:themechange` to recolor existing materials without rebuilding the graph or resetting the camera, active paper, or data mode. Its HTML fallback uses the same CSS tokens. Original figures and photographs are not inverted or filtered. Code blocks use Shiki's paired light/dark palettes.

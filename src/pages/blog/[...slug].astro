@@ -158,6 +158,39 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     background: var(--surface-subtle);
   }
 
+  .post-body :global(.post-addendum) {
+    margin: 2.5rem 0 0;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 0.65rem 0.65rem 0;
+    background: var(--bg-elevated);
+    font-size: 1rem;
+    line-height: 1.85;
+    overflow-wrap: anywhere;
+  }
+
+  .post-body :global(.addendum-header) {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+    font-family: var(--sans);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  .post-body :global(.addendum-header span) { color: var(--accent); }
+  .post-body :global(.addendum-header time) { color: var(--muted); font-variant-numeric: tabular-nums; }
+  .post-body :global(.post-addendum > p) { margin: 0.65rem 0; }
+  .post-body :global(.post-addendum > :last-child) { margin-bottom: 0; }
+  .post-body :global(.post-addendum h2), .post-body :global(.post-addendum h3) { margin-top: 1.25rem; }
+
+  @media (max-width: 640px) {
+    .post-body :global(.post-addendum) { padding: 1rem; }
+  }
+
   .post-body :global(video) {
     display: block;
     width: 100%;

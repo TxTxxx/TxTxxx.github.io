@@ -17,6 +17,7 @@ npm run dev
 
 ## Reading pages and Atlas
 
+- Handwritten Now updates and article addenda: [docs/writing.md](docs/writing.md)
 - Maintenance and Obsidian/Zotero integration boundaries: [docs/reading-site.md](docs/reading-site.md)
 - After building, verify integration data and reading routes with `node scripts/verify-reading-site.mjs`.
 - Verify light/dark preferences and page coverage with `node scripts/verify-theme.mjs`.

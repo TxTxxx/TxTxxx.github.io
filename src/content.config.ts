@@ -22,6 +22,14 @@ const blog = defineCollection({
   })
 });
 
+const now = defineCollection({
+  loader: glob({ pattern: "now.md", base: "./src/content" }),
+  schema: z.object({
+    updated: z.coerce.date().optional(),
+    draft: z.boolean().default(true)
+  })
+});
+
 const paperRadar = defineCollection({
   loader: glob({ pattern: paperPattern, base: "./src/content/paper-radar" }),
   schema: z.object({
@@ -66,4 +74,4 @@ const paperDeepDives = defineCollection({
   })
 });
 
-export const collections = { blog, paperRadar, paperDeepDives };
+export const collections = { blog, now, paperRadar, paperDeepDives };
