@@ -1,0 +1,90 @@
+:root {
+  color-scheme: light;
+  --bg: #f5f1e8;
+  --bg-elevated: rgba(255, 252, 245, 0.82);
+  --surface-strong: #fffcf5;
+  --surface-subtle: rgba(255, 255, 255, 0.55);
+  --text: #1f1e1a;
+  --muted: #686253;
+  --line: rgba(31, 30, 26, 0.12);
+  --accent: #b24c2c;
+  --accent-soft: rgba(178, 76, 44, 0.14);
+  --accent-line: rgba(178, 76, 44, 0.3);
+  --shadow: 0 5px 18px rgba(33, 26, 15, 0.035);
+  --header-bg: rgba(245, 241, 232, 0.9);
+  --footer-bg: rgba(255, 251, 244, 0.65);
+  --paper-gradient: linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(255, 248, 240, 0.82));
+  --on-emphasis: #fff8f0;
+  --on-emphasis-muted: rgba(255, 248, 240, 0.7);
+  --code-bg: #1d1d1b;
+  --code-text: #f5efe4;
+  --atlas-bg: #f6f4ef;
+  --atlas-ink: #303a3c;
+  --atlas-muted: #617169;
+  --atlas-line: #67756c33;
+  --atlas-surface: #fffdf9f5;
+  --atlas-soft: #ebece580;
+  --atlas-active: #fffdf8;
+  --atlas-dot: #8f9e9b;
+  --atlas-halo-one: #b7cdd425;
+  --atlas-halo-two: #bdb1cf20;
+  --atlas-vla: #426f80;
+  --atlas-world: #796595;
+  --atlas-action: #896337;
+  --atlas-reasoning: #946073;
+  --atlas-data: #47735e;
+  --atlas-evaluation: #9e5d46;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #171b20;
+  --bg-elevated: #20262d;
+  --surface-strong: #282f37;
+  --surface-subtle: #252c34;
+  --text: #e6e7e4;
+  --muted: #abb1b5;
+  --line: #e0e6e51c;
+  --accent: #e7a081;
+  --accent-soft: #e7a08118;
+  --accent-line: #e7a08166;
+  --shadow: 0 5px 18px #0000001f;
+  --header-bg: #171b20ed;
+  --footer-bg: #1b2026;
+  --paper-gradient: linear-gradient(160deg, #272e36, #20262d);
+  --on-emphasis: #20252b;
+  --on-emphasis-muted: #465058;
+  --code-bg: #11161c;
+  --code-text: #e0e6ed;
+  --atlas-bg: #171b20;
+  --atlas-ink: #dde5e5;
+  --atlas-muted: #a5b4b5;
+  --atlas-line: #b3c4c529;
+  --atlas-surface: #212a30f5;
+  --atlas-soft: #273138a6;
+  --atlas-active: #34424b;
+  --atlas-dot: #71848c;
+  --atlas-halo-one: #4364721f;
+  --atlas-halo-two: #7965951c;
+  --atlas-vla: #8cbed0;
+  --atlas-world: #b6a8d0;
+  --atlas-action: #cfb082;
+  --atlas-reasoning: #d3a4b7;
+  --atlas-data: #94c4aa;
+  --atlas-evaluation: #d3a18e;
+}
+
+/* Preserve source figures and photographs; only the surrounding UI changes. */
+html .astro-code,
+html .astro-code span {
+  color: var(--shiki-light, #24292e) !important;
+  background-color: var(--shiki-light-bg, #fff) !important;
+}
+
+html .astro-code code { color: inherit !important; }
+
+html[data-theme="dark"] .astro-code,
+html[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark, #e0e6ed) !important;
+  background-color: var(--shiki-dark-bg, #11161c) !important;
+}

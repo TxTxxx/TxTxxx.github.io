@@ -2,6 +2,8 @@
 import "../styles/global.css";
 import "katex/dist/katex.min.css";
 import { siteMeta } from "../data/profile";
+import ThemeHead from "../components/ThemeHead.astro";
+import ThemeToggle from "../components/ThemeToggle.astro";
 
 interface Props {
   title?: string;
@@ -17,7 +19,7 @@ const {
   description = siteMeta.description,
   variant = "blog",
   pathname = Astro.url.pathname,
-  canonicalPath = pathname,
+  canonicalPath = Astro.url.pathname,
   image
 } = Astro.props;
 
@@ -37,6 +39,8 @@ const navItems = [
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <ThemeHead />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
@@ -55,17 +59,20 @@ const navItems = [
       <div class="site-header-inner">
         <a class="brand" href="/">
           <span class="brand-mark">TxTxx</span>
-          <span class="brand-title">Notes, research, and public drafts</span>
+          <span class="brand-title">Notes & research</span>
         </a>
-        <nav class="nav" aria-label="Primary">
-          {
-            navItems.map((item) => (
-              <a class={pathname === item.href ? "active" : ""} href={item.href}>
-                {item.label}
-              </a>
-            ))
-          }
-        </nav>
+        <div class="header-controls">
+          <nav class="nav" aria-label="Primary">
+            {
+              navItems.map((item) => (
+                <a class={pathname === item.href ? "active" : ""} href={item.href}>
+                  {item.label}
+                </a>
+              ))
+            }
+          </nav>
+          <div class="site-theme-control"><ThemeToggle /></div>
+        </div>
       </div>
     </header>
     <main class="site-shell">
@@ -80,8 +87,8 @@ const navItems = [
         <div class="site-footer-links">
           <a href={`mailto:${siteMeta.email}`}>Email</a>
           <a href={siteMeta.github}>GitHub</a>
-          <a href={siteMeta.scholar}>Scholar</a>
-          <a href={siteMeta.cv}>CV</a>
+          {siteMeta.scholar && siteMeta.scholar !== "#" && <a href={siteMeta.scholar}>Scholar</a>}
+          {siteMeta.cv && siteMeta.cv !== "#" && <a href={siteMeta.cv}>CV</a>}
         </div>
       </div>
     </footer>

@@ -12,7 +12,7 @@ category: embodied-ai
 cover_image: /images/openvla-oft-steerable-experiment/openvla-oft-steering-2x2-cover.png
 featured_slot: 1
 cover_alt: OpenVLA, OFT, and Steering 2x2 experiment cover explaining language-side and action-side ablations
-draft: false
+draft: true
 ---
 
 # OpenVLA-OFT 上加入 steering commands 是否还有增益：Bridge V2 到 SimplerEnv 的 2×2 实验

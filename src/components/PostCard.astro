@@ -73,8 +73,8 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
     aspect-ratio: 16 / 10;
     padding: 1rem;
     background:
-      linear-gradient(160deg, rgba(255, 255, 255, 0.5), rgba(255, 248, 240, 0.82)),
-      linear-gradient(135deg, rgba(178, 76, 44, 0.2), transparent 45%);
+      var(--paper-gradient),
+      linear-gradient(135deg, var(--accent-soft), transparent 45%);
     border-bottom: 1px solid var(--line);
   }
 
@@ -83,8 +83,8 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
     height: 100%;
     border-radius: 1.15rem;
     overflow: hidden;
-    background: rgba(255, 251, 244, 0.72);
-    border: 1px solid rgba(31, 30, 26, 0.08);
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -93,8 +93,8 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
   .post-card-media img {
     width: 100%;
     height: 100%;
-    object-fit: contain;
-    background: rgba(255, 255, 255, 0.75);
+    object-fit: cover;
+    background: var(--surface-subtle);
   }
 
   .post-card.cover-image .post-card-media img {
@@ -157,8 +157,8 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
   }
 
   .post-card.featured h3 {
-    font-size: clamp(1.9rem, 3vw, 2.7rem);
-    line-height: 1;
+    font-size: clamp(1.5rem, 2.4vw, 2rem);
+    line-height: 1.35;
     margin-bottom: 0.75rem;
   }
 
@@ -175,8 +175,8 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
 
   .post-card.journal-card {
     border-radius: 1.2rem;
-    background: rgba(255, 252, 247, 0.72);
-    box-shadow: 0 10px 20px rgba(33, 26, 15, 0.05);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
   }
 
   .post-card.journal-card .post-card-link {

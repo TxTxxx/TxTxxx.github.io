@@ -3,7 +3,11 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import PaperDeepDive from "../../../components/PaperDeepDive.astro";
 
 export async function getStaticPaths() {
-  const entries = await getCollection("paperDeepDives", ({ data }) => !data.draft);
+  // Preview samples stay out of ordinary builds and published archives.
+  const previewSamples = import.meta.env.PAPER_RADAR_PREVIEW === "1";
+  const entries = await getCollection("paperDeepDives", ({ id, data }) =>
+    !data.draft || (previewSamples && id.endsWith("-preview"))
+  );
   return entries.map((entry) => ({
     params: { slug: entry.id },
     props: { entry }

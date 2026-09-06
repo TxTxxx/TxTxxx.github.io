@@ -72,14 +72,14 @@ const entries = (await getCollection("paperDeepDives", ({ data }) => !data.draft
     border: 1px solid var(--line);
     border-radius: 1.6rem;
     background: var(--bg-elevated);
-    box-shadow: 0 16px 38px rgba(33, 26, 15, 0.07);
+    box-shadow: var(--shadow);
     transition: transform 180ms ease, border-color 180ms ease;
   }
 
   .deep-card:hover,
   .deep-card:focus-visible {
     transform: translateY(-3px);
-    border-color: rgba(178, 76, 44, 0.34);
+    border-color: var(--accent-line);
   }
 
   .deep-card img {
@@ -87,7 +87,7 @@ const entries = (await getCollection("paperDeepDives", ({ data }) => !data.draft
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 1rem;
-    background: #fff;
+    background: var(--bg-elevated);
   }
 
   .deep-card span {

@@ -8,6 +8,8 @@ interface Props {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+const sections = [...(entry.body || "").matchAll(/<section[^>]*id="([^"]+)"[^>]*>[\s\S]*?<h2>([\s\S]*?)<\/h2>/g)]
+  .map(match => ({ id: match[1], title: match[2].replace(/<[^>]*>/g, "") }));
 const editionDate = entry.data.date.toISOString().slice(0, 10);
 const canonicalPath = `/papers/deep-dive/${entry.id}/`;
 const formattedDate = new Intl.DateTimeFormat("zh-CN", {
@@ -26,8 +28,8 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
   image={entry.data.hero_image}
 >
   <header class="deep-hero">
-    <a class="back-link" href="/papers/">← 返回今日论文雷达</a>
-    <div class="deep-label">TODAY'S DEEP DIVE · {entry.data.venue}</div>
+    <a class="back-link" href="/papers/">← 返回每日论文雷达</a>
+    <div class="deep-label">自动导读 · {entry.data.venue}</div>
     <h1>{entry.data.title}</h1>
     <p class="paper-title">{entry.data.paper_title}</p>
     <p class="hero-summary">{entry.data.summary}</p>
@@ -49,14 +51,9 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
     <aside class="deep-nav">
       <div class="eyebrow">阅读路线</div>
       <nav aria-label="主推导读目录">
-        <a href="#verdict">30 秒判断</a>
-        <a href="#problem">它解决什么</a>
-        <a href="#method">方法怎么工作</a>
-        <a href="#evidence">证据是否够硬</a>
-        <a href="#limits">可信边界</a>
-        <a href="#reading">如何读原文</a>
+        {sections.map(section => <a href={`#${section.id}`}>{section.title}</a>)}
       </nav>
-      <p>页面中的论文图片均标注 Figure 编号、PDF 页码和原始来源。</p>
+      <p>由 Codex 整理，供初读参考。个人阅读状态以阅读图谱为准。</p>
     </aside>
 
     <article class="deep-copy">
@@ -73,8 +70,8 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
     border: 1px solid var(--line);
     border-radius: 2.2rem;
     background:
-      radial-gradient(circle at 85% 15%, rgba(178, 76, 44, 0.2), transparent 18rem),
-      linear-gradient(145deg, rgba(255, 252, 245, 0.94), rgba(247, 236, 220, 0.82));
+      radial-gradient(circle at 85% 15%, var(--accent-soft), transparent 18rem),
+      var(--paper-gradient);
     box-shadow: var(--shadow);
   }
 
@@ -135,7 +132,7 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
   .hero-meta time::after {
     content: "·";
     margin-left: 0.55rem;
-    color: rgba(31, 30, 26, 0.28);
+    color: var(--muted);
   }
 
   .source-actions {
@@ -160,7 +157,7 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
     padding: 1.1rem;
     border: 1px solid var(--line);
     border-radius: 1.2rem;
-    background: rgba(255, 252, 245, 0.68);
+    background: var(--bg-elevated);
   }
 
   .deep-nav nav {
@@ -226,9 +223,9 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
 
   .deep-copy :global(.verdict-box) {
     padding: 1.35rem 1.5rem;
-    border: 1px solid rgba(178, 76, 44, 0.24);
+    border: 1px solid var(--accent-line);
     border-radius: 1.3rem;
-    background: linear-gradient(145deg, rgba(178, 76, 44, 0.1), rgba(255, 252, 245, 0.8));
+    background: linear-gradient(145deg, var(--accent-soft), var(--bg-elevated));
   }
 
   .deep-copy :global(.verdict-box strong) {
@@ -258,7 +255,7 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
     padding: 1rem;
     border: 1px solid var(--line);
     border-radius: 1.1rem;
-    background: rgba(255, 252, 245, 0.68);
+    background: var(--bg-elevated);
   }
 
   .deep-copy :global(.question-grid strong),
@@ -283,8 +280,8 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
     padding: 0.8rem;
     border: 1px solid var(--line);
     border-radius: 1.3rem;
-    background: #fff;
-    box-shadow: 0 16px 38px rgba(33, 26, 15, 0.08);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
   }
 
   .deep-copy :global(.paper-figure img) {
@@ -309,7 +306,7 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
     padding: 1rem 1.15rem;
     border-left: 0.28rem solid var(--accent);
     border-radius: 0 1rem 1rem 0;
-    background: rgba(255, 252, 245, 0.72);
+    background: var(--bg-elevated);
   }
 
   .deep-copy :global(.signal-note p) {

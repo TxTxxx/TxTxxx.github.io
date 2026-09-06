@@ -8,7 +8,7 @@ import { aboutProfile, siteMeta } from "../data/profile";
     <div class="about-hero">
       <div class="hero-copy">
         <div class="eyebrow">About</div>
-        <h1>A concise academic page, now with the same warmer visual rhythm as the blog.</h1>
+        <h1>{aboutProfile.name}</h1>
         <p>{aboutProfile.bio}</p>
       </div>
       <div class="hero-panel">
@@ -24,8 +24,8 @@ import { aboutProfile, siteMeta } from "../data/profile";
 
     <div class="about-grid">
       <article class="panel">
-        <h2>Bio</h2>
-        <p>{aboutProfile.bio}</p>
+        <h2>Research interests</h2>
+        <p>{aboutProfile.interests.join(" · ")}</p>
       </article>
       <article class="panel">
         <h2>Contact</h2>
@@ -38,10 +38,10 @@ import { aboutProfile, siteMeta } from "../data/profile";
             <span>GitHub</span>
             <a href={siteMeta.github}>{siteMeta.github}</a>
           </li>
-          <li>
+          {siteMeta.scholar && siteMeta.scholar !== "#" && <li>
             <span>Scholar</span>
             <a href={siteMeta.scholar}>{siteMeta.scholar}</a>
-          </li>
+          </li>}
         </ul>
       </article>
     </div>
@@ -79,7 +79,7 @@ import { aboutProfile, siteMeta } from "../data/profile";
   .panel {
     padding: 1.5rem;
     border: 1px solid var(--line);
-    border-radius: 2rem;
+    border-radius: 0.8rem;
     background: var(--bg-elevated);
     box-shadow: var(--shadow);
   }
@@ -96,8 +96,8 @@ import { aboutProfile, siteMeta } from "../data/profile";
     flex-direction: column;
     justify-content: flex-end;
     background:
-      linear-gradient(160deg, rgba(255, 255, 255, 0.56), rgba(255, 248, 240, 0.92)),
-      linear-gradient(135deg, rgba(178, 76, 44, 0.15), transparent 45%);
+      var(--paper-gradient),
+      linear-gradient(135deg, var(--accent-soft), transparent 45%);
   }
 
   .panel h2 {

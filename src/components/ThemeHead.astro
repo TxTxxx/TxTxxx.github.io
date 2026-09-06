@@ -1,0 +1,46 @@
+---
+import "../styles/theme.css";
+---
+
+<meta name="theme-color" content="#f5f1e8" />
+<script is:inline>
+  (() => {
+    const key = "txtxx-theme";
+    const root = document.documentElement;
+    const system = window.matchMedia("(prefers-color-scheme: dark)");
+    const valid = value => value === "light" || value === "dark";
+    let preference = null;
+    try { const saved = localStorage.getItem(key); if (valid(saved)) preference = saved; } catch {}
+
+    const syncButtons = () => {
+      const dark = root.dataset.theme === "dark";
+      document.querySelectorAll("[data-theme-toggle]").forEach(button => {
+        const label = dark ? "切换至浅色模式" : "切换至深色模式";
+        button.setAttribute("aria-label", label);
+        button.setAttribute("title", label);
+      });
+    };
+    const apply = () => {
+      const theme = preference || (system.matches ? "dark" : "light");
+      root.dataset.theme = theme;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute("content", theme === "dark" ? "#171b20" : "#f5f1e8");
+      syncButtons();
+      document.dispatchEvent(new CustomEvent("txtxx:themechange", { detail: { theme } }));
+    };
+    // Run in the head before content is painted to avoid a light flash on dark pages.
+    apply();
+    document.addEventListener("DOMContentLoaded", syncButtons, { once: true });
+    document.addEventListener("click", event => {
+      if (!(event.target instanceof Element) || !event.target.closest("[data-theme-toggle]")) return;
+      preference = root.dataset.theme === "dark" ? "light" : "dark";
+      try { localStorage.setItem(key, preference); } catch {}
+      apply();
+    });
+    system.addEventListener("change", () => { if (!preference) apply(); });
+    window.addEventListener("storage", event => {
+      if (event.key !== key && event.key !== null) return;
+      preference = valid(event.newValue) ? event.newValue : null;
+      apply();
+    });
+  })();
+</script>

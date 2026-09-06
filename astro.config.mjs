@@ -6,6 +6,10 @@ export default defineConfig({
   site: "https://txtxx.me",
   output: "static",
   markdown: {
+    shikiConfig: {
+      themes: { light: "github-light", dark: "github-dark" },
+      defaultColor: false
+    },
     remarkPlugins: [remarkMath],
     rehypePlugins: [rehypeKatex]
   }

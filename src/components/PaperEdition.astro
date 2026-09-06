@@ -24,6 +24,7 @@ const formatDate = (date: Date) =>
   title={`${edition.data.title} | Paper Radar`}
   description={edition.data.summary}
   pathname="/papers"
+  canonicalPath={isLatest ? "/papers/" : `/papers/${edition.id}/`}
 >
   <section class="edition-hero">
     <div class="edition-identity">
@@ -33,7 +34,7 @@ const formatDate = (date: Date) =>
       <div class="edition-meta">
         <time datetime={editionDate}>{formatDate(edition.data.date)}</time>
         <span>{edition.data.paper_count} 篇达到门槛</span>
-        {isLatest && <span class="latest-mark">今日更新</span>}
+        {isLatest && <span class="latest-mark">最新一期</span>}
       </div>
     </div>
     <aside class="reading-rule">
@@ -62,6 +63,20 @@ const formatDate = (date: Date) =>
 
   <article class="edition-copy">
     <Content />
+    {!/<section\s+class="paper-brief/.test(edition.body || "") && edition.data.papers?.map(paper => (
+      <section class="paper-brief">
+        <div class="paper-kicker">{paper.tags.join(" · ")}</div>
+        <h3><a href={paper.url} target="_blank" rel="noreferrer">{paper.title} ↗</a></h3>
+        {paper.publication && <p class="paper-byline">{paper.publication}</p>}
+        <p class="editorial-take">{paper.summary}</p>
+        {paper.guide_url && <p class="deep-dive-link"><a href={paper.guide_url}>打开主推导读 →</a></p>}
+        {paper.code_url && <p><a href={paper.code_url} target="_blank" rel="noreferrer">代码 ↗</a></p>}
+        {(paper.note || paper.reading_status) && <div class="reading-decision">
+          {paper.reading_status && <strong>{paper.reading_status}</strong>}
+          {paper.note && <span>{paper.note}</span>}
+        </div>}
+      </section>
+    ))}
   </article>
 
   <footer class="best-first">
@@ -121,7 +136,7 @@ const formatDate = (date: Date) =>
   .edition-meta time::after {
     content: "·";
     margin-left: 0.65rem;
-    color: rgba(31, 30, 26, 0.28);
+    color: var(--muted);
   }
 
   .edition-meta .latest-mark {
@@ -137,7 +152,7 @@ const formatDate = (date: Date) =>
     gap: 0.7rem;
     padding: clamp(1.4rem, 3vw, 2.2rem);
     background:
-      linear-gradient(155deg, rgba(178, 76, 44, 0.14), rgba(255, 252, 245, 0.86)),
+      linear-gradient(155deg, var(--accent-soft), var(--bg-elevated)),
       var(--bg-elevated);
   }
 
@@ -187,14 +202,14 @@ const formatDate = (date: Date) =>
     padding: 0.48rem 0.72rem;
     border: 1px solid var(--line);
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.55);
+    background: var(--surface-subtle);
     font-family: var(--mono);
     font-size: 0.8rem;
   }
 
   .archive-strip a[aria-current="page"],
   .archive-strip a:hover {
-    border-color: rgba(178, 76, 44, 0.34);
+    border-color: var(--accent-line);
     background: var(--accent-soft);
     color: var(--text);
   }
@@ -209,7 +224,7 @@ const formatDate = (date: Date) =>
     padding: 1.25rem 1.4rem;
     border-left: 0.28rem solid var(--accent);
     border-radius: 0 1.2rem 1.2rem 0;
-    background: rgba(255, 252, 245, 0.7);
+    background: var(--bg-elevated);
     color: var(--muted);
     font-size: 1.05rem;
     line-height: 1.75;
@@ -248,15 +263,15 @@ const formatDate = (date: Date) =>
     padding: clamp(1.35rem, 4vw, 2.25rem);
     border: 1px solid var(--line);
     border-radius: 1.7rem;
-    background: rgba(255, 252, 245, 0.78);
-    box-shadow: 0 16px 42px rgba(33, 26, 15, 0.07);
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow);
   }
 
   .edition-copy :global(.paper-brief.primary) {
-    border-color: rgba(178, 76, 44, 0.32);
+    border-color: var(--accent-line);
     background:
-      linear-gradient(150deg, rgba(178, 76, 44, 0.09), transparent 44%),
-      rgba(255, 252, 245, 0.88);
+      linear-gradient(150deg, var(--accent-soft), transparent 44%),
+      var(--bg-elevated);
   }
 
   .edition-copy :global(.paper-kicker) {
@@ -288,7 +303,7 @@ const formatDate = (date: Date) =>
     margin: 0 0 1.5rem;
     padding: 1rem 1.15rem;
     border-radius: 1rem;
-    background: rgba(31, 30, 26, 0.055);
+    background: var(--surface-subtle);
     font-family: var(--serif);
     font-size: 1.18rem;
     line-height: 1.65;
@@ -303,7 +318,7 @@ const formatDate = (date: Date) =>
     padding: 0.75rem 1rem;
     border-radius: 999px;
     background: var(--text);
-    color: #fff8f0;
+    color: var(--on-emphasis);
     font-weight: 700;
     transition: transform 180ms ease, opacity 180ms ease;
   }
@@ -371,11 +386,11 @@ const formatDate = (date: Date) =>
     padding: 1.3rem 1.5rem;
     border-radius: 1.3rem;
     background: var(--text);
-    color: #fff8f0;
+    color: var(--on-emphasis);
   }
 
   .best-first span {
-    color: rgba(255, 248, 240, 0.62);
+    color: var(--on-emphasis-muted);
     font-size: 0.78rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;

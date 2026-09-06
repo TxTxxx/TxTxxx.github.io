@@ -3,7 +3,10 @@ import { getCollection, type CollectionEntry } from "astro:content";
 import PaperEdition from "../../components/PaperEdition.astro";
 
 export async function getStaticPaths() {
-  const editions = (await getCollection("paperRadar", ({ data }) => !data.draft)).sort(
+  const previewSamples = import.meta.env.PAPER_RADAR_PREVIEW === "1";
+  const editions = (await getCollection("paperRadar", ({ id, data }) =>
+    !data.draft || (previewSamples && id.endsWith("-preview"))
+  )).sort(
     (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
   );
 

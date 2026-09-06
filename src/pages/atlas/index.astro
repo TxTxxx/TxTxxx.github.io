@@ -1,13 +1,15 @@
 ---
 import researchGraph from "../../data/researchGraph.json";
+import ThemeHead from "../../components/ThemeHead.astro";
+import ThemeToggle from "../../components/ThemeToggle.astro";
 
 const clusters = [
-  { id: "vla", label: "VLA", mapLabel: "VLA", color: "#6fe8ff", center: [-10, 4, 0] },
-  { id: "world", label: "WORLD MODELS", mapLabel: "WORLD", color: "#8f84ff", center: [-4, -7, -2] },
-  { id: "action", label: "ACTION", mapLabel: "ACTION", color: "#ffbe72", center: [7, -6, 1] },
-  { id: "reasoning", label: "REASONING", mapLabel: "REASONING", color: "#ff78b7", center: [11, 4, -2] },
-  { id: "data", label: "DATA + SCALE", mapLabel: "DATA", color: "#72f0b1", center: [1, 9, -1] },
-  { id: "evaluation", label: "EVAL + SIM", mapLabel: "EVAL", color: "#ff765f", center: [-13, -5, -3] }
+  { id: "vla", label: "VLA", mapLabel: "VLA", color: "#426f80", center: [-10, 4, 0] },
+  { id: "world", label: "World models", mapLabel: "WORLD", color: "#796595", center: [-4, -7, -2] },
+  { id: "action", label: "Action", mapLabel: "ACTION", color: "#9a7344", center: [7, -6, 1] },
+  { id: "reasoning", label: "Reasoning", mapLabel: "REASONING", color: "#a06b7b", center: [11, 4, -2] },
+  { id: "data", label: "Data", mapLabel: "DATA", color: "#527e69", center: [1, 9, -1] },
+  { id: "evaluation", label: "Evaluation", mapLabel: "EVAL", color: "#af6a51", center: [-13, -5, -3] }
 ];
 
 function mulberry32(seed: number) {
@@ -181,6 +183,8 @@ const clusterForTopic = (topic: string) => {
 
 const personalPapers = researchGraph.nodes.filter((node) => node.type === "paper");
 const personalNodes = personalPapers.map((node, index) => {
+  const seed = [...node.id].reduce((value, char) => Math.imul(value, 31) + char.charCodeAt(0) | 0, 7);
+  const stableRandom = mulberry32(seed);
   const fieldIds = [...new Set((node.topics?.length ? node.topics : ["vla"]).map(clusterForTopic))];
   const primaryCluster = clusters.find((cluster) => cluster.id === fieldIds[0]) ?? clusters[0];
   const secondaryCluster = clusters.find((cluster) => cluster.id === fieldIds[1]);
@@ -201,11 +205,11 @@ const personalNodes = personalPapers.map((node, index) => {
     fieldLabels: fieldIds.map((id) => clusters.find((cluster) => cluster.id === id)?.label ?? id.toUpperCase()),
     secondaryColor: secondaryCluster?.color || "",
     color: primaryCluster.color,
-    accent: "#e8fbff",
-    x: center[0] + personalGaussian() * spread,
-    y: center[1] + personalGaussian() * spread * 0.78,
-    z: center[2] + personalGaussian() * spread * 0.58,
-    size: 0.68 + maturity * 0.0026,
+    accent: primaryCluster.color,
+    x: center[0] + (stableRandom() - 0.5) * spread * 4,
+    y: center[1] + (stableRandom() - 0.5) * spread * 4,
+    z: center[2] + (stableRandom() - 0.5) * spread,
+    size: 0.94 + maturity * 0.0034,
     maturity,
     year: node.year,
     kind: "personal",
@@ -267,11 +271,14 @@ const atlasData = {
   }
 };
 const atlasJson = JSON.stringify(atlasData).replaceAll("<", "\\u003c");
-const fallbackDots = nodes.slice(0, 150).map((node) => ({
+const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
+  id: node.id,
+  title: node.title,
+  label: node.atlasLabel,
   left: Math.min(96, Math.max(4, 50 + Number(node.x) * 2.7)),
   top: Math.min(94, Math.max(6, 50 - Number(node.y) * 3.4)),
   size: Number(node.size) * 7,
-  color: String(node.color)
+  color: `var(--atlas-${node.cluster})`
 }));
 ---
 
@@ -280,14 +287,16 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#020508" />
+    <ThemeHead />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href="https://txtxx.me/atlas/" />
     <title>ATLAS / TxTxx</title>
-    <meta name="description" content="An experimental research constellation." />
+    <meta name="description" content="TxTxx 的论文收藏与公开阅读笔记。" />
   </head>
   <body>
-    <main class="atlas" data-atlas>
-      <div class="fallback-field" aria-hidden="true">
-        {fallbackDots.map((dot) => <i style={`--x:${dot.left}%;--y:${dot.top}%;--s:${dot.size}px;--c:${dot.color}`}></i>)}
+    <main class="atlas" data-atlas data-field-mode="personal">
+      <div class="fallback-field">
+        {fallbackDots.map((dot) => <button class="fallback-dot" type="button" data-fallback-node={dot.id} aria-label={dot.title} style={`--x:${dot.left}%;--y:${dot.top}%;--s:${dot.size}px;--c:${dot.color}`}><i></i>{dot.label && <span>{dot.label}</span>}</button>)}
       </div>
       <div class="webgl-mount" data-webgl-mount aria-label="Interactive research constellation"></div>
       <div class="grain" aria-hidden="true"></div>
@@ -296,31 +305,31 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       <header class="atlas-mark">
         <a href="/" aria-label="返回 TxTxx 网站">TX</a>
         <span></span>
-        <b>ATLAS</b>
+        <b>Atlas <small>阅读图谱</small></b>
       </header>
 
       <div class="atlas-tools">
-        <label class="atlas-search">
-          <span>⌕</span>
-          <input type="search" placeholder="SEARCH" autocomplete="off" data-atlas-search />
-        </label>
-        <button type="button" data-reset>RESET</button>
+        <ThemeToggle />
+        <button type="button" data-reset aria-label="将图谱归位">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" /><circle cx="12" cy="12" r="3" /></svg>
+          <span>归位</span>
+        </button>
       </div>
 
       <div class="cluster-legend" aria-label="Research fields">
-        {clusters.map((cluster) => <button type="button" data-cluster={cluster.id} aria-pressed="false"><i style={`--c:${cluster.color}`}></i>{cluster.label}</button>)}
+        {clusters.map((cluster) => <button type="button" data-cluster={cluster.id} aria-pressed="false"><i style={`--c:var(--atlas-${cluster.id})`}></i>{cluster.label}</button>)}
       </div>
 
       <div class="field-status">
         <div class="field-switch" aria-label="Atlas data field">
-          <button type="button" data-field-mode="demo" aria-pressed="true">DEMO FIELD</button>
+          <button type="button" data-field-mode="personal" aria-pressed="true">我的论文</button>
           <i aria-hidden="true"></i>
-          <button type="button" data-field-mode="personal" aria-pressed="false">MY FIELD</button>
+          <button type="button" data-field-mode="demo" aria-pressed="false">演示</button>
         </div>
-        <b data-node-count>{demoFieldNodes.length} NODES</b>
+        <b data-node-count>{personalNodes.length} 篇</b>
       </div>
 
-      <div class="label-layer" data-label-layer aria-hidden="true"></div>
+      <div class="label-layer" data-label-layer></div>
 
       <div class="hover-label" data-hover-label hidden>
         <span data-hover-index></span>
@@ -334,11 +343,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
         <div class="focus-meta">
           <span data-focus-year></span>
           <span data-focus-cluster></span>
+          <span data-focus-status></span>
         </div>
+        <div class="focus-relations" data-focus-relations hidden></div>
         <div class="focus-body" data-focus-body hidden></div>
         <div class="focus-actions">
-          <a data-focus-source target="_blank" rel="noreferrer" hidden>OPEN PAPER ↗</a>
-          <a data-focus-zotero hidden>ZOTERO ↗</a>
+          <a data-focus-source target="_blank" rel="noreferrer" hidden>原文 ↗</a>
+          <a data-focus-zotero hidden>Zotero ↗</a>
         </div>
       </aside>
 
@@ -347,16 +358,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
         <img data-media-image alt="" />
       </div>
 
-      <div class="loading-mark" data-loading><i></i><span>FORMING FIELD</span></div>
+      <div class="loading-mark" data-loading><i></i><span>载入图谱</span></div>
       <script id="atlas-data" type="application/json" set:html={atlasJson}></script>
     </main>
 
     <script>
       import * as THREE from "three";
       import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-      import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-      import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-      import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
 
       const atlas = document.querySelector("[data-atlas]");
       const mount = document.querySelector("[data-webgl-mount]");
@@ -368,7 +376,6 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       const mediaLightbox = document.querySelector("[data-media-lightbox]");
       const mediaImage = document.querySelector("[data-media-image]");
       const mediaClose = document.querySelector("[data-media-close]");
-      const search = document.querySelector("[data-atlas-search]");
       const reset = document.querySelector("[data-reset]");
       const closeFocus = document.querySelector("[data-focus-close]");
       const clusterButtons = Array.from(document.querySelectorAll("[data-cluster]"));
@@ -378,12 +385,53 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       const data = dataElement ? JSON.parse(dataElement.textContent || "{}") : { nodes: [], edges: [], clusters: [] };
       const dataById = new Map(data.nodes.map((node) => [node.id, node]));
       const colorByCluster = new Map(data.clusters.map((cluster) => [cluster.id, cluster.color]));
-      let activeFieldMode = "demo";
+      let activeFieldMode = "personal";
+      const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const statusLabel = (node) => node.kind !== "personal" ? "演示数据" : ({ inbox: "待阅", skimmed: "初读", reading: "在读", digested: "精读", archived: "归档" }[node.status] || "未标注状态");
 
+      // Both the interactive graph and static fallback read the same exported paper data.
+      const populateCard = (node) => {
+        setText("[data-focus-kind]", node.kind === "personal" ? "我的论文" : "演示数据");
+        setText("[data-focus-title]", node.title);
+        setText("[data-focus-year]", node.year ? String(node.year) : "年份未标注");
+        setText("[data-focus-cluster]", node.fieldLabels?.join(" · ") || node.clusterLabel);
+        setText("[data-focus-status]", statusLabel(node));
+        for (const [selector, url] of [["[data-focus-source]", node.sourceUrl], ["[data-focus-zotero]", node.zoteroUri]]) {
+          const link = document.querySelector(selector);
+          link?.toggleAttribute("hidden", !url);
+          if (url) link.href = url;
+        }
+        focusBody.hidden = !node.cardHtml;
+        focusBody.innerHTML = node.cardHtml || "";
+        const relationBox = document.querySelector("[data-focus-relations]");
+        relationBox.replaceChildren();
+        const relations = data.edges.filter(edge => edge.fieldMode === activeFieldMode && (edge.source === node.id || edge.target === node.id));
+        relationBox.hidden = !relations.length;
+        const labels = { manual: "笔记关联", "shared-field": "共同领域", "shared-concept": "共同概念" };
+        for (const edge of relations.slice(0, 8)) {
+          const related = dataById.get(edge.source === node.id ? edge.target : edge.source);
+          if (!related) continue;
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = `${labels[edge.kind] || "演示关联"} · ${related.atlasLabel || related.title}`;
+          button.addEventListener("click", () => focusNode(related.id));
+          relationBox.appendChild(button);
+        }
+      };
+      let focusNode = (id) => {
+        const node = dataById.get(id);
+        if (!node) return;
+        populateCard(node);
+        focusCard.hidden = false;
+        requestAnimationFrame(() => focusCard.classList.add("is-open"));
+      };
       const setText = (selector, value) => {
         const element = document.querySelector(selector);
         if (element) element.textContent = value || "—";
       };
+      document.querySelectorAll("[data-fallback-node]").forEach(button => {
+        button.addEventListener("click", () => focusNode(button.dataset.fallbackNode));
+      });
 
       const makeGlowTexture = () => {
         const canvas = document.createElement("canvas");
@@ -391,13 +439,20 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
         canvas.height = 128;
         const context = canvas.getContext("2d");
         const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
-        gradient.addColorStop(0, "rgba(255,255,255,1)");
-        gradient.addColorStop(0.08, "rgba(255,255,255,0.98)");
-        gradient.addColorStop(0.24, "rgba(255,255,255,0.5)");
-        gradient.addColorStop(0.58, "rgba(255,255,255,0.12)");
+        gradient.addColorStop(0, "rgba(255,255,255,0.12)");
+        gradient.addColorStop(0.45, "rgba(255,255,255,0.08)");
         gradient.addColorStop(1, "rgba(255,255,255,0)");
         context.fillStyle = gradient;
         context.fillRect(0, 0, 128, 128);
+        context.beginPath();
+        context.arc(64, 64, 21, 0, Math.PI * 2);
+        context.fillStyle = "#ffffff";
+        context.fill();
+        context.beginPath();
+        context.arc(64, 64, 39, 0, Math.PI * 2);
+        context.strokeStyle = "rgba(255,255,255,0.32)";
+        context.lineWidth = 1.8;
+        context.stroke();
         const texture = new THREE.CanvasTexture(canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
         return texture;
@@ -417,9 +472,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
         context.font = font;
         context.textAlign = "center";
         context.textBaseline = "middle";
-        context.shadowColor = glowColor;
-        context.shadowBlur = 18;
-        context.fillStyle = "rgba(238, 253, 255, 0.96)";
+        context.fillStyle = "#ffffff";
         context.fillText(label, canvas.width / 2, canvas.height / 2 + 1);
         const texture = new THREE.CanvasTexture(canvas);
         texture.colorSpace = THREE.SRGBColorSpace;
@@ -432,24 +485,19 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
       if (atlas && mount && data.nodes.length) {
         try {
           const scene = new THREE.Scene();
-          scene.background = new THREE.Color(0x020508);
-          scene.fog = new THREE.FogExp2(0x020508, 0.018);
+          scene.fog = new THREE.FogExp2(0xf6f4ef, 0.003);
 
           const camera = new THREE.PerspectiveCamera(46, window.innerWidth / window.innerHeight, 0.1, 150);
           camera.position.set(0, 0.5, 34);
 
-          const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+          const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "default" });
+          renderer.setClearColor(0xf6f4ef, 0);
           renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
           renderer.setSize(window.innerWidth, window.innerHeight);
           renderer.outputColorSpace = THREE.SRGBColorSpace;
-          renderer.toneMapping = THREE.ACESFilmicToneMapping;
+          renderer.toneMapping = THREE.NoToneMapping;
           renderer.toneMappingExposure = 1;
           mount.appendChild(renderer.domElement);
-
-          const composer = new EffectComposer(renderer);
-          composer.addPass(new RenderPass(scene, camera));
-          const bloom = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.82, 0.58, 0.22);
-          composer.addPass(bloom);
 
           const controls = new OrbitControls(camera, renderer.domElement);
           controls.enableDamping = true;
@@ -461,7 +509,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           controls.maxDistance = 58;
           controls.rotateSpeed = 0.22;
           controls.zoomSpeed = 0.65;
-          controls.autoRotate = true;
+          controls.autoRotate = false;
           controls.autoRotateSpeed = 0.12;
 
           const universe = new THREE.Group();
@@ -472,7 +520,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           const spritesByField = new Map([["demo", []], ["personal", []]]);
 
           const baseNodeOpacity = (node) => node.kind === "personal"
-            ? 0.56 + Math.min(100, Math.max(0, Number(node.maturity) || 0)) * 0.0026
+            ? 0.86 + Math.min(100, Math.max(0, Number(node.maturity) || 0)) * 0.0014
             : node.kind === "preview" ? 0.74 : node.atlasLabel ? 0.72 : 0.58;
 
           data.nodes.forEach((node) => {
@@ -482,7 +530,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               color: new THREE.Color(node.color),
               transparent: true,
               opacity: initialOpacity,
-              blending: THREE.AdditiveBlending,
+              blending: THREE.NormalBlending,
               depthWrite: false
             });
             const sprite = new THREE.Sprite(material);
@@ -501,14 +549,14 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             spriteById.set(node.id, sprite);
             spritesByField.get(node.fieldMode)?.push(sprite);
 
-            if (node.atlasLabel) {
+            if (node.atlasLabel && node.kind !== "personal") {
               const labelTexture = makeLabelTexture(node.atlasLabel, node.color);
               const labelMaterial = new THREE.SpriteMaterial({
                 map: labelTexture.texture,
-                color: new THREE.Color(node.color).lerp(new THREE.Color("#ffffff"), 0.58),
+                color: new THREE.Color(node.color),
                 transparent: true,
                 opacity: node.fieldMode === activeFieldMode ? 0.62 : 0,
-                blending: THREE.AdditiveBlending,
+                blending: THREE.NormalBlending,
                 depthTest: true,
                 depthWrite: false,
                 fog: true,
@@ -531,7 +579,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 color: new THREE.Color(node.secondaryColor),
                 transparent: true,
                 opacity: node.fieldMode === activeFieldMode ? 0.2 : 0,
-                blending: THREE.AdditiveBlending,
+                blending: THREE.NormalBlending,
                 depthWrite: false,
                 side: THREE.DoubleSide
               });
@@ -548,7 +596,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
                 color: new THREE.Color(node.accent || "#ffffff"),
                 transparent: true,
                 opacity: interactionOnly ? 0 : node.fieldMode === activeFieldMode ? 0.3 : 0,
-                blending: THREE.AdditiveBlending,
+                blending: THREE.NormalBlending,
                 depthWrite: false,
                 side: THREE.DoubleSide
               });
@@ -575,30 +623,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             });
             const lineGeometry = new THREE.BufferGeometry();
             lineGeometry.setAttribute("position", new THREE.Float32BufferAttribute(linePositions, 3));
-            const initialOpacity = fieldMode === activeFieldMode ? 0.16 : 0;
-            const lineMaterial = new THREE.LineBasicMaterial({ color: fieldMode === "personal" ? 0x4a8793 : 0x315d70, transparent: true, opacity: initialOpacity, blending: THREE.AdditiveBlending, depthWrite: false });
+            const initialOpacity = fieldMode === activeFieldMode ? 0.2 : 0;
+            const lineMaterial = new THREE.LineBasicMaterial({ color: fieldMode === "personal" ? 0x718b91 : 0x89999d, transparent: true, opacity: initialOpacity, blending: THREE.NormalBlending, depthWrite: false });
             const edgeField = new THREE.LineSegments(lineGeometry, lineMaterial);
             edgeField.userData.targetOpacity = initialOpacity;
             universe.add(edgeField);
             edgeFields.set(fieldMode, edgeField);
           });
-
-          const starCount = 1800;
-          const starPositions = new Float32Array(starCount * 3);
-          const starRandom = (index) => {
-            const value = Math.sin(index * 12.9898 + 78.233) * 43758.5453;
-            return value - Math.floor(value);
-          };
-          for (let index = 0; index < starCount; index += 1) {
-            starPositions[index * 3] = (starRandom(index) - 0.5) * 85;
-            starPositions[index * 3 + 1] = (starRandom(index + 1900) - 0.5) * 52;
-            starPositions[index * 3 + 2] = (starRandom(index + 3900) - 0.5) * 48 - 7;
-          }
-          const starGeometry = new THREE.BufferGeometry();
-          starGeometry.setAttribute("position", new THREE.BufferAttribute(starPositions, 3));
-          const starMaterial = new THREE.PointsMaterial({ color: 0x8fb5c6, size: 0.045, transparent: true, opacity: 0.42, depthWrite: false });
-          const starField = new THREE.Points(starGeometry, starMaterial);
-          scene.add(starField);
 
           const raycaster = new THREE.Raycaster();
           const pointer = new THREE.Vector2(4, 4);
@@ -610,13 +641,55 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           let cardHideTimer = null;
           let highlightedLines = null;
           let pointerDown = null;
+          let returnCamera = null;
+
+          // Only update presentation materials: preserve graph data, camera and selection.
+          const applyAtlasTheme = () => {
+            const style = getComputedStyle(document.documentElement);
+            const background = style.getPropertyValue("--atlas-bg").trim();
+            scene.fog.color.set(background);
+            renderer.setClearColor(background, 0);
+            data.clusters.forEach(cluster => {
+              colorByCluster.set(cluster.id, style.getPropertyValue(`--atlas-${cluster.id}`).trim());
+            });
+            sprites.forEach(sprite => {
+              const node = sprite.userData;
+              const primary = colorByCluster.get(node.cluster);
+              sprite.material.color.set(primary);
+              node.labelSprite?.material.color.set(primary);
+              node.ring?.material.color.set(primary);
+              node.fieldRing?.material.color.set(colorByCluster.get(node.fields?.[1]) || primary);
+            });
+            edgeFields.forEach(edgeField => {
+              edgeField.material.color.set(style.getPropertyValue("--atlas-muted").trim());
+            });
+            if (highlightedLines && selected) {
+              highlightedLines.material.color.set(colorByCluster.get(dataById.get(selected)?.cluster));
+            }
+          };
+          const paperLabelElements = new Map();
+          data.nodes.filter(node => node.kind === "personal" && node.atlasLabel).forEach(node => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "paper-map-label";
+            button.style.setProperty("--node-color", `var(--atlas-${node.cluster})`);
+            button.setAttribute("aria-label", node.title);
+            const title = document.createElement("strong");
+            title.textContent = node.atlasLabel || node.title;
+            const meta = document.createElement("span");
+            meta.textContent = `${node.year || "—"} · ${statusLabel(node)}`;
+            button.append(title, meta);
+            button.addEventListener("click", () => focusNode(node.id));
+            labelLayer.appendChild(button);
+            paperLabelElements.set(node.id, button);
+          });
 
           const clusterLabelElements = new Map();
           data.clusters.forEach((cluster) => {
             const element = document.createElement("span");
             element.className = "cluster-label";
             element.textContent = cluster.mapLabel || cluster.label;
-            element.style.setProperty("--label-color", cluster.color);
+            element.style.setProperty("--label-color", `var(--atlas-${cluster.id})`);
             labelLayer.appendChild(element);
             clusterLabelElements.set(cluster.id, element);
           });
@@ -637,6 +710,21 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
 
           const activeNodes = () => data.nodes.filter((node) => node.fieldMode === activeFieldMode);
 
+          const fitField = (animated = true) => {
+            const members = activeNodes().filter(node => !activeCluster || belongsToCluster(node, activeCluster));
+            if (!members.length) return;
+            const bounds = new THREE.Box3();
+            members.forEach(node => bounds.expandByPoint(new THREE.Vector3(node.x, node.y, node.z)));
+            const center = bounds.getCenter(new THREE.Vector3());
+            const size = bounds.getSize(new THREE.Vector3());
+            const tangent = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+            const distance = Math.min(58, Math.max(12, (Math.max((size.y + 5) / tangent, (size.x + 10) / (tangent * camera.aspect)) / 2 + size.z) * 1.1));
+            const position = center.clone().add(new THREE.Vector3(0, 0, distance));
+            universe.rotation.set(0, 0, 0);
+            if (animated && !reducedMotion) moveCameraTo(position, center, 500);
+            else { camera.position.copy(position); controls.target.copy(center); camera.lookAt(center); controls.update(); }
+          };
+
           const scopeIds = () => activeCluster
             ? new Set(activeNodes().filter((node) => belongsToCluster(node, activeCluster)).map((node) => node.id))
             : null;
@@ -656,7 +744,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               }
             });
             edgeFields.forEach((edgeField, fieldMode) => {
-              edgeField.userData.targetOpacity = fieldMode === activeFieldMode ? 0.16 : 0;
+              edgeField.userData.targetOpacity = fieldMode === activeFieldMode ? (fieldMode === "personal" ? 0.28 : 0.13) : 0;
             });
           };
 
@@ -668,7 +756,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               button.hidden = !availableClusters.has(button.dataset.cluster);
               button.setAttribute("aria-pressed", "false");
             });
-            if (nodeCount) nodeCount.textContent = activeFieldMode === "personal" ? `${currentNodes.length} PAPERS` : `${currentNodes.length} NODES`;
+            if (nodeCount) nodeCount.textContent = `${currentNodes.length} ${activeFieldMode === "personal" ? "篇" : "个演示节点"}`;
             atlas.dataset.fieldMode = activeFieldMode;
           };
 
@@ -776,7 +864,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             if (!positions.length) return;
             const geometry = new THREE.BufferGeometry();
             geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
-            const material = new THREE.LineBasicMaterial({ color: new THREE.Color(colorByCluster.get(node.cluster) || "#ffffff"), transparent: true, opacity: 0.82, blending: THREE.AdditiveBlending, depthWrite: false });
+            const material = new THREE.LineBasicMaterial({ color: new THREE.Color(colorByCluster.get(node.cluster) || "#426f80"), transparent: true, opacity: 0.68, blending: THREE.NormalBlending, depthWrite: false });
             highlightedLines = new THREE.LineSegments(geometry, material);
             universe.add(highlightedLines);
           };
@@ -785,6 +873,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             const node = dataById.get(nodeId);
             const sprite = spriteById.get(nodeId);
             if (!node || !sprite || node.fieldMode !== activeFieldMode) return;
+            if (!selected) returnCamera = { position: camera.position.clone(), target: controls.target.clone() };
             selected = nodeId;
             controls.autoRotate = false;
             updateNodeOpacity(connectedIds(nodeId));
@@ -793,21 +882,12 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             universe.updateMatrixWorld(true);
             const nodeTarget = new THREE.Vector3();
             sprite.getWorldPosition(nodeTarget);
-            moveCameraTo(nodeTarget.clone().add(direction.multiplyScalar(6.5)), nodeTarget, 780, null, "orbit", 0.07);
-            const personalKind = node.noteType === "paper" ? "PERSONAL / PAPER" : node.noteType === "field" ? "PERSONAL / FIELD" : node.noteType === "concept" ? "PERSONAL / CONCEPT" : "PERSONAL / NOTE";
-            setText("[data-focus-kind]", node.kind === "personal" ? personalKind : node.kind === "preview" ? "SIMULATED / READ SIGNAL" : "SIMULATED / FIELD CONTEXT");
-            setText("[data-focus-title]", node.title);
-            setText("[data-focus-year]", node.year ? String(node.year) : "—");
-            setText("[data-focus-cluster]", Array.isArray(node.fieldLabels) ? node.fieldLabels.join(" · ") : node.clusterLabel);
-            const source = document.querySelector("[data-focus-source]");
-            const zotero = document.querySelector("[data-focus-zotero]");
-            source?.toggleAttribute("hidden", !node.sourceUrl);
-            zotero?.toggleAttribute("hidden", !node.zoteroUri);
-            if (source && node.sourceUrl) source.href = node.sourceUrl;
-            if (zotero && node.zoteroUri) zotero.href = node.zoteroUri;
+            if (!reducedMotion) moveCameraTo(nodeTarget.clone().add(direction.multiplyScalar(16)), nodeTarget, 500);
+            populateCard(node);
             updateFocusBody(node);
             openFocusCard();
           };
+          focusNode = showFocus;
 
           const closeSelection = () => {
             cancelCameraTransition();
@@ -817,20 +897,25 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             clearHighlightedLines();
             updateNodeOpacity(scopeIds());
             controls.autoRotate = false;
+            if (returnCamera) {
+              if (reducedMotion) { camera.position.copy(returnCamera.position); controls.target.copy(returnCamera.target); controls.update(); }
+              else moveCameraTo(returnCamera.position, returnCamera.target, 450);
+            }
+            returnCamera = null;
           };
 
           const resetField = () => {
+            cancelCameraTransition();
             selected = null;
             activeCluster = null;
+            returnCamera = null;
             closeMedia();
             hideFocusCard();
             clearHighlightedLines();
             updateNodeOpacity();
             controls.autoRotate = false;
             clusterButtons.forEach((button) => button.setAttribute("aria-pressed", "false"));
-            moveCameraTo(new THREE.Vector3(0, 0.5, 34), new THREE.Vector3(0, 0, 0), 1080, () => {
-              controls.autoRotate = true;
-            }, "orbit", 0.26);
+            fitField();
           };
 
           const switchField = (nextFieldMode) => {
@@ -838,6 +923,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             cancelCameraTransition();
             selected = null;
             activeCluster = null;
+            returnCamera = null;
             activeFieldMode = nextFieldMode;
             closeMedia();
             hovered = null;
@@ -847,9 +933,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             updateNodeOpacity();
             refreshFieldInterface();
             controls.autoRotate = false;
-            moveCameraTo(new THREE.Vector3(0, 0.5, 34), new THREE.Vector3(0, 0, 0), 940, () => {
-              controls.autoRotate = true;
-            }, "orbit", 0.18);
+            fitField();
           };
 
           const updatePointer = (event) => {
@@ -872,6 +956,9 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           }, true);
           renderer.domElement.addEventListener("pointerup", (event) => {
             if (!pointerDown || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 6) return;
+            updatePointer(event);
+            raycaster.setFromCamera(pointer, camera);
+            hovered = raycaster.intersectObjects(spritesByField.get(activeFieldMode) || [], false)[0]?.object || null;
             if (hovered) showFocus(hovered.userData.id);
             else if (selected) closeSelection();
           });
@@ -920,28 +1007,21 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               const cluster = data.clusters.find((item) => item.id === button.dataset.cluster);
               if (!cluster) return;
               selected = null;
-              activeCluster = cluster.id;
+              activeCluster = activeCluster === cluster.id ? null : cluster.id;
               hideFocusCard();
               clearHighlightedLines();
               const clusterIds = scopeIds();
               updateNodeOpacity(clusterIds);
               controls.autoRotate = false;
-              clusterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
-              universe.updateMatrixWorld(true);
-              const clusterTarget = new THREE.Vector3(...cluster.center).applyMatrix4(universe.matrixWorld);
-              const direction = camera.position.clone().sub(controls.target).normalize();
-              moveCameraTo(clusterTarget.clone().add(direction.multiplyScalar(15)), clusterTarget, 820);
+              clusterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item.dataset.cluster === activeCluster)));
+              fitField();
             });
           });
 
-          search?.addEventListener("keydown", (event) => {
-            if (event.key !== "Enter") return;
-            const query = search.value.trim().toLowerCase();
-            const match = activeNodes().find((node) => node.title.toLowerCase().includes(query));
-            if (match) showFocus(match.id);
-          });
-
+          applyAtlasTheme();
+          document.addEventListener("txtxx:themechange", applyAtlasTheme);
           refreshFieldInterface();
+          fitField(false);
 
           const timer = new THREE.Timer();
           const clusterPosition = new THREE.Vector3();
@@ -954,7 +1034,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
             data.clusters.forEach((cluster) => {
               const element = clusterLabelElements.get(cluster.id);
               if (!element) return;
-              const hasActiveNodes = activeNodes().some((node) => belongsToCluster(node, cluster.id));
+              const hasActiveNodes = (activeFieldMode === "demo" || activeNodes().length > 8) && activeNodes().some((node) => belongsToCluster(node, cluster.id));
               if (!hasActiveNodes) {
                 element.classList.remove("visible");
                 return;
@@ -966,10 +1046,36 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               element.classList.toggle("visible", visible);
               if (visible) element.style.transform = `translate3d(${x}px, ${y - 27}px, 0)`;
             });
+            const occupied = [];
+            const labelNodes = activeNodes().filter(node => node.kind === "personal" && node.atlasLabel)
+              .sort((a, b) => Number(b.id === selected) - Number(a.id === selected));
+            paperLabelElements.forEach((element) => { element.hidden = true; });
+            for (const node of labelNodes) {
+              if (activeCluster && !belongsToCluster(node, activeCluster)) continue;
+              const sprite = spriteById.get(node.id);
+              const element = paperLabelElements.get(node.id);
+              const world = sprite.getWorldPosition(new THREE.Vector3());
+              const distance = camera.position.distanceTo(world);
+              if (labelNodes.length > 12 && distance > 28 && node.id !== selected && hovered !== sprite) continue;
+              const projected = world.project(camera);
+              const anchorX = (projected.x * 0.5 + 0.5) * width;
+              const y = (-projected.y * 0.5 + 0.5) * height + 22;
+              if (projected.z < -1 || projected.z > 1 || anchorX < 30 || anchorX > width - 30 || y < 110 || y > height - 130) continue;
+              const labelWidth = Math.min(190, Math.max(100, node.atlasLabel.length * 13 + 28));
+              const x = Math.max(16, Math.min(width - labelWidth - 16, anchorX - labelWidth / 2));
+              const rect = { x, y, right: x + labelWidth, bottom: y + 42 };
+              if (occupied.some(box => rect.x < box.right && rect.right > box.x && rect.y < box.bottom && rect.bottom > box.y)) continue;
+              occupied.push(rect);
+              element.hidden = false;
+              element.style.width = `${labelWidth}px`;
+              element.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+              element.setAttribute("aria-pressed", String(node.id === selected));
+            }
           };
 
           const animate = () => {
             requestAnimationFrame(animate);
+            if (document.hidden) return;
             timer.update();
             const elapsed = timer.getElapsed();
             raycaster.setFromCamera(pointer, camera);
@@ -990,7 +1096,7 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               sprite.material.opacity += (sprite.userData.targetOpacity - sprite.material.opacity) * 0.12;
               const nextScale = sprite.scale.x + (sprite.userData.targetScale - sprite.scale.x) * 0.12;
               sprite.scale.setScalar(nextScale);
-              if (sprite.userData.id !== selected) {
+              if (!reducedMotion && controls.autoRotate && sprite.userData.id !== selected) {
                 sprite.position.y = base.y + Math.sin(elapsed * 0.27 + sprite.userData.phase) * 0.035;
               }
               if (sprite.userData.ring) {
@@ -1025,12 +1131,6 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               edgeField.material.opacity += (edgeField.userData.targetOpacity - edgeField.material.opacity) * 0.1;
             });
 
-            if (!selected) {
-              universe.rotation.x += ((-pointerTarget.y * 0.025) - universe.rotation.x) * 0.015;
-              universe.rotation.y += ((pointerTarget.x * 0.035) - universe.rotation.y) * 0.015;
-            }
-            starField.rotation.y = elapsed * 0.0014;
-
             if (cameraTransition) {
               const progress = Math.min(1, (performance.now() - cameraTransition.startedAt) / cameraTransition.duration);
               const eased = easeInOutCubic(progress);
@@ -1060,15 +1160,15 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
               controls.update();
             }
             updateLabels();
-            composer.render();
+            renderer.render(scene, camera);
           };
 
           const onResize = () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            composer.setSize(window.innerWidth, window.innerHeight);
             renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
+            if (!selected) fitField(false);
           };
           window.addEventListener("resize", onResize);
           animate();
@@ -1082,6 +1182,13 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
           console.error("Atlas WebGL initialization failed", error);
           loading.hidden = true;
           atlas.classList.add("atlas-fallback");
+          document.querySelector(".field-switch").hidden = true;
+          clusterButtons.forEach(button => { button.hidden = true; });
+          reset.hidden = true;
+          closeFocus.addEventListener("click", () => { focusCard.hidden = true; focusCard.classList.remove("is-open"); });
+          window.addEventListener("keydown", event => {
+            if (event.key === "Escape") { focusCard.hidden = true; focusCard.classList.remove("is-open"); }
+          });
         }
       }
     </script>
@@ -1090,108 +1197,124 @@ const fallbackDots = nodes.slice(0, 150).map((node) => ({
 
 <style>
   :global(*) { box-sizing: border-box; }
-  :global(html) { width: 100%; height: 100%; overflow: hidden; background: #020508; color-scheme: dark; }
-  :global(body) { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #020508; color: #eafcff; font-family: "Helvetica Neue", "Avenir Next", sans-serif; }
-  :global(button), :global(input) { font: inherit; }
+  :global(html) { width: 100%; height: 100%; overflow: hidden; background: var(--atlas-bg); }
+  :global(body) { width: 100%; height: 100%; margin: 0; overflow: hidden; color: var(--atlas-ink); font-family: "Avenir Next", "Helvetica Neue", "PingFang SC", sans-serif; -webkit-font-smoothing: antialiased; }
+  :global(button) { font: inherit; }
   :global(button), :global(a) { -webkit-tap-highlight-color: transparent; }
+  :global(button:focus-visible), :global(a:focus-visible) { outline: 2px solid var(--atlas-vla); outline-offset: 4px; }
+  :global([hidden]) { display: none !important; }
 
-  .atlas { position: relative; width: 100%; height: 100%; overflow: hidden; background: radial-gradient(circle at 50% 50%, #08131d 0%, #020508 66%); }
-  .webgl-mount { position: absolute; inset: 0; z-index: 2; opacity: 0; transition: opacity 1.6s ease; }
+  .atlas { --line: var(--atlas-line); --muted: var(--atlas-muted); --text: var(--atlas-ink); --bg-elevated: var(--atlas-surface); --accent: var(--atlas-vla); position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--atlas-bg); }
+  .atlas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(var(--atlas-dot) 0.65px, transparent 0.85px); background-size: 26px 26px; mask-image: radial-gradient(ellipse at 50% 52%, #000 8%, transparent 73%); opacity: 0.32; pointer-events: none; }
+  .atlas::after { content: ""; position: absolute; z-index: 4; inset: 1.25rem; border: 1px solid var(--atlas-line); border-radius: 1rem; pointer-events: none; }
+  .webgl-mount { position: absolute; inset: 0; z-index: 2; opacity: 0; transition: opacity 600ms ease; }
   .atlas-ready .webgl-mount { opacity: 1; }
   .webgl-mount :global(canvas) { display: block; width: 100%; height: 100%; outline: none; }
-  .fallback-field { position: absolute; z-index: 1; inset: 0; overflow: hidden; background: radial-gradient(circle at 50% 50%, rgba(43, 93, 116, 0.16), transparent 42%); transition: opacity 1.4s ease; }
-  .atlas-ready .fallback-field { opacity: 0; pointer-events: none; }
-  .fallback-field i { position: absolute; left: var(--x); top: var(--y); width: max(2px, var(--s)); height: max(2px, var(--s)); border-radius: 50%; background: var(--c); box-shadow: 0 0 calc(var(--s) * 2.8) var(--c); opacity: 0.55; transform: translate(-50%, -50%); }
-  .grain { position: absolute; z-index: 4; inset: -25%; opacity: 0.16; pointer-events: none; background-image: radial-gradient(circle at 30% 20%, rgb(255 255 255 / 5%) 0 0.6px, transparent 0.8px), radial-gradient(circle at 70% 80%, rgb(255 255 255 / 4%) 0 0.5px, transparent 0.8px); background-size: 5px 5px, 7px 7px; animation: grain 0.7s steps(2) infinite; mix-blend-mode: soft-light; }
-  .vignette { position: absolute; z-index: 3; inset: 0; pointer-events: none; box-shadow: inset 0 0 11rem 2rem rgba(0, 0, 0, 0.78); background: linear-gradient(180deg, rgba(0, 0, 0, 0.22), transparent 25%, transparent 72%, rgba(0, 0, 0, 0.35)); }
+  .grain { display: none; }
+  .vignette { position: absolute; z-index: 1; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 38% 44%, var(--atlas-halo-one), transparent 37%), radial-gradient(ellipse at 64% 64%, var(--atlas-halo-two), transparent 33%); }
+
+  .fallback-field { position: absolute; z-index: 1; inset: 0; overflow: hidden; transition: opacity 500ms ease; }
+  .atlas-ready .fallback-field { opacity: 0; pointer-events: none; visibility: hidden; }
+  .fallback-dot { position: absolute; left: var(--x); top: var(--y); width: 3rem; height: 3rem; transform: translate(-50%, -50%); background: none; border: 0; color: var(--atlas-ink); cursor: pointer; }
+  .fallback-dot i { position: absolute; left: 50%; top: 50%; width: max(12px, var(--s)); height: max(12px, var(--s)); border-radius: 50%; background: var(--c); transform: translate(-50%, -50%); outline: 1px solid color-mix(in srgb, var(--c) 28%, transparent); outline-offset: 8px; }
+  .fallback-dot span { position: absolute; left: 50%; top: calc(100% + 0.2rem); transform: translateX(-50%); font: 1.25rem/1.4 "Iowan Old Style", Georgia, serif; white-space: nowrap; }
 
   .atlas-mark, .atlas-tools, .cluster-legend, .field-status, .hover-label, .focus-card, .loading-mark { position: absolute; z-index: 6; }
-  .atlas-mark { left: 2rem; top: 1.8rem; display: flex; align-items: center; gap: 0.75rem; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.62rem; letter-spacing: 0.22em; }
-  .atlas-mark a { display: grid; width: 2.15rem; height: 2.15rem; place-items: center; border: 1px solid rgba(196, 239, 248, 0.28); color: #e7fcff; text-decoration: none; }
-  .atlas-mark span { width: 2.4rem; height: 1px; background: rgba(190, 231, 239, 0.25); }
-  .atlas-mark b { color: #78919c; font-weight: 400; }
-
-  .atlas-tools { right: 2rem; top: 1.8rem; display: flex; gap: 0.55rem; }
-  .atlas-search { display: flex; height: 2.15rem; align-items: center; gap: 0.55rem; padding: 0 0.75rem; border: 1px solid rgba(196, 239, 248, 0.16); background: rgba(3, 10, 15, 0.46); backdrop-filter: blur(14px); }
-  .atlas-search span { color: #81adba; }
-  .atlas-search input { width: 7rem; padding: 0; border: 0; outline: none; color: #dffbff; background: transparent; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.58rem; letter-spacing: 0.12em; }
-  .atlas-search input::placeholder { color: #526c76; }
-  .atlas-tools button { height: 2.15rem; padding: 0 0.75rem; border: 1px solid rgba(196, 239, 248, 0.16); color: #6f8c96; background: rgba(3, 10, 15, 0.46); font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.54rem; letter-spacing: 0.12em; cursor: pointer; backdrop-filter: blur(14px); }
-  .atlas-tools button:hover, .atlas-tools button:focus-visible { border-color: rgba(196, 239, 248, 0.42); color: #e7fbff; }
+  .atlas-mark { left: 3.2rem; top: 2.8rem; display: flex; align-items: center; gap: 1.3rem; }
+  .atlas-mark a { display: grid; width: 2.7rem; height: 2.7rem; place-items: center; border: 1px solid var(--atlas-line); border-radius: 50%; color: var(--atlas-vla); font: 0.8rem/1 "Avenir Next", sans-serif; letter-spacing: 0.04em; text-decoration: none; transition: background 180ms ease; }
+  .atlas-mark a:hover { background: var(--atlas-soft); }
+  .atlas-mark > span { width: 1px; height: 2.1rem; background: var(--atlas-line); }
+  .atlas-mark b { color: var(--atlas-ink); font: 400 2.75rem/1 "Iowan Old Style", "Palatino Linotype", Georgia, serif; letter-spacing: -0.05em; }
+  .atlas-mark small { display: block; margin-top: 0.65rem; color: var(--atlas-muted); font: 0.875rem/1.4 "Avenir Next", "PingFang SC", sans-serif; letter-spacing: 0.08em; }
+  .atlas-tools { right: 3rem; top: 3.1rem; display: flex; align-items: center; gap: 0.6rem; }
+  .atlas-tools [data-reset] { display: inline-flex; align-items: center; gap: 0.65rem; min-height: 2.75rem; padding: 0.5rem 0.9rem; border: 1px solid var(--atlas-line); border-radius: 2rem; background: var(--atlas-surface); color: var(--atlas-muted); cursor: pointer; transition: background 180ms, border-color 180ms; }
+  .atlas-tools [data-reset] svg { width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.25; }
+  .atlas-tools [data-reset] span { font-size: 0.875rem; }
+  .atlas-tools [data-reset]:hover { background: var(--atlas-active); border-color: var(--atlas-vla); }
 
   .label-layer { position: absolute; z-index: 5; inset: 0; overflow: hidden; pointer-events: none; }
-  :global(.cluster-label) { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; will-change: transform, opacity; transition: opacity 180ms ease; }
-  :global(.cluster-label.visible) { opacity: 1; }
-  :global(.cluster-label) { color: var(--label-color); font-family: "Helvetica Neue", "Avenir Next", sans-serif; font-size: clamp(0.63rem, 0.8vw, 0.76rem); font-weight: 300; letter-spacing: 0.24em; text-shadow: 0 0 1.4rem color-mix(in srgb, var(--label-color) 62%, transparent); transform-origin: center bottom; }
+  :global(.paper-map-label) { position: absolute; top: 0; left: 0; padding: 0.35rem 0.55rem; color: var(--atlas-ink); border: 0; background: transparent; text-align: center; cursor: pointer; pointer-events: auto; transition: color 180ms; }
+  :global(.paper-map-label strong) { display: block; font: 400 1.25rem/1.35 "Iowan Old Style", "Palatino Linotype", Georgia, serif; letter-spacing: -0.015em; overflow-wrap: anywhere; }
+  :global(.paper-map-label span) { display: none; }
+  :global(.paper-map-label::after) { content: ""; display: block; height: 1px; width: 1.5rem; margin: 0.45rem auto 0; background: var(--node-color); opacity: 0.3; transform: scaleX(0.55); transition: transform 180ms, opacity 180ms; }
+  :global(.paper-map-label:hover), :global(.paper-map-label[aria-pressed="true"]) { color: var(--node-color); }
+  :global(.paper-map-label:hover::after), :global(.paper-map-label[aria-pressed="true"]::after) { transform: scaleX(1); opacity: 0.8; }
+  :global(.cluster-label) { position: absolute; left: 0; top: 0; opacity: 0; white-space: nowrap; color: var(--label-color); font-size: 0.8rem; font-weight: 500; letter-spacing: 0.16em; transition: opacity 180ms; transform-origin: center bottom; }
+  :global(.cluster-label.visible) { opacity: 0.75; }
 
-  .cluster-legend { left: 2rem; bottom: 1.75rem; display: flex; gap: 0.4rem 1.1rem; flex-wrap: wrap; max-width: 42rem; }
-  .cluster-legend button { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0; border: 0; color: #607984; background: transparent; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.11em; cursor: pointer; }
-  .cluster-legend button:hover, .cluster-legend button:focus-visible, .cluster-legend button[aria-pressed="true"] { color: #d9f8fd; outline: none; }
-  .cluster-legend i { width: 0.38rem; height: 0.38rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0.75rem var(--c); }
+  .cluster-legend { left: 3.2rem; bottom: 3rem; display: flex; flex-wrap: wrap; gap: 0.4rem 1.15rem; max-width: calc(100% - 26rem); }
+  .cluster-legend button { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.35rem 0; border: 0; background: none; color: var(--atlas-muted); font-size: 0.875rem; cursor: pointer; }
+  .cluster-legend button:hover, .cluster-legend button[aria-pressed="true"] { color: var(--atlas-ink); }
+  .cluster-legend i { width: 0.4rem; height: 0.4rem; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 10%, transparent); }
 
-  .field-status { right: 2rem; bottom: 1.75rem; display: flex; align-items: center; gap: 0.8rem; color: #4b626c; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.5rem; letter-spacing: 0.14em; }
-  .field-switch { display: flex; align-items: center; gap: 0.28rem; padding: 0.2rem; border: 1px solid rgba(177, 232, 243, 0.13); background: rgba(3, 10, 15, 0.38); backdrop-filter: blur(14px); }
-  .field-switch button { padding: 0.27rem 0.36rem; border: 0; color: #526a74; background: transparent; font-family: inherit; font-size: inherit; letter-spacing: inherit; cursor: pointer; transition: color 220ms ease, background 220ms ease, text-shadow 220ms ease; }
-  .field-switch button:hover, .field-switch button:focus-visible { color: #dff9fd; outline: none; }
-  .field-switch button[data-field-mode="demo"][aria-pressed="true"] { color: #d0a16b; background: rgba(255, 190, 114, 0.07); text-shadow: 0 0 0.8rem rgba(255, 190, 114, 0.38); }
-  .field-switch button[data-field-mode="personal"][aria-pressed="true"] { color: #a8edf6; background: rgba(111, 232, 255, 0.07); text-shadow: 0 0 0.8rem rgba(111, 232, 255, 0.4); }
-  .field-switch i { width: 1px; height: 0.7rem; background: rgba(177, 232, 243, 0.14); }
-  .field-status b { color: #7c959f; font-weight: 400; }
+  .field-status { right: 3rem; bottom: 3rem; display: flex; align-items: center; gap: 1.1rem; color: var(--atlas-muted); font-size: 0.875rem; }
+  .field-switch { display: flex; align-items: center; padding: 0.25rem; border: 1px solid var(--atlas-line); border-radius: 2rem; background: var(--atlas-soft); }
+  .field-switch button { min-height: 2.25rem; padding: 0.45rem 1rem; border: 0; border-radius: 2rem; color: var(--atlas-muted); background: none; font-size: 0.875rem; cursor: pointer; transition: background 180ms, color 180ms, box-shadow 180ms; }
+  .field-switch button[aria-pressed="true"] { background: var(--atlas-active); color: var(--atlas-ink); box-shadow: var(--shadow); }
+  .field-switch button:hover { color: var(--atlas-ink); }
+  .field-switch i { display: none; }
+  .field-status b { min-width: 2.5rem; font-size: 0.8125rem; font-weight: 400; font-variant-numeric: tabular-nums; }
 
-  .hover-label { width: min(17rem, calc(100vw - 2rem)); padding: 0.7rem 0.8rem; border-left: 1px solid rgba(152, 234, 248, 0.52); background: rgba(2, 8, 12, 0.68); pointer-events: none; backdrop-filter: blur(12px); }
-  .hover-label span { display: block; margin-bottom: 0.35rem; color: #65919d; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.12em; }
-  .hover-label strong { display: block; color: #e8fbff; font-size: 0.72rem; font-weight: 400; line-height: 1.35; }
+  .hover-label { width: min(19rem, calc(100vw - 2rem)); padding: 0.9rem 1rem; border: 1px solid var(--atlas-line); border-radius: 0.75rem; background: var(--atlas-surface); box-shadow: var(--shadow); pointer-events: none; backdrop-filter: blur(12px); }
+  .hover-label span { display: block; margin-bottom: 0.35rem; color: var(--atlas-muted); font-size: 0.75rem; }
+  .hover-label strong { display: block; color: var(--atlas-ink); font-size: 0.9375rem; font-weight: 400; line-height: 1.6; }
 
-  .focus-card { left: 2rem; top: 50%; display: flex; flex-direction: column; width: min(23rem, calc(100vw - 4rem)); max-height: min(84vh, 56rem); padding: 1.25rem 1.3rem 1.35rem; border: 1px solid rgba(177, 232, 243, 0.17); opacity: 0; pointer-events: none; background: linear-gradient(135deg, rgba(9, 23, 31, 0.82), rgba(2, 8, 12, 0.68)); box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.38); transform: translate(-0.8rem, -50%); transition: width 360ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1); backdrop-filter: blur(24px) saturate(1.2); }
-  .focus-card.is-open { opacity: 1; pointer-events: auto; transform: translate(0, -50%); }
-  .focus-card.has-content { width: min(36rem, calc(100vw - 4rem)); }
-  .focus-close { position: absolute; right: 0.7rem; top: 0.55rem; padding: 0.25rem; border: 0; color: #64808b; background: transparent; font-size: 1.1rem; cursor: pointer; }
-  .focus-kind { color: #6f9aa5; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.13em; }
-  .focus-card h1 { margin: 0.9rem 0 1.1rem; color: #f0fdff; font-size: clamp(1.25rem, 2.4vw, 1.85rem); font-weight: 400; line-height: 1.12; letter-spacing: -0.025em; }
-  .focus-meta, .focus-actions { display: flex; gap: 0.45rem; flex-wrap: wrap; }
-  .focus-meta span { padding: 0.32rem 0.42rem; border: 1px solid rgba(177, 232, 243, 0.13); color: #6e8993; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.08em; }
-  .focus-body { margin-top: 1rem; padding: 0.1rem 0.25rem 0.2rem 0; overflow-y: auto; color: #acc4ca; font-size: 0.76rem; line-height: 1.65; scrollbar-width: thin; scrollbar-color: rgba(133, 196, 209, 0.28) transparent; }
-  .focus-body :global(h2), .focus-body :global(h3), .focus-body :global(h4) { margin: 1rem 0 0.45rem; color: #e9fbfd; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.01em; }
-  .focus-body :global(p) { margin: 0.55rem 0; }
-  .focus-body :global(ul), .focus-body :global(ol) { margin: 0.65rem 0; padding-left: 1.2rem; }
-  .focus-body :global(blockquote) { margin: 0.8rem 0; padding: 0.05rem 0 0.05rem 0.75rem; border-left: 1px solid rgba(111, 232, 255, 0.38); color: #8eabb3; }
-  .focus-body :global(a) { color: #a9e9f2; text-underline-offset: 0.2em; }
-  .focus-body :global(code) { color: #c7eef3; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.7rem; }
-  .focus-body :global(pre) { padding: 0.7rem; overflow-x: auto; background: rgba(1, 7, 10, 0.62); }
-  .focus-body :global(figure) { margin: 0.8rem 0; }
-  .focus-body :global(img) { display: block; width: 100%; max-height: 44vh; border: 1px solid rgba(177, 232, 243, 0.12); object-fit: contain; cursor: zoom-in; background: rgba(0, 0, 0, 0.24); transition: border-color 180ms ease, filter 180ms ease; }
-  .focus-body :global(img:hover), .focus-body :global(img:focus-visible) { border-color: rgba(177, 232, 243, 0.42); filter: brightness(1.06); outline: none; }
-  .focus-body :global(figcaption) { margin-top: 0.45rem; color: #59737c; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.48rem; letter-spacing: 0.07em; }
-  .focus-actions { margin-top: 1.15rem; }
-  .focus-actions a { color: #a9e9f2; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.52rem; letter-spacing: 0.08em; text-decoration: none; }
+  .focus-card, .focus-card.has-content { right: 2rem; left: auto; top: 8rem; bottom: 7rem; display: flex; flex-direction: column; z-index: 9; width: min(29rem, calc(100vw - 4rem)); padding: 1.75rem; border: 1px solid var(--atlas-line); border-radius: 1.25rem; background: var(--atlas-surface); box-shadow: var(--shadow); opacity: 0; pointer-events: none; transform: translateX(0.8rem); transition: opacity 200ms ease, transform 300ms ease; backdrop-filter: blur(20px); }
+  .focus-card.is-open { opacity: 1; pointer-events: auto; transform: translateX(0); }
+  .focus-close { position: absolute; right: 0.65rem; top: 0.65rem; width: 2.75rem; height: 2.75rem; border: 0; border-radius: 50%; color: var(--atlas-muted); background: none; font-size: 1.4rem; cursor: pointer; }
+  .focus-close:hover { background: var(--atlas-soft); }
+  .focus-kind { color: var(--atlas-muted); font-size: 0.8125rem; letter-spacing: 0.05em; }
+  .focus-card h1 { margin: 1.1rem 0 0.75rem; padding-right: 0.5rem; color: var(--atlas-ink); font: 400 1.6rem/1.4 "Iowan Old Style", Georgia, "PingFang SC", serif; overflow-wrap: anywhere; }
+  .focus-meta { display: flex; flex-wrap: wrap; gap: 0.45rem 0.85rem; color: var(--atlas-muted); font-size: 0.8125rem; line-height: 1.6; }
+  .focus-meta span { border: 0; padding: 0; }
+  .focus-relations { margin: 1rem 0 0; padding-top: 0.75rem; border-top: 1px solid var(--atlas-line); }
+  .focus-relations :global(button) { display: block; padding: 0.35rem 0; border: 0; background: none; color: var(--atlas-vla); font-size: 0.875rem; text-align: left; line-height: 1.6; cursor: pointer; }
+  .focus-body { min-height: 0; margin-top: 1rem; overflow-y: auto; padding-right: 0.4rem; color: var(--atlas-ink); font-size: 1rem; line-height: 1.8; scrollbar-width: thin; scrollbar-color: var(--atlas-dot) transparent; }
+  .focus-body :global(h2), .focus-body :global(h3), .focus-body :global(h4) { margin: 1.15rem 0 0.5rem; color: var(--atlas-ink); font-size: 1rem; font-weight: 600; }
+  .focus-body :global(p) { margin: 0.65rem 0; }
+  .focus-body :global(ul), .focus-body :global(ol) { margin: 0.65rem 0; padding-left: 1.25rem; }
+  .focus-body :global(blockquote) { margin: 1rem 0; padding-left: 0.9rem; border-left: 2px solid var(--atlas-line); color: var(--atlas-muted); }
+  .focus-body :global(a) { color: var(--atlas-vla); text-underline-offset: 0.2em; }
+  .focus-body :global(code) { color: var(--atlas-muted); font-family: "SFMono-Regular", monospace; font-size: 0.875rem; }
+  .focus-body :global(pre) { overflow-x: auto; padding: 0.85rem; border-radius: 0.5rem; background: var(--atlas-soft); }
+  .focus-body :global(figure) { margin: 1rem 0; }
+  .focus-body :global(img) { display: block; width: 100%; max-height: 44vh; border: 1px solid var(--atlas-line); border-radius: 0.5rem; object-fit: contain; cursor: zoom-in; background: #fff; }
+  .focus-body :global(figcaption) { margin-top: 0.5rem; color: var(--atlas-muted); font-size: 0.8125rem; line-height: 1.65; }
+  .focus-actions { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: auto; padding-top: 1.25rem; }
+  .focus-actions a { color: var(--atlas-vla); font-size: 0.875rem; text-decoration: none; }
+  .focus-actions a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
 
-  .media-lightbox { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; padding: 4vw; opacity: 0; background: rgba(0, 3, 6, 0.9); pointer-events: none; transition: opacity 220ms ease; backdrop-filter: blur(18px); }
+  .media-lightbox { position: absolute; z-index: 20; inset: 0; display: grid; place-items: center; padding: 4vw; opacity: 0; background: #152724db; pointer-events: none; transition: opacity 200ms; backdrop-filter: blur(14px); }
   .media-lightbox.is-open { opacity: 1; pointer-events: auto; }
-  .media-lightbox[hidden] { display: none; }
-  .media-lightbox img { display: block; max-width: 92vw; max-height: 88vh; object-fit: contain; box-shadow: 0 2rem 7rem rgba(0, 0, 0, 0.6); transform: scale(0.985); transition: transform 280ms cubic-bezier(0.22, 1, 0.36, 1); }
-  .media-lightbox.is-open img { transform: scale(1); }
-  .media-lightbox button { position: absolute; right: 1.5rem; top: 1.2rem; padding: 0.4rem; border: 0; color: #91aeb6; background: transparent; font-size: 1.4rem; cursor: pointer; }
-
-  .loading-mark { left: 50%; top: 50%; display: flex; align-items: center; gap: 0.7rem; color: #607b86; font-family: "SFMono-Regular", Consolas, monospace; font-size: 0.52rem; letter-spacing: 0.16em; transform: translate(-50%, -50%); transition: opacity 0.8s ease; }
-  .loading-mark i { width: 0.55rem; height: 0.55rem; border: 1px solid #7edbeb; border-radius: 50%; box-shadow: 0 0 1rem rgba(126, 219, 235, 0.55); animation: pulse 1.2s ease-in-out infinite; }
+  .media-lightbox img { display: block; max-width: 92vw; max-height: 88dvh; object-fit: contain; border-radius: 0.3rem; }
+  .media-lightbox button { position: absolute; right: 1.5rem; top: 1.2rem; width: 2.75rem; height: 2.75rem; border: 0; color: #e1ebe5; background: none; font-size: 1.5rem; cursor: pointer; }
+  .loading-mark { left: 50%; top: 50%; display: flex; align-items: center; gap: 0.7rem; color: var(--atlas-muted); font-size: 0.875rem; transform: translate(-50%, -50%); transition: opacity 500ms; }
+  .loading-mark i { width: 0.5rem; height: 0.5rem; border-radius: 50%; background: var(--atlas-vla); animation: pulse 1.4s ease-in-out infinite; }
   .loading-mark.leaving { opacity: 0; }
+  @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 
-  @keyframes pulse { 0%, 100% { opacity: 0.25; transform: scale(0.7); } 50% { opacity: 1; transform: scale(1); } }
-  @keyframes grain { 0% { transform: translate(0, 0); } 25% { transform: translate(2%, -3%); } 50% { transform: translate(-3%, 2%); } 75% { transform: translate(3%, 4%); } 100% { transform: translate(-2%, -2%); } }
-
-  @media (prefers-reduced-motion: reduce) { .grain, .loading-mark i { animation: none; } }
   @media (max-width: 720px) {
-    .atlas-mark { left: 1rem; top: 1rem; }
-    .atlas-tools { right: 1rem; top: 1rem; }
-    .atlas-search { display: none; }
-    .cluster-legend { left: 1rem; right: 1rem; bottom: 1rem; max-width: none; gap: 0.45rem 0.8rem; }
-    .cluster-legend button { font-size: 0.43rem; }
-    .field-status { right: 1rem; bottom: auto; top: 4.2rem; }
-    .field-status b { display: none; }
-    .focus-card, .focus-card.has-content { left: 1rem; top: auto; bottom: 4.6rem; width: calc(100vw - 2rem); max-height: 70vh; transform: translateY(0.7rem); }
+    .atlas::after { inset: 0.65rem; border-radius: 0.85rem; }
+    .atlas-mark { left: 1.65rem; top: 1.8rem; gap: 0.85rem; }
+    .atlas-mark a { width: 2.35rem; height: 2.35rem; }
+    .atlas-mark > span { display: none; }
+    .atlas-mark b { font-size: 2.15rem; }
+    .atlas-mark small { margin-top: 0.4rem; font-size: 0.75rem; }
+    .atlas-tools { right: 1.55rem; top: 1.9rem; }
+    .atlas-tools [data-reset] { width: 2.75rem; padding: 0; justify-content: center; }
+    .atlas-tools [data-reset] span { display: none; }
+    .cluster-legend { left: 1.8rem; right: 1.8rem; bottom: 5.6rem; max-width: none; gap: 0.2rem 1rem; }
+    .cluster-legend button { min-height: 2rem; font-size: 0.8125rem; }
+    .field-status { left: 1.8rem; right: 1.8rem; bottom: 1.65rem; justify-content: space-between; }
+    .field-switch button { padding: 0.45rem 0.8rem; }
+    :global(.paper-map-label strong) { font-size: 1.125rem; }
+    .focus-card, .focus-card.has-content { top: auto; left: 0.65rem; right: 0.65rem; bottom: 0.65rem; width: auto; max-height: 78dvh; min-height: 16rem; padding: 1.5rem; transform: translateY(1rem); }
     .focus-card.is-open { transform: translateY(0); }
+    .focus-card h1 { font-size: 1.4rem; }
     .focus-body :global(img) { max-height: 32vh; }
-    .vignette { box-shadow: inset 0 0 5rem 1rem rgba(0, 0, 0, 0.72); }
-    :global(.cluster-label) { font-size: 0.58rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .loading-mark i { animation: none; }
+    .webgl-mount, .focus-card, .media-lightbox { transition: none; }
   }
 </style>
