@@ -32,6 +32,8 @@ const navItems = [
   { href: "/atlas", label: "Atlas" },
   { href: "/about", label: "About" }
 ];
+const sectionPath = pathname.replace(/\/$/, "") || "/";
+const activeNav = sectionPath === "/blog" || sectionPath.startsWith("/blog/") ? "/" : sectionPath;
 ---
 
 <!doctype html>
@@ -65,7 +67,7 @@ const navItems = [
           <nav class="nav" aria-label="Primary">
             {
               navItems.map((item) => (
-                <a class={pathname === item.href ? "active" : ""} href={item.href}>
+                <a class={activeNav === item.href ? "active" : ""} aria-current={activeNav === item.href ? "page" : undefined} href={item.href}>
                   {item.label}
                 </a>
               ))

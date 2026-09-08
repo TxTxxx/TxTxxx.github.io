@@ -1,7 +1,7 @@
 :root {
   --max-width: 1120px;
-  --sans: "Instrument Sans", "Avenir Next", "Segoe UI", sans-serif;
-  --serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  --sans: "Instrument Sans", "Avenir Next", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", "Songti SC", "Book Antiqua", serif;
   --mono: "IBM Plex Mono", "SFMono-Regular", monospace;
 }
 
@@ -20,7 +20,12 @@ body {
   margin: 0;
   min-height: 100vh;
   background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
+
+::selection { background: var(--accent-soft); color: var(--text); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+[id] { scroll-margin-top: 9rem; }
 
 a {
   color: inherit;
@@ -58,64 +63,71 @@ img {
 
 .site-header-inner {
   position: relative;
-  min-height: 4.5rem;
+  min-height: 5.5rem;
 }
 
-.header-controls { display: flex; align-items: center; gap: 0.75rem; }
-.site-theme-control { display: flex; flex: 0 0 auto; }
+.header-controls { display: flex; align-items: center; gap: 1.4rem; }
+.site-theme-control { display: flex; flex: 0 0 auto; padding-left: 1.2rem; border-left: 1px solid var(--line); }
 
 .brand {
-  display: grid;
-  gap: 0.15rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.9rem;
 }
 
 .brand-mark {
-  font-size: 0.8rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--muted);
+  font-family: var(--serif);
+  font-size: 1.9rem;
+  letter-spacing: -0.055em;
+  color: var(--text);
 }
 
 .brand-title {
-  font-family: var(--serif);
-  font-size: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--muted);
 }
 
 .nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 1.4rem;
   justify-content: flex-end;
 }
 
 .nav a {
-  padding: 0.55rem 0.85rem;
-  border-radius: 999px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0.55rem 0;
   color: var(--muted);
-  transition: background-color 180ms ease, color 180ms ease, transform 180ms ease;
+  font-size: 0.9375rem;
+  transition: color 160ms ease;
 }
+
+.nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.2rem; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; }
+.nav a.active::after { transform: scaleX(1); }
 
 .nav a:hover,
 .nav a:focus-visible,
 .nav a.active {
-  background: var(--accent-soft);
   color: var(--text);
-  transform: translateY(-1px);
 }
 
 main {
-  padding: 3.5rem 0 5rem;
+  padding: 3.5rem 0 3rem;
 }
 
 .site-footer {
   border-top: 1px solid var(--line);
-  margin-top: 4rem;
-  background: var(--footer-bg);
+  margin-top: 3rem;
+  background: transparent;
 }
 
 .site-footer-inner {
-  padding: 1.5rem 0 2.25rem;
-  font-size: 0.95rem;
+  padding: 2rem 0 2.5rem;
+  font-size: 0.875rem;
+  line-height: 1.8;
   color: var(--muted);
 }
 
@@ -124,6 +136,9 @@ main {
   gap: 1rem;
   flex-wrap: wrap;
 }
+
+.site-footer-links a { display: inline-flex; align-items: center; min-height: 2.75rem; text-underline-offset: 0.25em; }
+.site-footer-links a:hover { color: var(--text); text-decoration: underline; }
 
 .eyebrow {
   font-size: 0.8rem;
@@ -197,18 +212,6 @@ main {
   position: relative;
 }
 
-.blog-surface::before {
-  content: "";
-  position: fixed;
-  inset: auto auto 8% 5%;
-  width: 18rem;
-  height: 18rem;
-  border-radius: 50%;
-  background: radial-gradient(circle, var(--accent-soft), transparent 68%);
-  filter: blur(18px);
-  pointer-events: none;
-}
-
 .academic-content .brand-title {
   letter-spacing: 0.01em;
 }
@@ -225,13 +228,19 @@ main {
   }
 
   .site-header-inner { padding: 0.75rem 0; gap: 0.65rem; }
-  .brand { padding-right: 3.25rem; }
+  .brand { padding-right: 3.25rem; flex-wrap: wrap; column-gap: 0.7rem; row-gap: 0; }
   .header-controls { width: 100%; }
-  .site-theme-control { position: absolute; right: 0; top: 0.65rem; }
-  .nav { gap: 0.15rem; }
-  .nav a { padding: 0.55rem 0.7rem; }
+  .site-theme-control { position: absolute; right: 0; top: 0.65rem; border: 0; padding: 0; }
+  .nav { gap: 1.3rem; }
+  .nav a { padding: 0.5rem 0; font-size: 0.875rem; }
 
   main {
     padding-top: 2.25rem;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .nav a::after, .button-link { transition: none; }
+  .button-link:hover, .button-link:focus-visible { transform: none; }
 }

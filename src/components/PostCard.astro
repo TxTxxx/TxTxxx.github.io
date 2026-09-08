@@ -25,202 +25,136 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
     category === "journal" && variant !== "featured" ? "journal-card" : undefined
   ]}
   data-category={category}
+  data-cover-fit={post.data.cover_fit ?? "contain"}
 >
   <a href={`/blog/${post.id}/`} class="post-card-link">
     {
       hasImage && (
         <div class="post-card-media">
           <div class="post-card-media-frame">
-            <img src={post.data.cover_image} alt={post.data.cover_alt ?? post.data.title} loading="lazy" />
+            <img
+              src={post.data.cover_image}
+              alt={post.data.cover_alt ?? post.data.title}
+              loading={variant === "featured" ? "eager" : "lazy"}
+              decoding="async"
+            />
           </div>
         </div>
       )
     }
-    <div class="post-card-meta">
-      <span>{formattedDate}</span>
-      <span>{post.data.tags.join(" / ")}</span>
+    <div class="post-card-copy">
+      <div class="post-card-meta">
+        <time datetime={post.data.date.toISOString().slice(0, 10)}>{formattedDate}</time>
+        {variant === "featured" && <span>{post.data.tags.join(" / ")}</span>}
+      </div>
+      <h3>{post.data.title}</h3>
+      <p>{post.data.summary}</p>
     </div>
-    <h3>{post.data.title}</h3>
-    <p>{post.data.summary}</p>
   </a>
 </article>
 
 <style>
   .post-card {
+    min-width: 0;
     border: 1px solid var(--line);
-    border-radius: 1.6rem;
+    border-radius: 1rem;
     background: var(--bg-elevated);
-    box-shadow: var(--shadow);
-    overflow: hidden;
+    transition: border-color 180ms ease;
   }
+
+  .post-card[hidden] { display: none; }
+  .post-card:hover { border-color: var(--accent-line); }
 
   .post-card-link {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
     height: 100%;
-    padding: 1.4rem;
+    border-radius: inherit;
   }
 
-  .post-card.with-image .post-card-link {
-    padding: 0;
+  .post-card-copy {
+    flex: 1;
+    min-width: 0;
+    padding: 1.25rem 1.4rem 1.5rem;
   }
 
   .post-card-link:hover h3,
-  .post-card-link:focus-visible h3 {
-    color: var(--accent);
-  }
+  .post-card-link:focus-visible h3 { color: var(--accent); }
 
   .post-card-media {
-    aspect-ratio: 16 / 10;
-    padding: 1rem;
-    background:
-      var(--paper-gradient),
-      linear-gradient(135deg, var(--accent-soft), transparent 45%);
-    border-bottom: 1px solid var(--line);
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    padding: 0.75rem 0.75rem 0;
   }
 
   .post-card-media-frame {
+    position: relative;
     width: 100%;
-    height: 100%;
-    border-radius: 1.15rem;
+    aspect-ratio: 2 / 1;
+    border-radius: 0.65rem;
     overflow: hidden;
-    background: var(--bg-elevated);
-    border: 1px solid var(--line);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .post-card-media img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     background: var(--surface-subtle);
   }
 
-  .post-card.cover-image .post-card-media img {
-    object-fit: cover;
-    background: transparent;
+  .post-card-media img {
+    /* Keep intrinsic image dimensions out of the card's layout calculation. */
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
   }
 
-  .post-card.with-image .post-card-meta,
-  .post-card.with-image h3,
-  .post-card.with-image p {
-    margin-left: 1.4rem;
-    margin-right: 1.4rem;
-  }
+  .post-card.cover-image .post-card-media img { object-fit: cover; }
 
   .post-card-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    column-gap: 0.8rem;
+    row-gap: 0.25rem;
+    margin-bottom: 0.65rem;
     color: var(--muted);
-    font-size: 0.85rem;
-    margin-bottom: 0.75rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
   }
 
+  .post-card-meta time { font-variant-numeric: tabular-nums; }
+
   h3 {
-    margin: 0 0 0.5rem;
-    font-size: 1.4rem;
+    margin: 0 0 0.55rem;
     font-family: var(--serif);
+    font-size: clamp(1.25rem, 2vw, 1.5rem);
+    font-weight: 600;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
     transition: color 180ms ease;
   }
 
   p {
     margin: 0;
     color: var(--muted);
-    line-height: 1.6;
-  }
-
-  .post-card.with-image p {
-    margin-bottom: 1.4rem;
-  }
-
-  .post-card.featured {
-    border-radius: 2rem;
-  }
-
-  .post-card.featured .post-card-link {
-    padding: 1.8rem;
-  }
-
-  .post-card.featured.with-image .post-card-link {
-    padding: 0;
-  }
-
-  .post-card.featured .post-card-media {
-    aspect-ratio: 16 / 9;
-    padding: 1.2rem;
-  }
-
-  .post-card.featured .post-card-media-frame {
-    border-radius: 1.35rem;
-  }
-
-  .post-card.featured h3 {
-    font-size: clamp(1.5rem, 2.4vw, 2rem);
-    line-height: 1.35;
-    margin-bottom: 0.75rem;
-  }
-
-  .post-card.featured.with-image .post-card-meta,
-  .post-card.featured.with-image h3,
-  .post-card.featured.with-image p {
-    margin-left: 1.8rem;
-    margin-right: 1.8rem;
-  }
-
-  .post-card.featured.with-image p {
-    margin-bottom: 1.8rem;
-  }
-
-  .post-card.journal-card {
-    border-radius: 1.2rem;
-    background: var(--bg-elevated);
-    box-shadow: var(--shadow);
-  }
-
-  .post-card.journal-card .post-card-link {
-    padding: 0.9rem 0.95rem 1rem;
-  }
-
-  .post-card.journal-card.with-image .post-card-link {
-    padding: 0;
-  }
-
-  .post-card.journal-card .post-card-media {
-    aspect-ratio: 16 / 10;
-    padding: 0.65rem;
-  }
-
-  .post-card.journal-card .post-card-media-frame {
-    border-radius: 0.95rem;
-  }
-
-  .post-card.journal-card.with-image .post-card-meta,
-  .post-card.journal-card.with-image h3,
-  .post-card.journal-card.with-image p {
-    margin-left: 0.95rem;
-    margin-right: 0.95rem;
-  }
-
-  .post-card.journal-card .post-card-meta {
-    gap: 0.55rem;
-    font-size: 0.74rem;
-    margin-bottom: 0.45rem;
-  }
-
-  .post-card.journal-card h3 {
     font-size: 1rem;
-    line-height: 1.2;
-    margin-bottom: 0.3rem;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
   }
 
-  .post-card.journal-card p {
-    font-size: 0.86rem;
-    line-height: 1.45;
+  .featured .post-card-media-frame { aspect-ratio: 16 / 9; }
+  .featured .post-card-copy { padding: 1.4rem 1.5rem 1.6rem; }
+  .featured .post-card-meta { margin-bottom: 0.85rem; font-size: 0.8125rem; }
+  .featured h3 { font-size: clamp(1.4rem, 2.3vw, 1.8rem); line-height: 1.4; margin-bottom: 0.75rem; }
+  .featured.text-only .post-card-copy { padding-top: 2rem; }
+
+  @media (max-width: 600px) {
+    .post-card-copy { padding: 1.1rem 1.25rem 1.35rem; }
+    .post-card-meta { font-size: 0.75rem; column-gap: 0.6rem; }
+    h3 { font-size: 1.25rem; }
+    .featured .post-card-copy { padding: 1.15rem 1.25rem 1.35rem; }
   }
 
-  .post-card.journal-card.with-image p {
-    margin-bottom: 0.95rem;
+  @media (prefers-reduced-motion: reduce) {
+    .post-card, h3 { transition: none; }
   }
 </style>

@@ -2,6 +2,7 @@ import { defineConfig } from "astro/config";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import remarkAddenda from "./src/lib/remark-addenda.mjs";
+import rehypeBlogTitle from "./src/lib/rehype-blog-title.mjs";
 
 export default defineConfig({
   site: "https://txtxx.me",
@@ -12,6 +13,6 @@ export default defineConfig({
       defaultColor: false
     },
     remarkPlugins: [remarkMath, remarkAddenda],
-    rehypePlugins: [rehypeKatex]
+    rehypePlugins: [rehypeKatex, rehypeBlogTitle]
   }
 });
