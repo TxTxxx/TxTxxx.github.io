@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#2457ed" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="description" content="每天记一个数，把省下来的钱真正攒起来。" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>一点点 · 我的攒钱本</title>
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icon-192.png" />
+    <link rel="stylesheet" href="./app.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="brand" href="./"
+          ><span class="mark">点</span
+          ><span>一点点<small>我的攒钱本</small></span></a
+        ><button id="settings-open" class="quiet" type="button">
+          设置与备份
+        </button>
+      </header>
+      <div id="storage-error" class="notice error" role="alert" hidden></div>
+      <section class="balance">
+        <div class="eyebrow">已经真正攒下</div>
+        <div class="total">¥ <span id="saved">0.00</span></div>
+        <div class="balance-foot">
+          <span id="transfer-count">从第一笔开始</span
+          ><span>一点点，也算数。</span>
+        </div>
+      </section>
+      <div class="workspace">
+        <section class="card entry">
+          <div class="section-head">
+            <h1>今天花了多少？</h1>
+            <span class="pill" id="mode-label">每日结算</span>
+          </div>
+          <form id="entry-form">
+            <label for="entry-date" class="label">记录日期</label
+            ><input id="entry-date" type="date" required /><label
+              for="amount"
+              class="label amount-label"
+              >当天消费总额</label
+            >
+            <div class="money-input">
+              <span>¥</span
+              ><input
+                id="amount"
+                inputmode="decimal"
+                autocomplete="off"
+                placeholder="0.00"
+                required
+                aria-label="当天消费总额（元）"
+              />
+            </div>
+            <div id="entry-hint" class="muted">不用分类，记一个总数就好。</div>
+            <div id="live-difference" class="difference">每日额度 ¥100.00</div>
+            <button class="primary full" id="entry-submit" type="submit">
+              记下这一天
+            </button>
+          </form>
+        </section>
+        <section class="card settlement">
+          <div class="section-head">
+            <h2>下一笔积累</h2>
+            <span class="index">01 / KEEP SAVING</span>
+          </div>
+          <p class="muted" id="settle-label">本次可转存</p>
+          <div class="settle-amount">¥ <span id="available">0.00</span></div>
+          <p id="settle-note" class="settle-note">先记下今天的消费。</p>
+          <div class="debt">
+            <span>未来需要补齐</span><strong id="debt">¥0.00</strong>
+          </div>
+          <button id="transfer-open" class="primary full" disabled>
+            去攒这一笔
+          </button>
+          <p class="micro">超支由未来结余补齐，攒下的钱不转回。</p>
+        </section>
+      </div>
+      <section class="card history">
+        <div class="section-head">
+          <h2>积累的日子</h2>
+          <span class="muted" id="record-count">0 天记录</span>
+        </div>
+        <div id="history-list" class="history-list"></div>
+        <details id="transfers-details">
+          <summary>转存记录</summary>
+          <div id="transfers-list"></div>
+        </details>
+      </section>
+      <footer>
+        账本只保存在此浏览器 · 请定期导出备份<br /><span
+          >iPhone：Safari 分享 → 添加到主屏幕</span
+        >
+      </footer>
+    </main>
+    <dialog id="settings">
+      <form id="settings-form">
+        <div class="section-head">
+          <h2 id="settings-title">设置与备份</h2>
+          <button
+            type="button"
+            class="quiet close"
+            data-close="settings"
+            aria-label="关闭设置"
+          >
+            关闭
+          </button>
+        </div>
+        <p class="muted" id="setup-note">从一个舒服的额度开始。</p>
+        <label class="label" for="budget">每日额度（元）</label
+        ><input id="budget" inputmode="decimal" required /><label
+          class="label"
+          for="start"
+          >开始记录日期</label
+        ><input id="start" type="date" required /><label
+          class="label"
+          for="mode"
+          >结算方式</label
+        ><select id="mode">
+          <option value="daily">每日结算 · 每天攒一点</option>
+          <option value="weekly">每周结算 · 周日攒一笔</option>
+        </select>
+        <p class="micro">
+          额度调整从今天生效，过去日期的额度保留。每周按周一至周日结算，起始周按实际天数计算。切换模式不会重复计算已转存金额。
+        </p>
+        <button type="submit" class="primary full">保存设置</button>
+      </form>
+      <div class="backup">
+        <h3>把账本收好</h3>
+        <p class="micro">
+          手机与电脑不自动同步。清除网站数据或更换浏览器可能丢失记录；导出的文件包含你的完整账本。
+        </p>
+        <div class="actions">
+          <button id="export" class="secondary">导出备份</button
+          ><button id="import" class="secondary">恢复备份</button>
+        </div>
+        <input
+          id="import-file"
+          type="file"
+          accept="application/json,.json"
+          hidden
+        />
+      </div>
+    </dialog>
+    <dialog id="transfer">
+      <div class="section-head">
+        <h2>把这一笔攒起来</h2>
+        <button class="quiet" data-close="transfer">关闭</button>
+      </div>
+      <p class="muted">本次转存</p>
+      <div class="settle-amount">¥ <span id="transfer-amount"></span></div>
+      <ol>
+        <li>复制金额，打开微信。</li>
+        <li>扫一扫 → 相册，选择攒钱号的收款码。</li>
+        <li>确认收款人并付款，再回来记录。</li>
+      </ol>
+      <button id="copy" class="secondary full">复制金额</button
+      ><button id="confirm-transfer" class="primary full">
+        我已付款，记入攒钱本
+      </button>
+      <p class="micro">
+        这里不会发起支付，也无法自动核实到账。请在微信付款成功后确认。
+      </p>
+    </dialog>
+    <dialog id="restore">
+      <h2>恢复这份账本？</h2>
+      <p id="restore-summary"></p>
+      <p class="muted">将替换此浏览器里的当前账本。建议先导出当前备份。</p>
+      <button id="restore-confirm" class="primary full">确认替换</button
+      ><button class="quiet full" data-close="restore">取消</button>
+    </dialog>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+    <div id="celebration" hidden aria-hidden="true">
+      <span>又攒下一点！</span><strong id="celebrate-amount"></strong>
+    </div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
