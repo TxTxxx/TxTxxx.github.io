@@ -37,3 +37,11 @@ iPhone 用 Safari 打开正式入口，通过分享菜单添加到主屏幕。�
 生成提示词：
 
 > Use case: logo-brand. Create one premium iOS app icon for a personal savings app named 一点点, no text anywhere. A single beautifully sculpted translucent emerald-green glass pebble/pocket containing one warm brushed-gold coin, simple iconic silhouette suggesting a small growing savings reserve. Sophisticated tactile 3D product render, generous optical padding, subtle caustic highlights, restrained luxury, readable at 48px. Full-bleed square deep forest green background #123c32, no outer border, no rounded-square container (OS applies mask), no phone mockup, no typography, no watermark, no clutter. Centered symbol occupies 65% of canvas. Square 1024x1024. Save output image for use as a website and iPhone home screen app icon.
+
+## 第三版桌面图标
+
+桌面、网页标签与页头改用简化的金色钱袋标志，保留原玻璃插画作为转存成功画面的配图。内置图像生成工具生成，未返回可核验的模型名称。成品为 `public/save-money/icon-v3-{32,64,180,192,512}.png`，已检查 32 与 64 像素下的轮廓。图片仅缩放并转换为不透明 PNG；iPhone 图标采用 180 像素，Manifest 采用 192/512 像素，网页标签采用 32 像素。缓存版本更新为 v3，账本数据不变。
+
+生成提示词：
+
+> Design ONE production-ready iOS home screen app icon, square full bleed 1024x1024. Personal savings app. Flat graphic icon design, NOT product illustration. Solid uniform deep forest green #123c32 background covering the full canvas, no outer rounded-square boundary, no transparency. Centered oversized warm gold minimal rounded savings pouch silhouette, a single smooth simple recognizable shape, broad rounded base and short gently pinched top with one simple horizontal opening detail. Within pouch a single small deep green circular dot as negative-space mark. Symbol occupies approximately 72 percent of width and 70 percent of height, optically centered, safely inside OS corner mask. Bold, distinctive, legible at 32 pixels, almost vector-flat with only the most subtle gold tonal variation. Exactly one symbol, no floating coins, no glass, no translucent materials, no glow, no lighting scene, no ground shadow, no perspective, no text, no letters, no currency sign, no decorative elements. Restrained premium friendly graphic design. Render only the finished square icon, not a mockup or contact sheet.
