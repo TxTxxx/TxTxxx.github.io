@@ -18,8 +18,12 @@ let state = fresh(),
 function notify(text) {
   $("toast").textContent = text;
   $("toast").hidden = false;
+  if (typeof $("toast").showPopover === "function") $("toast").showPopover();
   clearTimeout(notify.timer);
-  notify.timer = setTimeout(() => ($("toast").hidden = true), 4000);
+  notify.timer = setTimeout(() => {
+    if (typeof $("toast").hidePopover === "function") $("toast").hidePopover();
+    $("toast").hidden = true;
+  }, 4000);
 }
 function storageError(text) {
   broken = true;
@@ -58,8 +62,9 @@ function openSettings() {
   $("start").disabled = state.entries.length > 0 || state.transfers.length > 0;
   $("mode").value = state.mode;
   $("settings-title").textContent = state.configured
-    ? "设置与备份"
+    ? "攒钱设置"
     : "给自己一个每日额度";
+  $("backup-section").hidden = !state.configured && !broken;
   $("settings").showModal();
 }
 function selectDate(day) {
@@ -74,16 +79,29 @@ function updateHint() {
     budget = budgetAt(state, day);
   $("entry-submit").textContent = existing ? "更新这一天" : "记下这一天";
   $("entry-hint").textContent = existing
-    ? "已记录。修改会重新计算待攒金额，已转存不变。"
-    : "当天没有消费也请填 0；空白不会算成零消费。";
+    ? "已保存，可修改金额。已确认转存的记录会保留。"
+    : "只填生活消费，不包括转到攒钱号的钱；没消费填 0。";
+  $("daily-budget").textContent = `¥${money(budget)}`;
+  let spentForMeter = 0;
+  try {
+    spentForMeter = cents($("amount").value);
+  } catch {}
+  const used = Math.min(100, Math.round((spentForMeter / budget) * 100));
+  $("budget-fill").style.width = `${used}%`;
+  $("budget-fill").classList.toggle("over-budget", spentForMeter > budget);
+  $("budget-progress").setAttribute("aria-valuenow", String(used));
+  $("budget-progress").setAttribute(
+    "aria-valuetext",
+    `已输入消费 ${money(spentForMeter)} 元，每日额度 ${money(budget)} 元`,
+  );
   try {
     const spent = cents($("amount").value);
     $("live-difference").textContent =
       spent <= budget
-        ? `当天结余 ¥${money(budget - spent)} · 先补超支，再攒新钱`
-        : `当天超支 ¥${money(spent - budget)} · 由未来结余补齐`;
+        ? `当日结余 ¥${money(budget - spent)}`
+        : `当日超支 ¥${money(spent - budget)}，之后慢慢补齐`;
   } catch {
-    $("live-difference").textContent = `当天额度 ¥${money(budget)}`;
+    $("live-difference").textContent = "输入金额，看看今天能留下多少。";
   }
 }
 function row(main, sub, right, action) {
@@ -106,6 +124,37 @@ function row(main, sub, right, action) {
   }
   return node;
 }
+function renderWeek(today) {
+  const monday = addDays(
+    today,
+    -((new Date(`${today}T12:00:00`).getDay() + 6) % 7),
+  );
+  const strip = $("week-strip");
+  strip.replaceChildren();
+  let count = 0;
+  for (let i = 0; i < 7; i++) {
+    const day = addDays(monday, i);
+    const recorded = state.entries.some((entry) => entry.date === day);
+    if (recorded) count++;
+    const cell = document.createElement("button");
+    cell.type = "button";
+    cell.className = `week-day${recorded ? " recorded" : ""}${day === today ? " today" : ""}`;
+    cell.disabled = day > today || day < state.start;
+    cell.setAttribute("aria-label", `${day} ${recorded ? "已记录" : "未记录"}`);
+    cell.setAttribute("aria-current", day === today ? "date" : "false");
+    const label = document.createElement("span");
+    label.textContent = ["一", "二", "三", "四", "五", "六", "日"][i];
+    const status = document.createElement("strong");
+    status.textContent = recorded ? "✓" : String(Number(day.slice(-2)));
+    cell.append(label, status);
+    cell.onclick = () => {
+      selectDate(day);
+      $("amount").focus();
+    };
+    strip.append(cell);
+  }
+  $("week-count").textContent = `${count} / 7 天`;
+}
 function render() {
   const c = calculate(state),
     today = dateKey();
@@ -113,11 +162,13 @@ function render() {
   $("available").textContent = money(c.available);
   $("debt").textContent = `¥${money(c.debt)}`;
   $("transfer-count").textContent = state.transfers.length
-    ? `${state.transfers.length} 次认真积累`
-    : "从第一笔开始";
+    ? `${state.transfers.length} 笔转存，都是你的积累`
+    : "期待你的第一笔积累";
   $("mode-label").textContent =
     state.mode === "daily" ? "每日结算" : "每周结算";
   $("record-count").textContent = `${c.days} 天记录`;
+  $("debt-row").hidden = c.debt === 0;
+  renderWeek(today);
   $("entry-date").min = state.start;
   $("entry-date").max = today;
   $("transfer-open").disabled =
@@ -125,7 +176,9 @@ function render() {
   $("settle-label").textContent =
     state.mode === "weekly" ? "已完成周的可转存金额" : "本次可转存";
   $("settle-note").textContent = c.missing
-    ? `${c.missing} 尚未记录，后续日期暂不结算。${c.available > 0 ? "之前完整日期仍可转存。" : ""}`
+    ? c.missing === today
+      ? `记下今天的消费，再算这一笔。${c.available > 0 ? "之前的结余现在也可以攒入。" : ""}`
+      : `${c.missing} 还没记，补上后继续结算。${c.available > 0 ? "之前的结余可先攒入。" : ""}`
     : c.debt > 0
       ? `先用之后的结余补齐 ¥${money(c.debt)}，再开始下一笔积累。`
       : state.mode === "weekly"
@@ -138,7 +191,16 @@ function render() {
   if (!state.entries.length) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "还没有记录。今天，就是开始积累的第一天。";
+    const symbol = document.createElement("span");
+    symbol.className = "empty-symbol";
+    symbol.textContent = "01";
+    const message = document.createElement("div");
+    const title = document.createElement("strong");
+    title.textContent = "从今天这一笔开始";
+    const hint = document.createElement("p");
+    hint.textContent = "记下消费，你的每一天会留在这里。";
+    message.append(title, hint);
+    empty.append(symbol, message);
     list.append(empty);
   }
   for (const e of [...state.entries].sort((a, b) =>
@@ -191,6 +253,11 @@ $("entry-form").onsubmit = (e) => {
 $("entry-date").onchange = () => selectDate($("entry-date").value);
 $("amount").oninput = updateHint;
 $("settings-open").onclick = openSettings;
+$("backup-open").onclick = () => {
+  openSettings();
+  $("backup-section").hidden = false;
+  $("backup-section").scrollIntoView({ block: "nearest" });
+};
 $("settings-form").onsubmit = (e) => {
   e.preventDefault();
   try {

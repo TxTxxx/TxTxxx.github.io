@@ -25,3 +25,15 @@ iPhone 用 Safari 打开正式入口，通过分享菜单添加到主屏幕。�
 运行 `node --test scripts/tests/save-money.test.mjs` 验证金额、超支、漏记、周结算、模式切换、历史修改、预算变更及备份校验。按仓库要求运行 `ASTRO_TELEMETRY_DISABLED=1 npm run build`。
 
 开发服务器请使用 `/save-money/index.html` 预览；GitHub Pages 支持正式目录入口 `/save-money/`。WebMCP 支持检测后仅注册只读结算摘要；没有兼容上下文时不影响应用。
+
+## 第二版界面与图标
+
+深绿主色、浅灰工作区，累计转存与每日输入并列；手机上按概览、录入、转存排列。本周日期条只显示真实记录，并复用原有日期选择流程。预算使用条随输入更新；零超支时隐藏待补项。数据结构与存储键保持不变。
+
+备份说明改为“数据保存与备份”，分别说明本机存储、没有自动同步，以及换设备前下载文件、再恢复的步骤。提示消息使用支持检测后的 Popover，避免弹窗内的错误提示被遮挡。
+
+图标使用内置图像生成工具制作（工具未提供可核验的具体模型名称），最终资源为 `public/save-money/icon-v2-192.png` 和 `public/save-money/icon-v2-512.png`。生成后仅转换为适合图标使用的不透明 PNG 并缩放。旧资源保留以兼容缓存；主页面、Manifest 和离线缓存改用新版资源。
+
+生成提示词：
+
+> Use case: logo-brand. Create one premium iOS app icon for a personal savings app named 一点点, no text anywhere. A single beautifully sculpted translucent emerald-green glass pebble/pocket containing one warm brushed-gold coin, simple iconic silhouette suggesting a small growing savings reserve. Sophisticated tactile 3D product render, generous optical padding, subtle caustic highlights, restrained luxury, readable at 48px. Full-bleed square deep forest green background #123c32, no outer border, no rounded-square container (OS applies mask), no phone mockup, no typography, no watermark, no clutter. Centered symbol occupies 65% of canvas. Square 1024x1024. Save output image for use as a website and iPhone home screen app icon.

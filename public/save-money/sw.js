@@ -1,14 +1,13 @@
-const CACHE = "txtxx-save-money-v1";
+const CACHE = "txtxx-save-money-v2";
 const FILES = [
   "./",
   "./index.html",
-  "./app.css",
-  "./app.js",
+  "./app.css?v=2",
+  "./app.js?v=2",
   "./ledger.js",
   "./manifest.webmanifest",
-  "./icon.svg",
-  "./icon-192.png",
-  "./icon-512.png",
+  "./icon-v2-192.png",
+  "./icon-v2-512.png",
 ];
 self.addEventListener("install", (event) =>
   event.waitUntil(
