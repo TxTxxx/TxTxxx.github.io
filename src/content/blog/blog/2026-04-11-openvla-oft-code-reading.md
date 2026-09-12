@@ -15,9 +15,7 @@ draft: false
 
 # OpenVLA-OFT 代码解读：动作头、并行解码与多模态输入
 
-OpenVLA-OFT 的重点不在于继续基于 OpenVLA 做一次 LoRA 微调，而在于它同时改了动作表示、动作解码、输入模态和语言条件进入视觉主干的方式。对同一个 7B VLA 底座来说，这些改动已经属于结构层面的重新设计。
-
-结合项目代码看，OpenVLA-OFT 的核心变化可以压成四部分：连续动作头、并行 action chunk 解码、多图像与 proprio 输入、FiLM 语言调制。下面按这四部分展开。
+OpenVLA-OFT 在 OpenVLA 底座上加入连续动作头和并行 action chunk 预测，并支持多视角图像、机器人状态与 FiLM 语言调制。本文沿着这些模块的前向计算，整理训练、推理和 checkpoint 加载之间的对应关系。代码片段省略了部分上下文，用于阅读调用关系，不是可独立运行的脚本。
 
 ## 原始 OpenVLA 如何输出动作
 
@@ -59,7 +57,7 @@ def predict_action(
     return actions
 ```
 
-这段代码可以作为后文所有改动的对照。OpenVLA-OFT 没有替换 OpenVLA 的视觉编码器和语言主干，但它确实修改了“动作如何被输出”这条主线。
+后文以这条“生成 token—解码—反归一化”路径作对照。
 
 ## 连续动作头如何从离散 token 扩展到连续回归
 
@@ -121,7 +119,7 @@ class DiffusionActionHead(nn.Module):
         return noise_pred
 ```
 
-这里的关键点是，动作预测不再依赖最终生成出的 token id，而是直接读取动作位点上的 Transformer hidden states。这样做的结果是，OpenVLA-OFT 仍然保留 OpenVLA 主干对观测和任务的建模能力，但动作输出层已经从“离散 token 解码”变成了“连续值回归”或“条件去噪”。
+两个分支都读取动作位点的 Transformer hidden states。L1 分支预测连续动作，diffusion 分支预测噪声，各自使用对应的训练损失。
 
 ## 并行 action chunk 解码如何改变推理接口
 
@@ -191,11 +189,11 @@ def _regression_or_discrete_prediction(...):
 
 从这部分实现可以看出，OpenVLA-OFT 的做法不是用 past key values 一步一步地推出动作 token，而是先在输入序列里预留整段动作位点，再通过一次 forward 直接读取整个 action chunk 的 hidden states 或 logits。
 
-因此，OpenVLA-OFT 不能简单概括成“OpenVLA + LoRA”。从依赖、序列构造到推理逻辑，它都在为并行动作读出服务。项目主页给出的结果是：在 LIBERO 上，parallel decoding 和 action chunking 对应 26x 更快的 action generation speed 与 3x 更低的 latency；首页 TL;DR 给出的总口径是 25-50x inference speedup。这些数字来自论文和项目页，但相关机制在代码里是可以直接定位到的。
+因此，加载权重时也要使用匹配的序列构造和 attention 实现。只挂载 LoRA adapter 并不能复现这条并行预测路径。
 
 ## 多图像与 proprio 输入如何进入模型前向
 
-OpenVLA-OFT 不只是改了动作输出，也扩展了模型可以接收的输入。最重要的两项新增模态是额外相机视角和机器人 proprioceptive state。
+输入侧可以加入额外相机视角和机器人 proprioceptive state。
 
 ```python
 # experiments/robot/openvla_utils.py
@@ -287,13 +285,11 @@ class PrismaticVisionBackbone(nn.Module):
             return torch.cat(all_patches, dim=1)
 ```
 
-这些实现说明，多图像和 proprio 不是训练脚本外层附加的辅助特征，而是被接入了模型 forward 的正式输入路径。尤其是 proprio 最终会被投影到和视觉 patch 对齐的 embedding 空间，再作为额外 token 拼接进序列中。
+每张图像分别编码，得到的 patch 序列再拼接。proprio 经过归一化和投影后，作为额外 token 加入序列；训练与推理需要使用一致的图像数量和状态定义。
 
 ## FiLM 如何把语言条件注入视觉编码器
 
-如果说连续动作头改的是输出端，多图像和 proprio 改的是输入端，那么 FiLM 处理的是中间这一层：语言信息如何影响视觉特征。
-
-在 ALOHA 设置下，OpenVLA-OFT+ 会在 OFT 基础上启用 FiLM。这不是 prompt engineering，也不是额外辅助 loss，而是直接修改 vision transformer block 的前向过程。
+ALOHA 设置中的 OpenVLA-OFT+ 启用 FiLM，让语言条件参与视觉特征计算。它修改的是 vision transformer block 的前向过程：
 
 ```python
 # prismatic/models/film_vit_wrapper.py
@@ -349,11 +345,11 @@ if cfg.use_film:
     )
 ```
 
-这部分代码表明，OFT+ 把语言条件前移到了视觉编码阶段。语言 token 会先被压成任务级 embedding，再通过 FiLM 生成的缩放和偏移参数调制视觉中间特征。对于依赖语言消歧的操作任务，这是一种明确的结构修改，而不是推理时的附加技巧。
+语言 token 的 embedding 先取均值，再生成缩放和偏移参数，作用于视觉 block 的中间特征。启用 FiLM 后，视觉编码便依赖当前语言输入。
 
-## OpenVLA-OFT 为什么更像可组合的微调框架
+## 可选模块怎样保存和恢复
 
-把前面的几部分合在一起看，OpenVLA-OFT 已经不只是一个固定结构的 checkpoint，而是一个围绕 OpenVLA 主干搭建的可组合微调框架。这个判断也能从配置、保存和加载逻辑里得到支持。
+动作头、FiLM 和 proprio 都有独立配置。保存与加载必须匹配这些开关：
 
 ```python
 # vla-scripts/finetune.py
@@ -422,17 +418,17 @@ def get_action_head(cfg: Any, llm_dim: int) -> Union[L1RegressionActionHead, Dif
     ...
 ```
 
-从这些配置项和模块保存逻辑可以看出，OpenVLA-OFT 的 checkpoint 不是单一 adapter，而是由底座和多种可选模块共同组成。动作头、FiLM 包装、多图像输入、proprio projector 都是可以单独开关和单独恢复的部分。
+除 adapter 外，checkpoint 还可能包含动作头、proprio projector 和 FiLM 视觉主干参数。加载时需要恢复相应模块，并设置图像数量和数据集统计量。
 
 ## 这些结构改动带来了什么结果
 
-如果只看代码，可以确认 OpenVLA-OFT 改了哪些机制；再结合项目页和文档，可以看出这些改动在速度和任务表现上的目标。
+以下数字来自项目页和文档，对应项目的评估设置，不是本文重新测得的结果。
 
-第一，项目主页把速度提升直接归因于 parallel decoding 和 action chunking，并报告在 LIBERO 上实现了 26x faster action generation speed 和 3x lower latency；首页 TL;DR 给出的总口径是 25-50x inference speedup。这和代码里预留整段动作位点、一次性读取 action chunk 的实现是一致的。
+项目主页把速度提升直接归因于 parallel decoding 和 action chunking，并报告在 LIBERO 上实现了 26x faster action generation speed 和 3x lower latency；首页 TL;DR 给出的总口径是 25-50x inference speedup。这和代码里预留整段动作位点、一次性读取 action chunk 的实现是一致的。
 
-第二，`LIBERO.md` 中给出的结果显示，针对四个任务套件分别训练的 OpenVLA-OFT policy 平均成功率为 97.1%，把四个套件合并成单一 policy 后平均成功率仍有 96.8%。连续动作头、多图像输入和 proprio 支持，都是围绕这类下游任务表现做出的结构改动。
+`LIBERO.md` 中给出的结果显示，针对四个任务套件分别训练的 OpenVLA-OFT policy 平均成功率为 97.1%，把四个套件合并成单一 policy 后平均成功率仍有 96.8%。连续动作头、多图像输入和 proprio 支持，都是围绕这类下游任务表现做出的结构改动。
 
-第三，OFT+ 在 ALOHA 上启用了 FiLM，把 `NUM_ACTIONS_CHUNK` 提高到 25，并支持 3 张输入图像和 proprio。这些能力在 `prismatic/vla/constants.py`、`film_vit_wrapper.py` 和 `openvla_utils.py` 中都有对应实现。
+OFT+ 在 ALOHA 上启用了 FiLM，把 `NUM_ACTIONS_CHUNK` 提高到 25，并支持 3 张输入图像和 proprio。这些能力在 `prismatic/vla/constants.py`、`film_vit_wrapper.py` 和 `openvla_utils.py` 中都有对应实现。
 
 与此同时，工程复杂度也明显增加：
 
@@ -440,19 +436,11 @@ def get_action_head(cfg: Any, llm_dim: int) -> Union[L1RegressionActionHead, Dif
 - 它的 checkpoint 由多个模块组成，加载时需要匹配相应配置。
 - 它对平台和任务设定有更强绑定，例如 LIBERO 和 ALOHA 的 `NUM_ACTIONS_CHUNK`、`ACTION_DIM`、`PROPRIO_DIM` 并不相同。
 
-如果目标只是复现原始 OpenVLA 的 PEFT 微调，OFT 不一定是最直接的入口；但如果关注的是控制频率、动作延迟、多视角观测和语言条件如何进入模型，那么 OpenVLA-OFT 的代码很值得逐段阅读，因为它修改的就是这些核心接口。
+这些结果不能只凭单个模块的代码归因。比较自己的配置时，还要固定任务、硬件、chunk 长度和输入模态。
 
-## 总结
+## 加载模型前核对配置
 
-OpenVLA-OFT 的主要变化，在于它没有沿用原始 OpenVLA 的动作接口和输入接口，而是把下游控制任务最敏感的几部分重新拆开实现。动作输出、解码方式、输入模态和语言条件注入位置都发生了变化。
-
-如果你准备继续读这个仓库，最值得优先看的三个文件是：
-
-- `vla-scripts/finetune.py`
-- `prismatic/extern/hf/modeling_prismatic.py`
-- `prismatic/models/film_vit_wrapper.py`
-
-前者决定训练入口和模块组合，后两者决定并行动作预测、多模态输入和 FiLM 是如何接入模型主干的。
+`vla-scripts/finetune.py` 决定训练时启用哪些模块；`prismatic/extern/hf/modeling_prismatic.py` 负责并行动作位点和多模态输入；FiLM 的实现位于 `prismatic/models/film_vit_wrapper.py`。排查加载或输出维度问题时，可以按这个对应关系检查训练配置、保存的模块文件和推理参数是否一致。
 
 ## References
 

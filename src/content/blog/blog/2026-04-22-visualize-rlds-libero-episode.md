@@ -15,9 +15,9 @@ draft: false
 
 # 我是怎么可视化 RLDS 版 LIBERO 数据集的
 
-最近在看 RLDS 版的 LIBERO 数据集时，我最想确认的不是训练 batch 长什么样，而是一条原始 episode 里到底有什么：任务指令、动作、状态、主视角图像、腕部图像分别怎么存，终止标记放在哪一层。
+最近在看 RLDS 版的 LIBERO 数据集，我想先确认一条原始 episode 的结构：任务指令、动作、状态、主视角和腕部图像分别怎么存，终止标记放在哪一层。
 
-直接看训练代码不太适合回答这个问题。我最后用了一个更直接的办法：从 TFDS 里取一条原始 episode，把内部的 `steps` 展开，然后同时导出终端结构、JSON 摘要和逐步 PNG。这样一条轨迹发生了什么，基本就能直接看清。
+我用 TFDS 取出一条 episode，展开内部的 `steps`，再导出字段结构、JSON 摘要和逐步 PNG。下面记录读取过程，以及处理嵌套 `steps` 时遇到的报错。
 
 ## 先确认 RLDS 数据在磁盘上怎么放
 
@@ -34,7 +34,7 @@ draft: false
         └── ...
 ```
 
-这个结构里最值得先看的有三类文件：
+目录里的文件分别保存：
 
 - `dataset_info.json`：数据集名、版本、split 和分片信息。
 - `features.json`：episode 和 step 的字段 schema。
@@ -58,7 +58,7 @@ draft: false
 
 所以后面读取时，最少要先把 `dataset_name` 和 `split` 对上。
 
-## 读取一条 episode 的代码其实很短
+## 用 TFDS 读取并展开 episode
 
 我最后用的读取方式就是直接走 TFDS：
 
@@ -106,9 +106,9 @@ def materialize_rlds(value: Any) -> Any:
 TypeError: Arguments to as_numpy must be tf.Tensors or tf.data.Datasets.
 ```
 
-原因很简单：外层 episode 已经转成 NumPy 了，里面这个 `steps` 只是个还能继续遍历的包装对象，不是新的 `tf.data.Dataset`。
+在这里，外层 episode 已经经过 NumPy 转换，内部 `steps` 是可遍历的包装对象，不能再当作 `tf.data.Dataset` 传入。
 
-## 我最后保留了三种输出
+## 导出结构摘要和逐步图像
 
 只在终端里打印整条 episode 不太够，因为图像数组和状态向量都比较大。我最后保留了三种输出：
 
@@ -280,7 +280,7 @@ conda run -n keyan python scripts/inspect_raw_rlds_episode.py \
     dict(keys=['image', 'joint_state', 'state', 'wrist_image'])
 ```
 
-这已经足够回答几个很实际的问题：
+检查输出时，我会核对：
 
 - 一条 episode 顶层是不是 `episode_metadata + steps`
 - `action` 的维度是多少
@@ -297,12 +297,8 @@ conda run -n keyan python scripts/inspect_raw_rlds_episode.py \
 ...
 ```
 
-## 这类小脚本什么时候有用
+## 与训练输入对照
 
-我觉得这种脚本最适合两个场景。
+刚接手数据集时，这个脚本可以先确认原始字段和图像。训练结果异常时，也可以拿它的输出与 batch transform 后的样本对照，检查动作、语言和时间步在哪一层发生了变化。
 
-第一种是刚接手一个 RLDS 数据集的时候。你还没开始训练，但想先确认这份数据里到底有什么，字段层级对不对，图像和动作是不是按你预期存的。
-
-第二种是训练结果不对的时候。比起一上来就读 dataloader 和训练主循环，先把一条原始 episode 展开看看，通常更快定位问题到底出在原始数据，还是出在后面的变换逻辑。
-
-如果下一步还要继续查，我一般会再看两处：`features.json` 里的 schema，和训练代码里的 batch transform。前者回答“理论上应该长什么样”，后者回答“训练前又被改成了什么样”。
+需要注意，这里只展开了一条轨迹，不能据此判断整个数据集都没有问题。进一步检查还要对照 `features.json` 的 schema，并抽取其他 episode。
