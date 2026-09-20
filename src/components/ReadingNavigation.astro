@@ -1,0 +1,41 @@
+<script is:inline>
+  (() => {
+    const key = "txtxx-reading-return";
+    const read = () => { try { return JSON.parse(sessionStorage.getItem(key) || "null"); } catch { return null; } };
+    const plainClick = event => event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey;
+    document.addEventListener("click", event => {
+      if (!plainClick(event) || !(event.target instanceof Element)) return;
+      const link = event.target.closest(".post-card-link");
+      if (!link) return;
+      const card = link.closest(".post-card");
+      const state = {
+        article: new URL(link.href).pathname, card: card.id,
+        category: document.querySelector('[data-filter][aria-pressed="true"]')?.dataset.filter || "all",
+        y: scrollY, width: innerWidth, time: Date.now()
+      };
+      try { sessionStorage.setItem(key, JSON.stringify(state)); } catch {}
+    });
+    const saved = read();
+    const valid = saved && Date.now() - saved.time < 86400000 &&
+      typeof saved.card === "string" && /^post-[a-f0-9]+$/.test(saved.card);
+    const back = document.querySelector("[data-reading-back]");
+    if (back && valid && saved.article === location.pathname) {
+      const url = new URL("/", location.origin);
+      if (["embodied-ai", "tech-sharing", "journal"].includes(saved.category)) url.searchParams.set("category", saved.category);
+      url.hash = saved.card;
+      back.href = url.pathname + url.search + url.hash;
+    }
+    const restore = () => {
+      if (location.pathname !== "/" || !valid || location.hash !== `#${saved.card}`) return;
+      const card = document.getElementById(saved.card);
+      if (!card || card.hidden) return;
+      if (Math.abs(innerWidth - saved.width) < 2 && Number.isFinite(saved.y)) {
+        window.scrollTo({ top: Math.max(0, saved.y), behavior: "instant" });
+      } else card.scrollIntoView({ block: "center", behavior: "instant" });
+      card.querySelector("a")?.focus({ preventScroll: true });
+    };
+    document.addEventListener("txtxx:archive-ready", restore);
+    window.addEventListener("pageshow", restore);
+    window.addEventListener("pagereveal", restore);
+  })();
+</script>

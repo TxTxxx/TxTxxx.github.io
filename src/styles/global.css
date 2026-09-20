@@ -107,6 +107,7 @@ img {
 
 .nav a::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0.2rem; height: 1px; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform 160ms ease; }
 .nav a.active::after { transform: scaleX(1); }
+.nav a:hover::after, .nav a:focus-visible::after { transform: scaleX(1); }
 
 .nav a:hover,
 .nav a:focus-visible,

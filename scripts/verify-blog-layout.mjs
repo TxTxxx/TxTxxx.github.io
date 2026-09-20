@@ -63,6 +63,8 @@ const element = dataset => {
     dataset, attributes, classes, listeners,
     classList: { toggle: (name, on) => on ? classes.add(name) : classes.delete(name) },
     toggleAttribute: (name, on) => on ? attributes.set(name, "") : attributes.delete(name),
+    hasAttribute: name => attributes.has(name),
+    getBoundingClientRect: () => ({ left: 0, top: 0, bottom: 100 }),
     setAttribute: (name, value) => attributes.set(name, value),
     addEventListener: (name, callback) => { listeners[name] = callback; }
   };
@@ -72,10 +74,31 @@ const filters = [...home.matchAll(/<button[^>]*data-filter="([^"]+)"/g)].map(mat
 const grid = element({});
 grid.querySelectorAll = () => archiveCards;
 const empty = element({});
+const count = element({});
+const clear = element({});
+let focusReturned = false;
+filters[0].focus = () => { focusReturned = true; };
+const motionPreference = { matches: false, addEventListener: (_, callback) => { motionPreference.onChange = callback; } };
+const animations = [];
+archiveCards.forEach(card => {
+  card.animate = (frames, options) => {
+    const animation = { frames, options, cancelled: false, cancel() { this.cancelled = true; } };
+    animations.push(animation);
+    return animation;
+  };
+});
 runInNewContext(filterScript, {
+  window: { matchMedia: () => motionPreference, addEventListener() {}, innerHeight: 800 },
   document: {
+    addEventListener() {},
     querySelectorAll: () => filters,
-    querySelector: selector => selector === "[data-archive-grid]" ? grid : empty
+    querySelector: selector => ({
+      "[data-archive-grid]": grid,
+      "[data-empty-state]": empty,
+      "[data-filter-count]": count,
+      "[data-clear-filter]": clear,
+      '[data-filter="all"]': filters[0]
+    })[selector] ?? null
   }
 });
 const checkFilter = category => {
@@ -87,6 +110,7 @@ const checkFilter = category => {
     assert.equal(filter.classes.has("active"), filter.dataset.filter === category);
   }
   const hasResults = archiveCards.some(card => !card.attributes.has("hidden"));
+  assert.equal(count.textContent, `显示 ${archiveCards.filter(card => !card.attributes.has("hidden")).length} 篇`);
   assert.equal(empty.attributes.has("hidden"), hasResults);
   assert.equal(grid.attributes.has("hidden"), !hasResults);
 };
@@ -101,8 +125,19 @@ filters[0].dataset.filter = "missing-test-category";
 filters[0].listeners.click();
 checkFilter("missing-test-category");
 filters[0].dataset.filter = originalFilter;
-filters[0].listeners.click();
+clear.listeners.click();
 checkFilter("all");
+assert.ok(focusReturned, "Clearing the filter must return focus to All");
+assert.ok(animations.length > 0, "Newly visible cards should animate after filtering");
+motionPreference.matches = true;
+motionPreference.onChange();
+assert.ok(animations.every(animation => animation.cancelled), "Reduced motion must cancel running animations");
+const animationCount = animations.length;
+filters[1].listeners.click();
+checkFilter(filters[1].dataset.filter);
+clear.listeners.click();
+checkFilter("all");
+assert.equal(animations.length, animationCount, "Reduced motion must not create spatial animations");
 
 // Keep CSS display rules from overriding the native hidden attribute.
 const cardSource = read("src/components/PostCard.astro");

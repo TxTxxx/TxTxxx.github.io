@@ -33,21 +33,21 @@ const formatDate = (date: Date) =>
       <p>{edition.data.summary}</p>
       <div class="edition-meta">
         <time datetime={editionDate}>{formatDate(edition.data.date)}</time>
-        <span>{edition.data.paper_count} 篇达到门槛</span>
+        <span>本期收录 {edition.data.paper_count} 篇</span>
         {isLatest && <span class="latest-mark">最新一期</span>}
       </div>
     </div>
     <aside class="reading-rule">
-      <span class="rule-label">今日配额</span>
-      <div><strong>1</strong><span>今日主推</span></div>
+      <span class="rule-label">每期选文上限</span>
+      <div><strong>1</strong><span>主推论文</span></div>
       <div><strong>2</strong><span>前沿观察</span></div>
-      <div><strong>1</strong><span>遗漏补全</span></div>
-      <small>最多四篇 · 宁缺毋滥</small>
+      <div><strong>1</strong><span>往期补读</span></div>
+      <small>最多四篇，不足时不补齐</small>
     </aside>
   </section>
 
   <nav class="archive-strip" aria-label="论文雷达归档">
-    <span>历史归档</span>
+    <span>按日期查看</span>
     {
       allEditions.map((item, index) => {
         const itemDate = item.data.date.toISOString().slice(0, 10);
@@ -69,7 +69,7 @@ const formatDate = (date: Date) =>
         <h3><a href={paper.url} target="_blank" rel="noreferrer">{paper.title} ↗</a></h3>
         {paper.publication && <p class="paper-byline">{paper.publication}</p>}
         <p class="editorial-take">{paper.summary}</p>
-        {paper.guide_url && <p class="deep-dive-link"><a href={paper.guide_url}>打开主推导读 →</a></p>}
+        {paper.guide_url && <p class="deep-dive-link"><a href={paper.guide_url}>阅读论文导读 →</a></p>}
         {paper.code_url && <p><a href={paper.code_url} target="_blank" rel="noreferrer">代码 ↗</a></p>}
         {(paper.note || paper.reading_status) && <div class="reading-decision">
           {paper.reading_status && <strong>{paper.reading_status}</strong>}
@@ -80,7 +80,7 @@ const formatDate = (date: Date) =>
   </article>
 
   <footer class="best-first">
-    <span>今日最值得先读什么</span>
+    <span>本期建议先读</span>
     <strong>{edition.data.best_first}</strong>
   </footer>
 </BaseLayout>

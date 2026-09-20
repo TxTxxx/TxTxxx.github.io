@@ -1,5 +1,6 @@
 ---
 import type { CollectionEntry } from "astro:content";
+import { optimizedImage } from "../lib/optimized-image.mjs";
 
 interface Props {
   post: CollectionEntry<"blog">;
@@ -13,10 +14,13 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
   day: "numeric"
 });
 const hasImage = Boolean(post.data.cover_image);
+const cover = await optimizedImage(post.data.cover_image);
+const transitionName = `post-${Buffer.from(post.id).toString("hex")}`;
 const category = post.data.category ?? (post.id.startsWith("journal/") ? "journal" : "tech-sharing");
 ---
 
 <article
+  id={transitionName}
   class:list={[
     "post-card",
     variant === "featured" ? "featured" : undefined,
@@ -31,9 +35,11 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
     {
       hasImage && (
         <div class="post-card-media">
-          <div class="post-card-media-frame">
+          <div class="post-card-media-frame" data-post-cover style={`--post-transition: ${transitionName}`}>
             <img
               src={post.data.cover_image}
+              srcset={cover?.srcset}
+              sizes="(max-width: 600px) calc(100vw - 56px), (max-width: 1160px) calc((100vw - 96px) / 2), 520px"
               alt={post.data.cover_alt ?? post.data.title}
               loading={variant === "featured" ? "eager" : "lazy"}
               decoding="async"
@@ -63,7 +69,7 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
   }
 
   .post-card[hidden] { display: none; }
-  .post-card:hover { border-color: var(--accent-line); }
+  .post-card:hover, .post-card:focus-within { border-color: var(--accent-line); }
 
   .post-card-link {
     display: flex;
@@ -109,6 +115,13 @@ const category = post.data.category ?? (post.id.startsWith("journal/") ? "journa
   }
 
   .post-card.cover-image .post-card-media img { object-fit: cover; }
+
+  /* Only photographic covers may crop; diagrams retain their complete frame. */
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .post-card.cover-image .post-card-media img { transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1); }
+    .post-card.cover-image .post-card-link:hover img,
+    .post-card.cover-image .post-card-link:focus-visible img { transform: scale(1.025); }
+  }
 
   .post-card-meta {
     display: flex;

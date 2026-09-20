@@ -1,0 +1,33 @@
+/* Native document navigation keeps normal links, history and script lifecycles. */
+@view-transition { navigation: auto; }
+/* Snapshot layers must not swallow a quick second navigation. */
+::view-transition { pointer-events: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-header { view-transition-name: site-header; }
+  [data-post-cover] { view-transition-name: var(--post-transition); }
+  ::view-transition-group(*) {
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  ::view-transition-old(root) { animation: page-leave 140ms ease-out both; }
+  ::view-transition-new(root) { animation: page-enter 240ms ease-out both; }
+  :root:has(.post-article)::view-transition-old(root) { animation: reading-enter-out 160ms ease-out both; }
+  :root:has(.post-article)::view-transition-new(root) { animation: reading-enter-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  :root:has(.archive-grid)::view-transition-old(root) { animation: reading-return-out 160ms ease-out both; }
+  :root:has(.archive-grid)::view-transition-new(root) { animation: reading-return-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both; }
+  ::view-transition-group(site-header) { animation-duration: 0s; }
+  ::view-transition-old(site-header) { animation: none; opacity: 0; }
+  ::view-transition-new(site-header) { animation: none; }
+}
+
+@keyframes page-leave { to { opacity: 0; } }
+@keyframes page-enter { from { opacity: 0; } }
+@keyframes reading-enter-out { to { opacity: 0; transform: translateY(-8px); } }
+@keyframes reading-enter-in { from { opacity: 0; transform: translateY(12px); } }
+@keyframes reading-return-out { to { opacity: 0; transform: translateY(12px); } }
+@keyframes reading-return-in { from { opacity: 0; transform: translateY(-8px); } }
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}

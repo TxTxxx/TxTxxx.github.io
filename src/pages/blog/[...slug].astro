@@ -2,6 +2,7 @@
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import type { CollectionEntry } from "astro:content";
+import { optimizedImage } from "../../lib/optimized-image.mjs";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog", ({ data }) => !data.draft);
@@ -13,6 +14,8 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props as { post: CollectionEntry<"blog"> };
 const { Content } = await render(post);
+const cover = await optimizedImage(post.data.cover_image);
+const transitionName = `post-${Buffer.from(post.id).toString("hex")}`;
 const formattedDate = post.data.date.toLocaleDateString("en-US", {
   year: "numeric",
   month: "long",
@@ -23,7 +26,7 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
 <BaseLayout title={`${post.data.title} | TxTxx`} description={post.data.summary} pathname="/blog">
   <article class="post-article">
     <header class="post-header">
-      <div class="eyebrow">Essay</div>
+      <a class="back-link" data-reading-back href={`/#${transitionName}`}>← 返回博客</a>
       <div class="post-header-copy">
         <h1>{post.data.title}</h1>
         <p>{post.data.summary}</p>
@@ -35,9 +38,11 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
       {
         post.data.cover_image && (
           <div class="post-header-media" data-cover-fit={post.data.cover_fit ?? "contain"}>
-            <div class="post-header-media-frame">
+            <div class="post-header-media-frame" data-post-cover style={`--post-transition: ${transitionName}`}>
               <img
                 src={post.data.cover_image}
+                srcset={cover?.srcset}
+                sizes="(max-width: 900px) calc(100vw - 56px), 840px"
                 alt={post.data.cover_alt ?? post.data.title}
                 loading="eager"
                 decoding="async"
@@ -63,9 +68,12 @@ const formattedDate = post.data.date.toLocaleDateString("en-US", {
     margin-bottom: 2.5rem;
   }
 
-  .post-header > .eyebrow,
+  .post-header > .back-link,
   .post-header-copy,
   .post-body { max-width: 46rem; margin-inline: auto; }
+
+  .back-link { display: block; color: var(--muted); font-size: 0.875rem; }
+  .back-link:hover { color: var(--accent); }
 
   .post-header-copy { margin-top: 1rem; }
 

@@ -28,7 +28,7 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
   image={entry.data.hero_image}
 >
   <header class="deep-hero">
-    <a class="back-link" href="/papers/">← 返回每日论文雷达</a>
+    <a class="back-link" href="/papers/">← 查看最新一期 Paper Radar</a>
     <div class="deep-label">自动导读 · {entry.data.venue}</div>
     <h1>{entry.data.title}</h1>
     <p class="paper-title">{entry.data.paper_title}</p>
@@ -53,7 +53,7 @@ const formattedDate = new Intl.DateTimeFormat("zh-CN", {
       <nav aria-label="主推导读目录">
         {sections.map(section => <a href={`#${section.id}`}>{section.title}</a>)}
       </nav>
-      <p>由 Codex 整理，供初读参考。个人阅读状态以阅读图谱为准。</p>
+      <p>由 Codex 整理，供初读参考；不代表我已读完。我的公开阅读笔记见 <a href="/atlas/">Atlas 阅读图谱</a>。</p>
     </aside>
 
     <article class="deep-copy">

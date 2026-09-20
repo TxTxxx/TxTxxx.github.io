@@ -39,10 +39,9 @@ for (const post of posts) {
 const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) => featuredPost.id === post.id));
 ---
 
-<BaseLayout title="Blog | TxTxx" description="Blog archive" pathname="/">
+<BaseLayout title="Blog | TxTxx" description="TxTxx 的博客：机器人学习、技术笔记与生活记录。" pathname="/">
   <div class="home-intro">
     <section class="blog-header">
-      <div class="eyebrow">Blog archive</div>
       <h1>Trying to be<br /><span>100% of CR7.</span></h1>
       <p>机器人学习、技术笔记，以及球场和生活里的记录。</p>
     </section>
@@ -56,13 +55,13 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
   <section class="archive-section">
     <div class="section-heading">
       <div class="archive-heading-copy">
-        <h2>More writing</h2>
-        <span class="muted archive-count">
-          共 {posts.length} 篇文章
+        <h2>更多文章</h2>
+        <span class="muted archive-count" data-filter-count role="status" aria-live="polite" aria-atomic="true">
+          显示 {archivePosts.length} 篇
         </span>
       </div>
       <div class="archive-filter-bar">
-        <div class="archive-filters" aria-label="Archive category filters">
+        <div class="archive-filters" role="group" aria-label="筛选下方文章">
           <button type="button" class="archive-filter active" data-filter="all">全部</button>
           <button type="button" class="archive-filter" data-filter="embodied-ai">
             <span>{categoryLabels["embodied-ai"]}</span>
@@ -77,7 +76,7 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
       </div>
     </div>
     <div class="archive-empty muted" data-empty-state hidden>
-      这个分类下暂时还没有文章。
+      这个分类下暂无公开文章。<button type="button" class="archive-filter" data-clear-filter>查看全部文章</button>
     </div>
     <div class="archive-grid" data-archive-grid>
       {archivePosts.map((post) => <PostCard post={post} />)}
@@ -87,12 +86,39 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
 
 <script>
   const defaultCategory = "all";
-  const filterButtons = Array.from(document.querySelectorAll(".archive-filter"));
+  const filterButtons = Array.from(document.querySelectorAll(".archive-filter[data-filter]"));
   const archiveGrid = document.querySelector("[data-archive-grid]");
   const archiveCards = Array.from(archiveGrid?.querySelectorAll(".post-card") ?? []);
   const emptyState = document.querySelector("[data-empty-state]");
+  const filterCount = document.querySelector("[data-filter-count]");
+  const clearFilter = document.querySelector("[data-clear-filter]");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const motions = new Set<Animation>();
+  const stopMotion = () => {
+    motions.forEach(animation => animation.cancel());
+    motions.clear();
+  };
+  reducedMotion.addEventListener("change", stopMotion);
+  window.addEventListener("pagehide", stopMotion);
+  window.addEventListener("resize", stopMotion);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) stopMotion(); });
+  let activeCategory: string | null = null;
 
   const applyFilter = (category) => {
+    if (category === activeCategory) return;
+    const animate = activeCategory !== null && !reducedMotion.matches;
+    // Capture the current visual position before cancelling an interrupted move.
+    const before = new Map(animate ? archiveCards.filter(card => !card.hasAttribute("hidden"))
+      .map(card => [card, card.getBoundingClientRect()] as const) : []);
+    stopMotion();
+    activeCategory = category;
+    // Store the filter in this history entry so Back/Forward restores it too.
+    try {
+      const url = new URL(window.location.href);
+      if (category === "all") url.searchParams.delete("category");
+      else url.searchParams.set("category", category);
+      window.history.replaceState(window.history.state, "", url);
+    } catch {}
     let visibleCount = 0;
 
     archiveCards.forEach((card) => {
@@ -107,9 +133,30 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
       button.setAttribute("aria-pressed", String(isActive));
     });
 
+    if (filterCount) filterCount.textContent = `显示 ${visibleCount} 篇`;
     if (emptyState && archiveGrid) {
       emptyState.toggleAttribute("hidden", visibleCount !== 0);
       archiveGrid.toggleAttribute("hidden", visibleCount === 0);
+    }
+    if (animate) {
+      // Read every destination together, then animate without changing layout.
+      const destinations = archiveCards.filter(card => !card.hasAttribute("hidden"))
+        .map(card => ({ card, rect: card.getBoundingClientRect() }));
+      destinations.forEach(({ card, rect }) => {
+        if (rect.bottom < 0 || rect.top > window.innerHeight || !card.animate) return;
+        const origin = before.get(card);
+        // Offscreen cards enter quietly instead of travelling an entire page.
+        const previous = origin && origin.bottom > 0 && origin.top < window.innerHeight ? origin : undefined;
+        const x = previous ? previous.left - rect.left : 0;
+        const y = previous ? previous.top - rect.top : 0;
+        if (previous && Math.abs(x) + Math.abs(y) < 1) return;
+        const animation = card.animate([
+          { transform: `translate(${x}px, ${y}px)`, opacity: previous ? 1 : 0.45 },
+          { transform: "translate(0, 0)", opacity: 1 }
+        ], { duration: previous ? 260 : 180, easing: "cubic-bezier(0.16, 1, 0.3, 1)" });
+        motions.add(animation);
+        animation.onfinish = () => motions.delete(animation);
+      });
     }
   };
 
@@ -120,7 +167,17 @@ const archivePosts = posts.filter((post) => !featuredPosts.some((featuredPost) =
     });
   });
 
-  applyFilter(defaultCategory);
+  let initialCategory = defaultCategory;
+  try {
+    const requested = new URL(window.location.href).searchParams.get("category");
+    if (filterButtons.some(button => button.dataset.filter === requested)) initialCategory = requested;
+  } catch {}
+  applyFilter(initialCategory);
+  document.dispatchEvent?.(new CustomEvent("txtxx:archive-ready"));
+  clearFilter?.addEventListener("click", () => {
+    applyFilter(defaultCategory);
+    document.querySelector<HTMLButtonElement>('[data-filter="all"]')?.focus();
+  });
 </script>
 
 <style>

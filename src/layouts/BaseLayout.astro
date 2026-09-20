@@ -1,9 +1,11 @@
 ---
 import "../styles/global.css";
+import "../styles/navigation-motion.css";
 import "katex/dist/katex.min.css";
 import { siteMeta } from "../data/profile";
 import ThemeHead from "../components/ThemeHead.astro";
 import ThemeToggle from "../components/ThemeToggle.astro";
+import ReadingNavigation from "../components/ReadingNavigation.astro";
 
 interface Props {
   title?: string;
@@ -94,5 +96,6 @@ const activeNav = sectionPath === "/blog" || sectionPath.startsWith("/blog/") ? 
         </div>
       </div>
     </footer>
+    <ReadingNavigation />
   </body>
 </html>

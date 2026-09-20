@@ -298,33 +298,33 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
       <div class="fallback-field">
         {fallbackDots.map((dot) => <button class="fallback-dot" type="button" data-fallback-node={dot.id} aria-label={dot.title} style={`--x:${dot.left}%;--y:${dot.top}%;--s:${dot.size}px;--c:${dot.color}`}><i></i>{dot.label && <span>{dot.label}</span>}</button>)}
       </div>
-      <div class="webgl-mount" data-webgl-mount aria-label="Interactive research constellation"></div>
+      <div class="webgl-mount" data-webgl-mount aria-label="论文阅读图谱"></div>
       <div class="grain" aria-hidden="true"></div>
       <div class="vignette" aria-hidden="true"></div>
 
       <header class="atlas-mark">
-        <a href="/" aria-label="返回 TxTxx 网站">TX</a>
+        <a href="/" aria-label="返回博客首页">TX</a>
         <span></span>
         <b>Atlas <small>阅读图谱</small></b>
       </header>
 
       <div class="atlas-tools">
         <ThemeToggle />
-        <button type="button" data-reset aria-label="将图谱归位">
+        <button type="button" data-reset aria-label="重置图谱视角" title="重置图谱视角">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5" /><circle cx="12" cy="12" r="3" /></svg>
-          <span>归位</span>
+          <span>重置视角</span>
         </button>
       </div>
 
-      <div class="cluster-legend" aria-label="Research fields">
+      <div class="cluster-legend" aria-label="研究领域">
         {clusters.map((cluster) => <button type="button" data-cluster={cluster.id} aria-pressed="false"><i style={`--c:var(--atlas-${cluster.id})`}></i>{cluster.label}</button>)}
       </div>
 
       <div class="field-status">
-        <div class="field-switch" aria-label="Atlas data field">
-          <button type="button" data-field-mode="personal" aria-pressed="true">我的论文</button>
+        <div class="field-switch" role="group" aria-label="选择图谱内容">
+          <button type="button" data-field-mode="personal" aria-pressed="true">论文收藏</button>
           <i aria-hidden="true"></i>
-          <button type="button" data-field-mode="demo" aria-pressed="false">演示</button>
+          <button type="button" data-field-mode="demo" aria-pressed="false">演示图谱</button>
         </div>
         <b data-node-count>{personalNodes.length} 篇</b>
       </div>
@@ -337,7 +337,7 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
       </div>
 
       <aside class="focus-card" data-focus-card hidden>
-        <button type="button" class="focus-close" data-focus-close aria-label="关闭">×</button>
+        <button type="button" class="focus-close" data-focus-close aria-label="关闭论文详情">×</button>
         <span class="focus-kind" data-focus-kind></span>
         <h1 data-focus-title></h1>
         <div class="focus-meta">
@@ -347,8 +347,8 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
         <div class="focus-relations" data-focus-relations hidden></div>
         <div class="focus-body" data-focus-body hidden></div>
         <div class="focus-actions">
-          <a data-focus-source target="_blank" rel="noreferrer" hidden>原文 ↗</a>
-          <a data-focus-zotero hidden>Zotero ↗</a>
+          <a data-focus-source target="_blank" rel="noreferrer" hidden>阅读原文 ↗</a>
+          <a data-focus-zotero title="需在本机安装 Zotero 并有对应条目" hidden>在 Zotero 中打开 ↗</a>
         </div>
       </aside>
 
@@ -389,7 +389,7 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
 
       // Both the interactive graph and static fallback read the same exported paper data.
       const populateCard = (node) => {
-        setText("[data-focus-kind]", node.kind === "personal" ? "我的论文" : "演示数据");
+        setText("[data-focus-kind]", node.kind === "personal" ? "论文收藏" : "演示数据 · 非个人阅读记录");
         setText("[data-focus-title]", node.title);
         setText("[data-focus-year]", node.year ? String(node.year) : "年份未标注");
         setText("[data-focus-cluster]", node.fieldLabels?.join(" · ") || node.clusterLabel);
@@ -1081,7 +1081,7 @@ const fallbackDots = personalNodes.slice(0, 150).map((node) => ({
               tooltip.hidden = !hovered;
               renderer.domElement.style.cursor = hovered ? "pointer" : "grab";
               if (hovered) {
-                setText("[data-hover-index]", hovered.userData.kind === "personal" ? "PERSONAL" : hovered.userData.kind === "preview" ? "DEMO READ" : hovered.userData.clusterLabel);
+                setText("[data-hover-index]", hovered.userData.kind === "personal" ? "论文收藏" : "演示数据 · 非个人阅读记录");
                 setText("[data-hover-title]", hovered.userData.title);
               }
             }
