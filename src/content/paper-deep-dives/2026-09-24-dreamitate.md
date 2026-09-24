@@ -9,7 +9,7 @@ summary: "核对双视角视频生成、CAD 工具跟踪与四项真机评测，
 reading_time: "约 5 分钟"
 paper_url: "https://raw.githubusercontent.com/mlresearch/v270/main/assets/liang25b/liang25b.pdf"
 project_url: "https://dreamitate.cs.columbia.edu/"
-hero_image: "/images/paper-radar/2026-09-24-dreamitate/stereo-video-tool-tracking.png"
+hero_image: "/images/paper-radar/2026-09-24-dreamitate/stereo-video-tool-tracking.png?v=20260924"
 hero_alt: "Dreamitate Figure 2：双相机记录人类工具演示，生成双视角视频后以 CAD 模型跟踪工具并执行轨迹"
 draft: false
 ---
@@ -25,7 +25,7 @@ draft: false
   <span class="section-index">02 / METHOD</span>
   <h2>双视角生成提供画面，工具跟踪提供六维位姿</h2>
   <figure class="paper-figure">
-    <a href="/images/paper-radar/2026-09-24-dreamitate/stereo-video-tool-tracking.png" target="_blank" rel="noreferrer"><img src="/images/paper-radar/2026-09-24-dreamitate/stereo-video-tool-tracking.png" alt="Figure 2 完整方法图：左侧双相机人类演示用于微调视频生成器；右侧新场景双视角输入产生视频，CAD 工具跟踪将预测转换为机器人动作" loading="lazy" /></a>
+    <a href="/images/paper-radar/2026-09-24-dreamitate/stereo-video-tool-tracking.png?v=20260924" target="_blank" rel="noreferrer"><img src="/images/paper-radar/2026-09-24-dreamitate/stereo-video-tool-tracking.png?v=20260924" alt="Figure 2 完整方法图：左侧双相机人类演示用于微调视频生成器；右侧新场景双视角输入产生视频，CAD 工具跟踪将预测转换为机器人动作" loading="lazy" /></a>
     <figcaption>Figure 2 · <a href="https://raw.githubusercontent.com/mlresearch/v270/main/assets/liang25b/liang25b.pdf#page=3">PDF 文件第 3 页</a>。Junbang Liang 等，<a href="https://proceedings.mlr.press/v270/liang25b.html"><em>Dreamitate: Real-World Visuomotor Policy Learning via Video Generation</em></a>，CoRL 2024 / PMLR 270（2025）会议版。依 <a href="https://proceedings.mlr.press/pmlr-license-agreement.html">PMLR 出版许可第 2、3 条</a>按 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> 重用；600 dpi，保留完整图，仅裁去图外文字与原图注。点击打开高清图。</figcaption>
   </figure>
   <p>先看左侧的数据采集：人拿着可跟踪的工具示范，两台标定相机保持固定布局。Stable Video Diffusion 按任务分别微调，冻结编解码器，只调整空间和时间注意力。25 帧输出被分配给两个视角，去掉重复初始帧后形成 12 对预测帧。</p>
@@ -36,7 +36,7 @@ draft: false
   <span class="section-index">03 / EVIDENCE</span>
   <h2>四项真机评测采用不同指标与成功标准</h2>
   <figure class="paper-figure">
-    <a href="/images/paper-radar/2026-09-24-dreamitate/real-robot-task-results.png" target="_blank" rel="noreferrer"><img src="/images/paper-radar/2026-09-24-dreamitate/real-robot-task-results.png" alt="Table 2 完整结果：Dreamitate 旋转、舀取、扫动分别成功 37/40、34/40、37/40 次；推形状 mIoU 为 0.731、旋转误差为 8.0 度，各项指标不能混作统一成功率" loading="lazy" /></a>
+    <a href="/images/paper-radar/2026-09-24-dreamitate/real-robot-task-results.png?v=20260924" target="_blank" rel="noreferrer"><img src="/images/paper-radar/2026-09-24-dreamitate/real-robot-task-results.png?v=20260924" alt="Table 2 完整结果：Dreamitate 旋转、舀取、扫动分别成功 37/40、34/40、37/40 次；推形状 mIoU 为 0.731、旋转误差为 8.0 度，各项指标不能混作统一成功率" loading="lazy" /></a>
     <figcaption>Table 2 · <a href="https://raw.githubusercontent.com/mlresearch/v270/main/assets/liang25b/liang25b.pdf#page=6">PDF 文件第 6 页</a>。Junbang Liang 等，<a href="https://proceedings.mlr.press/v270/liang25b.html"><em>Dreamitate: Real-World Visuomotor Policy Learning via Video Generation</em></a>，CoRL 2024 / PMLR 270（2025）会议版。依 <a href="https://proceedings.mlr.press/pmlr-license-agreement.html">PMLR 出版许可第 2、3 条</a>按 <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> 重用；300 dpi，保留全部行列，仅裁去表外区域与原图注。点击放大。</figcaption>
   </figure>
   <p>先看前三列的分母：每项 40 次，测试物体与训练不重叠。旋转成功要求持续接触并逆时针转至少 25°；舀取只要求转移任意颗粒，扫动只要求任意一粒到目标 50 mm 内。因此 37/40 的扫动结果不表示全部颗粒清扫完成。</p>
