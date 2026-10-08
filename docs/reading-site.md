@@ -25,6 +25,8 @@ After the normal build, run `node scripts/verify-theme.mjs` for preference-state
 
 ## Paper Radar
 
+User-approved refinement (2026-10-08): the latest edition stays primary, with a smaller header. Historical dates live in a collapsed searchable archive with month filtering and eight editions per page; all links remain available without JavaScript. Adjacent-edition links support sequential browsing. The fixed quota panel and redundant single-paper recommendation footer are removed. Historical content and canonical routes are unchanged.
+
 At the user's request on 2026-09-07, Paper Radar returned to its original edition-based presentation: the index shows the newest published daily edition, with the large title panel, date archive, complete paper cards and reading recommendation. The monthly compact list and collapsed daily text are no longer active. Historical Markdown and guide files remain intact; the global light/dark toggle remains available.
 
 `papers` entries contain `title`, optional `short_title`, `url`, `summary` (up to 240 characters), `tags` (up to two), optional `publication`, `code_url`, and `guide_url`. `note` and `reading_status` are author-controlled: automation must not invent them. Legacy required edition fields remain supported for compatibility.

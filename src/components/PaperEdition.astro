@@ -1,6 +1,7 @@
 ---
 import { render, type CollectionEntry } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import PaperArchive from "./PaperArchive.astro";
 
 interface Props {
   edition: CollectionEntry<"paperRadar">;
@@ -28,7 +29,6 @@ const formatDate = (date: Date) =>
 >
   <section class="edition-hero">
     <div class="edition-identity">
-      <div class="eyebrow">Paper Radar · {edition.data.focus}</div>
       <h1>{edition.data.title}</h1>
       <p>{edition.data.summary}</p>
       <div class="edition-meta">
@@ -37,29 +37,9 @@ const formatDate = (date: Date) =>
         {isLatest && <span class="latest-mark">最新一期</span>}
       </div>
     </div>
-    <aside class="reading-rule">
-      <span class="rule-label">每期选文上限</span>
-      <div><strong>1</strong><span>主推论文</span></div>
-      <div><strong>2</strong><span>前沿观察</span></div>
-      <div><strong>1</strong><span>往期补读</span></div>
-      <small>最多四篇，不足时不补齐</small>
-    </aside>
   </section>
 
-  <nav class="archive-strip" aria-label="论文雷达归档">
-    <span>按日期查看</span>
-    {
-      allEditions.map((item, index) => {
-        const itemDate = item.data.date.toISOString().slice(0, 10);
-        const href = index === 0 ? "/papers" : `/papers/${item.id}`;
-        return (
-          <a href={href} aria-current={item.id === edition.id ? "page" : undefined}>
-            {itemDate}
-          </a>
-        );
-      })
-    }
-  </nav>
+  <PaperArchive editions={allEditions} currentId={edition.id} />
 
   <article class="edition-copy">
     <Content />
@@ -79,38 +59,33 @@ const formatDate = (date: Date) =>
     ))}
   </article>
 
-  <footer class="best-first">
+  {edition.data.paper_count > 1 && edition.data.best_first && <footer class="best-first">
     <span>本期建议先读</span>
     <strong>{edition.data.best_first}</strong>
-  </footer>
+  </footer>}
 </BaseLayout>
 
 <style>
   .edition-hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(16rem, 0.65fr);
-    gap: 1rem;
-  }
-
-  .edition-identity,
-  .reading-rule {
-    border: 1px solid var(--line);
-    border-radius: 2rem;
-    background: var(--bg-elevated);
-    box-shadow: var(--shadow);
+    max-width: 58rem;
+    margin: 0 auto;
   }
 
   .edition-identity {
-    padding: clamp(1.7rem, 5vw, 3.5rem);
+    padding: 0 0 1.5rem;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
   }
 
   .edition-identity h1 {
-    max-width: 15ch;
+    max-width: 100%;
     margin: 0.55rem 0 1rem;
     font-family: var(--serif);
-    font-size: clamp(2.7rem, 6vw, 5.2rem);
+    font-size: clamp(2rem, 4.5vw, 3.4rem);
     font-weight: 600;
-    line-height: 0.98;
+    line-height: 1.18;
   }
 
   .edition-identity > p {
@@ -144,74 +119,6 @@ const formatDate = (date: Date) =>
     border-radius: 999px;
     background: var(--accent-soft);
     color: var(--accent);
-  }
-
-  .reading-rule {
-    display: grid;
-    align-content: center;
-    gap: 0.7rem;
-    padding: clamp(1.4rem, 3vw, 2.2rem);
-    background:
-      linear-gradient(155deg, var(--accent-soft), var(--bg-elevated)),
-      var(--bg-elevated);
-  }
-
-  .rule-label,
-  .reading-rule small {
-    color: var(--muted);
-    font-size: 0.76rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .reading-rule div {
-    display: grid;
-    grid-template-columns: 2rem 1fr;
-    gap: 0.7rem;
-    align-items: baseline;
-    padding-bottom: 0.65rem;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .reading-rule strong {
-    color: var(--accent);
-    font-family: var(--serif);
-    font-size: 1.8rem;
-  }
-
-  .reading-rule small {
-    justify-self: end;
-    margin-top: 0.35rem;
-  }
-
-  .archive-strip {
-    display: flex;
-    gap: 0.55rem;
-    align-items: center;
-    flex-wrap: wrap;
-    margin: 1.35rem 0 3rem;
-    color: var(--muted);
-  }
-
-  .archive-strip > span {
-    margin-right: 0.2rem;
-    font-size: 0.85rem;
-  }
-
-  .archive-strip a {
-    padding: 0.48rem 0.72rem;
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    background: var(--surface-subtle);
-    font-family: var(--mono);
-    font-size: 0.8rem;
-  }
-
-  .archive-strip a[aria-current="page"],
-  .archive-strip a:hover {
-    border-color: var(--accent-line);
-    background: var(--accent-soft);
-    color: var(--text);
   }
 
   .edition-copy {

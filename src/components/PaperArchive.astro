@@ -1,0 +1,105 @@
+---
+import type { CollectionEntry } from "astro:content";
+interface Props { editions: CollectionEntry<"paperRadar">[]; currentId: string }
+const { editions, currentId } = Astro.props;
+const months = [...new Set(editions.map(item => item.data.date.toISOString().slice(0, 7)))];
+const currentIndex = editions.findIndex(item => item.id === currentId);
+const newer = editions[currentIndex - 1];
+const older = editions[currentIndex + 1];
+---
+
+<nav class="edition-navigation" aria-label="相邻收录">
+  {newer ? <a href={`/papers/${newer.id}/`}>较新一期</a> : <span>最新一期</span>}
+  {older && <a href={`/papers/${older.id}/`}>较早一期</a>}
+  <a href="/papers/deep-dive/">导读归档</a>
+</nav>
+<details class="paper-archive" data-paper-archive>
+  <summary>查找历史收录 <span>{editions.length} 期</span></summary>
+  <div class="archive-controls" hidden>
+    <label>搜索论文或主题<input type="search" placeholder="例如 VIMA、world model" /></label>
+    <label>收录月份<select><option value="">全部月份</option>{months.map(month => <option value={month}>{month}</option>)}</select></label>
+  </div>
+  <p class="archive-status" role="status" aria-live="polite" hidden></p>
+  <ul class="archive-results">
+    {editions.map(item => (
+      <li data-month={item.data.date.toISOString().slice(0, 7)} data-search={[item.data.title, item.data.focus, item.data.best_first, ...(item.data.papers || []).map(paper => `${paper.title} ${paper.short_title || ""} ${paper.tags.join(" ")}`), (item.body || "").replace(/<[^>]+>/g, " ")].join(" ").toLocaleLowerCase()}>
+        <a href={`/papers/${item.id}/`} aria-current={item.id === currentId ? "page" : undefined}>
+          <time>{item.data.date.toISOString().slice(0, 10)}</time>
+          <span>{item.data.best_first || item.data.focus}<small>{item.data.paper_count} 篇 · {item.data.focus}</small></span>
+        </a>
+      </li>
+    ))}
+  </ul>
+  <div class="archive-pagination" hidden>
+    <button type="button" data-previous>上一页</button>
+    <span data-page></span>
+    <button type="button" data-next>下一页</button>
+  </div>
+</details>
+
+<script>
+  // Keep every archive reachable without JavaScript; enhance with bounded result pages.
+  function initArchives() {
+    document.querySelectorAll<HTMLElement>("[data-paper-archive]").forEach(root => {
+      if (root.dataset.ready) return;
+      root.dataset.ready = "true";
+      const search = root.querySelector<HTMLInputElement>("input")!;
+      const month = root.querySelector<HTMLSelectElement>("select")!;
+      const rows = [...root.querySelectorAll<HTMLElement>("li")];
+      const status = root.querySelector<HTMLElement>(".archive-status")!;
+      const previous = root.querySelector<HTMLButtonElement>("[data-previous]")!;
+      const next = root.querySelector<HTMLButtonElement>("[data-next]")!;
+      let page = 0;
+      const size = 8;
+      function update() {
+        const terms = search.value.trim().toLocaleLowerCase().split(/\s+/).filter(Boolean);
+        const matches = rows.filter(row => (!month.value || row.dataset.month === month.value) && terms.every(term => row.dataset.search!.includes(term)));
+        const pages = Math.max(1, Math.ceil(matches.length / size));
+        page = Math.min(page, pages - 1);
+        rows.forEach(row => { row.hidden = true; });
+        matches.slice(page * size, (page + 1) * size).forEach(row => { row.hidden = false; });
+        status.textContent = matches.length ? `找到 ${matches.length} 期收录` : "没有匹配的收录，请更换关键词或月份。";
+        root.querySelector<HTMLElement>("[data-page]")!.textContent = `${page + 1} / ${pages}`;
+        previous.disabled = page === 0;
+        next.disabled = page === pages - 1;
+      }
+      root.querySelectorAll<HTMLElement>(".archive-controls, .archive-status, .archive-pagination").forEach(el => { el.hidden = false; });
+      search.addEventListener("input", () => { page = 0; update(); });
+      month.addEventListener("change", () => { page = 0; update(); });
+      previous.addEventListener("click", () => { page--; update(); });
+      next.addEventListener("click", () => { page++; update(); });
+      update();
+    });
+  }
+  initArchives();
+  document.addEventListener("astro:page-load", initArchives);
+</script>
+
+<style>
+  .edition-navigation { display: flex; flex-wrap: wrap; gap: 1.5rem; margin: 1.5rem auto 1rem; max-width: 58rem; font-size: .9rem; }
+  .edition-navigation > span { color: var(--muted); }
+  .edition-navigation a:last-child { margin-left: auto; }
+  .paper-archive { max-width: 58rem; margin: 0 auto 2rem; border-block: 1px solid var(--line); }
+  summary { padding: 1rem 0; cursor: pointer; font-weight: 600; }
+  summary span { margin-left: .75rem; color: var(--muted); font-size: .85rem; font-weight: 400; }
+  .archive-controls { display: grid; grid-template-columns: 1fr 10rem; gap: 1rem; margin: .5rem 0 1rem; }
+  label { display: grid; gap: .4rem; font-size: .85rem; }
+  input, select, button { font: inherit; color: var(--text); background: var(--bg-elevated); border: 1px solid var(--line); border-radius: .5rem; padding: .65rem .8rem; min-width: 0; }
+  input::placeholder { color: var(--muted); }
+  input { caret-color: var(--accent); }
+  :is(a, summary, input, select, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  a:hover { color: var(--accent); }
+  .archive-status { color: var(--muted); font-size: .85rem; }
+  .archive-results { list-style: none; padding: 0; margin: 0; }
+  li { border-top: 1px solid var(--line); }
+  li a { display: grid; grid-template-columns: 7rem 1fr; gap: 1rem; padding: .85rem 0; line-height: 1.5; overflow-wrap: anywhere; }
+  time { font-size: .85rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+  small { display: block; margin-top: .3rem; color: var(--muted); }
+  a[aria-current="page"] { color: var(--accent); }
+  .archive-pagination { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; font-variant-numeric: tabular-nums; }
+  button { cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: .45; cursor: default; }
+  [hidden] { display: none !important; }
+  @media (max-width: 600px) { .archive-controls { grid-template-columns: 1fr; } li a { grid-template-columns: 1fr; gap: .25rem; } }
+</style>

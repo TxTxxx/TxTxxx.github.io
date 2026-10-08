@@ -31,8 +31,8 @@ for (const [, src] of atlas.matchAll(/<script[^>]+src="(\/_astro\/[^"?#]+\.js)"/
 const radar = read("dist/papers/index.html");
 assert.ok(!radar.includes("今日更新"));
 assert.ok(radar.includes('class="edition-hero"'), "Radar should show the full latest edition");
-assert.ok(radar.includes('class="archive-strip"'), "Date archive navigation must remain available");
-assert.ok(radar.includes('class="best-first"'));
+assert.ok(radar.includes('data-paper-archive'), "Searchable date archive must remain available");
+assert.ok(radar.includes('type="search"') && radar.includes('data-next'), "Archive search and pagination must remain available");
 assert.ok(!radar.includes('class="month"') && !radar.includes('class="paper-row"'), "Compact monthly list should not replace the edition");
 assert.ok(radar.includes('rel="canonical" href="https://txtxx.me/papers/"'));
 const publishedEditions = [];
@@ -46,7 +46,9 @@ for (const filename of readdirSync(path.join(root, "src/content/paper-radar"))) 
   const legacyCount = [...source.matchAll(/<section class="paper-brief/g)].length;
   if (legacyCount) assert.equal([...html.matchAll(/<section class="paper-brief/g)].length, legacyCount, `Missing or duplicated full paper cards: ${slug}`);
   assert.ok(!html.includes('class="original-edition"'), `Daily content should be visible, not collapsed: ${slug}`);
-  assert.ok(html.includes('class="edition-hero"') && html.includes('class="archive-strip"'), `Missing original edition layout: ${slug}`);
+  assert.ok(html.includes('class="edition-hero"') && html.includes('data-paper-archive'), `Missing edition or archive: ${slug}`);
+  const paperCount = Number(source.match(/^paper_count:\s*(\d+)/m)?.[1]);
+  if (paperCount <= 1) assert.ok(!html.includes('class="best-first"'), `Redundant single-paper recommendation: ${slug}`);
   const date = source.match(/^date:\s*(\d{4}-\d{2}-\d{2})/m)?.[1];
   publishedEditions.push({ slug, date, legacyCount });
   assert.ok(radar.includes(date), `Missing date archive entry: ${slug}`);
