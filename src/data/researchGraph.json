@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-08-31T06:34:04.900Z",
+  "generatedAt": "2026-10-10T04:54:14.681Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 5,
-    "papers": 3,
+    "nodes": 6,
+    "papers": 4,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 30
+    "evidenceSignals": 39
   },
   "nodes": [
     {
@@ -37,6 +37,32 @@
       "maturity": 100,
       "atlasCardHtml": "",
       "atlasCardImages": 0
+    },
+    {
+      "id": "paper-fc15e3571d",
+      "path": "20 论文/haWorldModels2018",
+      "title": "World Models",
+      "type": "paper",
+      "citekey": "haWorldModels2018",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2018,
+      "authors": "David Ha, Jürgen Schmidhuber",
+      "topics": [
+        "world model"
+      ],
+      "created": "2026-10-10",
+      "readDate": "",
+      "doi": "10.5281/zenodo.1207631",
+      "sourceUrl": "http://arxiv.org/abs/1803.10122",
+      "zoteroUri": "zotero://select/library/items/MMZPWFWJ",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-fc15e3571d-ad896894485b.png\" alt=\"截屏2026-10-10 12.11.24\" loading=\"lazy\" decoding=\"async\" /><img src=\"/images/atlas-cards/paper-fc15e3571d-f36130729880.png\" alt=\"截屏2026-10-10 12.25.50\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>大模型虽然能力强，但在强化学习给出的反馈，往往不足以让它学好（比如让 AI 学开赛车：它先加速、再转弯、再刹车，最后冲出了赛道，得到一个负分。问题是：<strong>到底是之前加速太猛，还是转弯太晚，或者刹车太迟？</strong>）所以很多策略是用小网络</li>\n<li>在模型的Controller部分，因为C很小（867个参数），没有选择用梯度下降，而生用了CMA-ES去搜索参数</li>\n<li>模型在梦境里训练，但因为模型本身原因有bug会导致agent利用bug拿高分。论文通过温度参数tao调整梦境的随机程度改善了这一问题（随机性太大也会导致环境混乱到无法学习）</li>\n<li>在较难的环境中，要多次迭代训练，鼓励决策模型在不熟悉的地方进行探索搜集数据</li>\n<li>论文中的discussion：<ul>\n<li>世界模型里训练，可以减少成本</li>\n<li>VAE压缩的东西用处可能不大（目标主要还是还原画面，不在意得分）</li>\n<li>当前论文的模拟方法缺少高层次的推理（人说可以用抽象目标规划的）</li>\n<li></li>\n</ul>\n</li>\n</ol>",
+      "atlasCardImages": 2
     },
     {
       "id": "paper-753ba1a081",
