@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-10T04:54:14.681Z",
+  "generatedAt": "2026-10-10T08:03:07.525Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 6,
-    "papers": 4,
+    "nodes": 7,
+    "papers": 5,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 39
+    "evidenceSignals": 48
   },
   "nodes": [
     {
@@ -39,6 +39,32 @@
       "atlasCardImages": 0
     },
     {
+      "id": "paper-4f65b66851",
+      "path": "20 论文/chuaDeepReinforcementLearning2018",
+      "title": "Deep Reinforcement Learning in a Handful of Trials using Probabilistic Dynamics Models",
+      "type": "paper",
+      "citekey": "chuaDeepReinforcementLearning2018",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2018,
+      "authors": "Kurtland Chua, Roberto Calandra, Rowan McAllister, Sergey Levine",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-10",
+      "readDate": "",
+      "doi": "10.48550/arXiv.1805.12114",
+      "sourceUrl": "http://arxiv.org/abs/1805.12114",
+      "zoteroUri": "zotero://select/library/items/ERJ3IUYW",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-4f65b66851-8f2786ed072a.png\" alt=\"截屏2026-10-10 16.02.12\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>MBRL is appealing because the dynamics model is reward-independent and therefore can generalize to new tasks in the same environment, and it can easily benefit from all of the advances in deep supervised learning to utilize high-capacity models.</li>\n<li>高斯过程GP：非参数，输出分布；不确定性很可靠；适合小样本低维；大数据计算成本高</li>\n<li>PET出发点：普通神经网络小数据下容易过拟合，导致远期预测不可靠，于是选择保留神经网络的高表达能力，同时用概率输出和ensemble补充不确定性估计（恰当地把不确定性纳入动力学模型） //当年的dropout方法也是表现不确定性的一种方式</li>\n<li>偶然不确定性和认知不确定性</li>\n<li>总结：论文通过提出了一个新框架，巧妙地处理了偶然不确定性和认知不确定性之间的关系，实现了MBRL既可以省数据，又能达到较好的最终效果</li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
       "id": "paper-fc15e3571d",
       "path": "20 论文/haWorldModels2018",
       "title": "World Models",
@@ -47,7 +73,7 @@
       "status": "inbox",
       "readingLevel": "",
       "paperRole": "",
-      "atlasLabel": "",
+      "atlasLabel": "worldmodel",
       "year": 2018,
       "authors": "David Ha, Jürgen Schmidhuber",
       "topics": [
@@ -73,7 +99,7 @@
       "status": "inbox",
       "readingLevel": "",
       "paperRole": "",
-      "atlasLabel": "",
+      "atlasLabel": "DDPM",
       "year": 2020,
       "authors": "Jonathan Ho, Ajay Jain, Pieter Abbeel",
       "topics": [
