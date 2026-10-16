@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-15T06:22:36.416Z",
+  "generatedAt": "2026-10-16T03:56:15.792Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 9,
-    "papers": 7,
+    "nodes": 10,
+    "papers": 8,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 66
+    "evidenceSignals": 75
   },
   "nodes": [
     {
@@ -113,7 +113,7 @@
       "noteDensity": 0,
       "evidenceCount": 9,
       "maturity": 27,
-      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-d76a22b1a6-771a387e9382.png\" alt=\"截屏2026-10-12 18.17.47\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>不同于PlaNet等工作， 想象不是被用来搜索当前最好的动作序列，而是直接用来训练actor 和 critic。之前工作用CEM采样，评估，筛选动作序列，而dreamer沿想象轨迹反向传播梯度价值</li>\n<li>只用“预测奖励“来训练世界模型，理论上可行，但数据少，奖励稀疏时，学习观测中的信息也很有帮助。</li>\n<li>这篇论文最大的贡献是提出 <strong>Dreamer：在学到的世界模型的潜在空间里，通过想象未来轨迹来训练行动策略，并将奖励与价值的梯度穿过模型反向传播，从而高效改进策略。</strong> 它还利用价值网络估计有限想象范围之外的长期回报，让智能体能够学会需要长远考虑的行为，并在视觉控制实验中取得了较高的样本效率和性能</li>\n</ol>",
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-d76a22b1a6-771a387e9382.png\" alt=\"截屏2026-10-12 18.17.47\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>不同于PlaNet等工作， 想象不是被用来搜索当前最好的动作序列，而是直接用来训练actor 和 critic。之前工作用CEM采样，评估，筛选动作序列，而dreamer沿想象轨迹反向传播梯度价值</li>\n<li>只用“预测奖励“来训练世界模型，理论上可行，但数据少，奖励稀疏时，学习观测中的信息也很有帮助。</li>\n<li>这篇论文最大的贡献是提出 <strong>Dreamer：在学到的世界模型的潜在空间里，通过想象未来轨迹来训练行动策略，并将奖励与价值的梯度穿过模型反向传播，从而高效改进策略。</strong> 它还利用价值网络估计有限想象范围之外的长期回报，让智能体能够学会需要长远考虑的行为，并在视觉控制实验中取得了较高的样本效率和性能p</li>\n</ol>",
       "atlasCardImages": 1
     },
     {
@@ -167,6 +167,32 @@
       "maturity": 27,
       "atlasCardHtml": "",
       "atlasCardImages": 0
+    },
+    {
+      "id": "paper-05c2360767",
+      "path": "20 论文/intelligence$p^_06$VLAThat2025",
+      "title": "$π^{*}_{0.6}$: a VLA That Learns From Experience",
+      "type": "paper",
+      "citekey": "intelligence$p^_06$VLAThat2025",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "recap",
+      "year": 2025,
+      "authors": "Physical Intelligence, Ali Amin, Raichelle Aniceto, Ashwin Balakrishna, Kevin Black, Ken Conley, Grace Connors, James Darpinian, Karan Dhabalia, Jared DiCarlo, Danny Driess, Michael Equi, Adnan Esmail, Yunhao Fang, Chelsea Finn, Catherine Glossop, Thomas Godden, Ivan Goryachev, Lachy Groom, Hunter Hancock, Karol Hausman, Gashon Hussein, Brian Ichter, Szymon Jakubczak, Rowan Jen, Tim Jones, Ben Katz, Liyiming Ke, Chandra Kuchi, Marinda Lamb, Devin LeBlanc, Sergey Levine, Adrian Li-Bell, Yao Lu, Vishnu Mano, Mohith Mothukuri, Suraj Nair, Karl Pertsch, Allen Z. Ren, Charvi Sharma, Lucy Xiaoyang Shi, Laura Smith, Jost Tobias Springenberg, Kyle Stachowicz, Will Stoeckle, Alex Swerdlow, James Tanner, Marcel Torne, Quan Vuong, Anna Walling, Haohuan Wang, Blake Williams, Sukwon Yoo, Lili Yu, Ury Zhilinsky, Zhiyuan Zhou",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-15",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2511.14759",
+      "sourceUrl": "http://arxiv.org/abs/2511.14759",
+      "zoteroUri": "zotero://select/library/items/4TMNU5DY",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-05c2360767-f1310e753c89.png\" alt=\"截屏2026-10-15 16.10.25\" loading=\"lazy\" decoding=\"async\" /><br /><img src=\"/images/atlas-cards/paper-05c2360767-9bb855767a59.png\" alt=\"截屏2026-10-15 19.47.25\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>π*₀.₆ 增加了<strong>以二值化的优势值作为条件输入</strong>的能力，从而可以借助价值函数来改进策略</li>\n<li>RECAP 通过优势条件化，让表达能力更强的流匹配 VLA 能够接受端到端的迭代式离线强化学习训练。相比基于策略梯度的方法，它的训练方式更简单、更易扩展，而且在论文的对比实验中表现更好</li>\n<li>优秀的特征提取方法（用value model训练更好的vla）：1. 能有效利用多种来源的离策略数据，2. 有良好的扩展性 3. 能够利用坏的数据</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 2
     },
     {
       "id": "paper-10edc29447",
