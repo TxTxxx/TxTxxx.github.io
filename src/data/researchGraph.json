@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-20T03:11:12.876Z",
+  "generatedAt": "2026-10-22T05:18:51.601Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 11,
-    "papers": 9,
+    "nodes": 13,
+    "papers": 11,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 84
+    "evidenceSignals": 102
   },
   "nodes": [
     {
@@ -143,6 +143,58 @@
       "atlasCardImages": 2
     },
     {
+      "id": "paper-6bc2d7133e",
+      "path": "20 论文/hafnerMasteringAtariDiscrete2022",
+      "title": "Mastering Atari with Discrete World Models",
+      "type": "paper",
+      "citekey": "hafnerMasteringAtariDiscrete2022",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2022,
+      "authors": "Danijar Hafner, Timothy Lillicrap, Mohammad Norouzi, Jimmy Ba",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-20",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2010.02193",
+      "sourceUrl": "http://arxiv.org/abs/2010.02193",
+      "zoteroUri": "zotero://select/library/items/MLB5R3LX",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>相比于v1， RSSM的随机潜在状态从高斯变量变成离散变量（离散采样使用straight-through梯度传播）（离散变量可能更适合游戏里的突变， 但有可能只是在atari里表现比较好而已）</li>\n<li>v1的actor的训练方式为dynamic backpropagation， v2的方式同时还使用REINFORCE。（感觉只是为了Atari而已）</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 0
+    },
+    {
+      "id": "paper-1d29f52cb0",
+      "path": "20 论文/hafnerMasteringDiverseDomains2024",
+      "title": "Mastering Diverse Domains through World Models",
+      "type": "paper",
+      "citekey": "hafnerMasteringDiverseDomains2024",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2024,
+      "authors": "Danijar Hafner, Jurgis Pasukonis, Jimmy Ba, Timothy Lillicrap",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-20",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2301.04104",
+      "sourceUrl": "http://arxiv.org/abs/2301.04104",
+      "zoteroUri": "zotero://select/library/items/VVRS366H",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>DreamerV2 到 V3 的核心改进是通过归一化、数值变换和训练稳定化，让同一套超参数能在更多不同任务上稳定学习，并支持更大的模型。（改动但看起来感觉都是细节，但是组合后实现了跨任务的稳定学习）</li>\n<li>文章中提到 “更大的模型不仅得分更高，需要的环境交互数反而更少”</li>\n<li><img src=\"/images/atlas-cards/paper-1d29f52cb0-9565d62e32a1.png\" alt=\"截屏2026-10-20 20.06.58\" loading=\"lazy\" decoding=\"async\" /></li>\n<li><img src=\"/images/atlas-cards/paper-1d29f52cb0-4df131b41181.png\" alt=\"截屏2026-10-20 20.45.14\" loading=\"lazy\" decoding=\"async\" /><img src=\"/images/atlas-cards/paper-1d29f52cb0-85bb1bc86b88.png\" alt=\"截屏2026-10-20 20.45.30\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>dreamerv3里有一个表征损失representation loss:L_rep, 让学到的表征更容易被预测，有一个可变参数，表征损失权重有时不能太低，有时不能太高（maybe低了，可能编码器保留太多没用的细节，高了，可能信息太少了）</li>\n<li>为了防止KL尖峰，他们讲编码器和动力学预测器的分类分布参数化为1%均匀分布和99%的神经网络输出的混合分布（保证分母别太小）</li>\n<li>论文没有吧critic的输出建模为正太分布（回报分布可能具有多个峰， 不同环境中的回报尺度可能相差多个数量级），采用了指数间隔分箱的类别分布。</li>\n<li>论文团队说随机初始化  效果 不如将一些地方随机初始化为0的效果好</li>\n<li>论文使用了symlog和twohot，前者改变了“数字的尺度”，twohot改变“数字的表达方式和训练目标”</li>\n<li>这篇论文讲得更多的是工程化的东西啊</li>\n</ol>",
+      "atlasCardImages": 3
+    },
+    {
       "id": "paper-753ba1a081",
       "path": "20 论文/hoDenoisingDiffusionProbabilistic2020",
       "title": "Denoising Diffusion Probabilistic Models",
@@ -269,8 +321,8 @@
       "noteDensity": 0,
       "evidenceCount": 9,
       "maturity": 27,
-      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-be728e4dbe-56625225c397.png\" alt=\"截屏2026-10-17 15.34.48\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>RECAp专注于长时限任务的大规模强化学习，RLT是机器人能够利用数小时甚至数分钟的数据，快速提升特定技能中个别且特别具有挑战性的阶段（可以在运行的时候直接跑）</li>\n<li></li>\n</ol>",
-      "atlasCardImages": 1
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-be728e4dbe-56625225c397.png\" alt=\"截屏2026-10-17 15.34.48\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>RECAp专注于长时限任务的大规模强化学习，RLT是机器人能够利用数小时甚至数分钟的数据，快速提升特定技能中个别且特别具有挑战性的阶段（可以在运行的时候直接跑）</li>\n<li>这项工作的核心贡献是提出 <strong>RL Token，将预训练 VLA 的内部特征压缩为紧凑表示，为大模型与轻量强化学习网络建立接口</strong>。在此基础上，冻结大模型，仅在线训练小型 Actor–Critic，结合 VLA 的参考动作，让机器人通过少量真实交互快速改进精细操作，降低直接微调整个 VLA 的计算和数据成本。实验在拧螺丝、扎带和插接等任务上验证了有效性，关键操作阶段的吞吐量最高提升约 3 倍，展示了利用通用模型知识实现快速技能适应的可行性</li>\n<li><img src=\"/images/atlas-cards/paper-be728e4dbe-42e234045e32.png\" alt=\"截屏2026-10-20 12.52.23\" loading=\"lazy\" decoding=\"async\" /><img src=\"/images/atlas-cards/paper-be728e4dbe-f0b03ecf5efe.png\" alt=\"截屏2026-10-20 13.05.50\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>在预测动作是，引入了reference action dropout，防止动作无止境的向val输出的动作靠近。</li>\n<li><img src=\"/images/atlas-cards/paper-be728e4dbe-9e60e9029bff.png\" alt=\"截屏2026-10-20 13.15.19\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>论文进行了Subsampling action chunks扩充数据量，提高学习效率</li>\n<li>RLT只在任务最难的阶段进行优化RL</li>\n</ol>",
+      "atlasCardImages": 4
     },
     {
       "id": "concept-facd23940b",
