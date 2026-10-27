@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-22T05:18:51.601Z",
+  "generatedAt": "2026-10-27T03:29:13.824Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 13,
-    "papers": 11,
+    "nodes": 19,
+    "papers": 17,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 102
+    "evidenceSignals": 156
   },
   "nodes": [
     {
@@ -37,6 +37,84 @@
       "maturity": 100,
       "atlasCardHtml": "",
       "atlasCardImages": 0
+    },
+    {
+      "id": "paper-4c1919da85",
+      "path": "20 论文/assranSelfSupervisedLearningImages2023",
+      "title": "Self-Supervised Learning from Images with a Joint-Embedding Predictive Architecture",
+      "type": "paper",
+      "citekey": "assranSelfSupervisedLearningImages2023",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2023,
+      "authors": "Mahmoud Assran, Quentin Duval, Ishan Misra, Piotr Bojanowski, Pascal Vincent, Michael Rabbat, Yann LeCun, Nicolas Ballas",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-24",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2301.08243",
+      "sourceUrl": "http://arxiv.org/abs/2301.08243",
+      "zoteroUri": "zotero://select/library/items/8368Q2KZ",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>JEPA（joint-embedding predict architecture）</li>\n<li>让I-JEPA学到具有语义信息的表示，掩码策略要做好（目标区域要足够大，从而包含有意义的语义信息， 上下文区域要提供足够丰富的信息，其可见内容应该再空间上分散分布）</li>\n<li><img src=\"/images/atlas-cards/paper-4c1919da85-ada2dbd33eda.png\" alt=\"截屏2026-10-24 14.36.35\" loading=\"lazy\" decoding=\"async\" /></li>\n<li><img src=\"/images/atlas-cards/paper-4c1919da85-f37fc3c60b8a.png\" alt=\"截屏2026-10-24 14.47.09\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>joint-embedding结构需要面临的挑战就是表征坍塌（无论输入是什么，编码器都输出同一个常量表示）//感觉和world model的一些固有缺陷好像</li>\n<li>他们在x编码器和y编码器之间采用了不对称的架构设计，来避免表征坍塌</li>\n<li>I-JEPA 是一种图像自监督学习方法，核心是<strong>根据可见区域的特征，预测同一张图像中被遮挡区域的特征表示</strong>。它在特征空间中进行预测，无需重建像素，也无需依赖人工设计的多视图数据增强来学习语义。。。。它通过较大的目标区域和信息充分、空间分散的上下文，引导模型学习高层语义，并使用指数移动平均更新目标编码器，为训练提供目标表示。实验表明，I-JEPA 能以较低的计算成本学到有效的视觉表示，在图像分类、物体计数和深度预测等下游任务中表现良好。</li>\n<li>I-JEPA的参考答案也是自己生成的，而EMA能让生成答案的目标编码器缓慢变化，使训练更加稳定</li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
+      "id": "paper-e9fe333edd",
+      "path": "20 论文/bardesRevisitingFeaturePrediction2024",
+      "title": "Revisiting Feature Prediction for Learning Visual Representations from Video",
+      "type": "paper",
+      "citekey": "bardesRevisitingFeaturePrediction2024",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2024,
+      "authors": "Adrien Bardes, Quentin Garrido, Jean Ponce, Xinlei Chen, Michael Rabbat, Yann LeCun, Mahmoud Assran, Nicolas Ballas",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-26",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2404.08471",
+      "sourceUrl": "http://arxiv.org/abs/2404.08471",
+      "zoteroUri": "zotero://select/library/items/HPVFSNN3",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li></li>\n</ol>",
+      "atlasCardImages": 0
+    },
+    {
+      "id": "paper-ae6488c109",
+      "path": "20 论文/bruceGenieGenerativeInteractive2024",
+      "title": "Genie: Generative Interactive Environments",
+      "type": "paper",
+      "citekey": "bruceGenieGenerativeInteractive2024",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2024,
+      "authors": "Jake Bruce, Michael Dennis, Ashley Edwards, Jack Parker-Holder, Yuge Shi, Edward Hughes, Matthew Lai, Aditi Mavalankar, Richie Steigerwald, Chris Apps, Yusuf Aytar, Sarah Bechtle, Feryal Behbahani, Stephanie Chan, Nicolas Heess, Lucy Gonzalez, Simon Osindero, Sherjil Ozair, Scott Reed, Jingwei Zhang, Konrad Zolna, Jeff Clune, Nando de Freitas, Satinder Singh, Tim Rocktäschel",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-23",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2402.15391",
+      "sourceUrl": "http://arxiv.org/abs/2402.15391",
+      "zoteroUri": "zotero://select/library/items/6UDPYZNT",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>之前的论文的训练数据中都带有明确的动作标签（此篇论文研究能不能只看视频，自动推断出其中的潜在动作，并学习一个能被这些动作控制的世界模型）</li>\n<li>采用了时空transformer（普通transformer内存开销随token数量平方增长，视频token太多了），使用了一种新的视频分词器，并通过一个有因果结构的动作模型提取钱在动作。动力学模型使用MaskGIT</li>\n<li><img src=\"/images/atlas-cards/paper-ae6488c109-826b1c582629.png\" alt=\"截屏2026-10-23 21.10.42\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>它的训练模式是两阶段训练</li>\n<li><img src=\"/images/atlas-cards/paper-ae6488c109-ab24dbc9a12d.png\" alt=\"截屏2026-10-23 21.21.08\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>在训练LAM的时候，采用了基于VQ-VAE的目标函数，将模型预测的动作限制在一个较小的离散编码集合中</li>\n<li>在video tokenizer上，再次使用了VQ-VAE，将视频压缩为零离散token，然后encoder和decoder又是用的ST-transformer。。最后他们的分词器叫做（ST-ViViT）</li>\n<li>之前的训练世界模型的常见做法是，将时间步t的动作与对应帧的表示进行拼接。但作者发现，在LAM和Dynamics Model中，将潜在动作作为相加式嵌入加入，有助于提高生产结果的可控性。</li>\n<li>在训练的时候，部分token也被替换成{mask}来进行无监督学习</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 2
     },
     {
       "id": "paper-4f65b66851",
@@ -195,6 +273,32 @@
       "atlasCardImages": 3
     },
     {
+      "id": "paper-ec450c1d20",
+      "path": "20 论文/hansenTDMPC2ScalableRobust2024",
+      "title": "TD-MPC2: Scalable, Robust World Models for Continuous Control",
+      "type": "paper",
+      "citekey": "hansenTDMPC2ScalableRobust2024",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2024,
+      "authors": "Nicklas Hansen, Hao Su, Xiaolong Wang",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-22",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2310.16828",
+      "sourceUrl": "http://arxiv.org/abs/2310.16828",
+      "zoteroUri": "zotero://select/library/items/NQVAIWXV",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-ec450c1d20-4da1adad09f1.png\" alt=\"截屏2026-10-22 13.35.25\" loading=\"lazy\" decoding=\"async\" /></li>\n<li><img src=\"/images/atlas-cards/paper-ec450c1d20-1f8cef2762bf.png\" alt=\"截屏2026-10-22 13.40.08\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>模型不能只看当前观察，还要知道任务（TD-MPC2给每个任务分配一个可学习向量e， 让模型的各个组件都以它为条件，用e来区分目标和环境）</li>\n<li>和dreamer不同，他是decoder-free，他没有把钱在状态还原成原始观察，而dreamer在训练世界模型的时候，用了decoder重建观察了的。</li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
       "id": "paper-753ba1a081",
       "path": "20 论文/hoDenoisingDiffusionProbabilistic2020",
       "title": "Denoising Diffusion Probabilistic Models",
@@ -273,6 +377,32 @@
       "atlasCardImages": 0
     },
     {
+      "id": "paper-3ba44919e0",
+      "path": "20 论文/ohActionConditionalVideoPrediction2015",
+      "title": "Action-Conditional Video Prediction using Deep Networks in Atari Games",
+      "type": "paper",
+      "citekey": "ohActionConditionalVideoPrediction2015",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2015,
+      "authors": "Junhyuk Oh, Xiaoxiao Guo, Honglak Lee, Richard Lewis, Satinder Singh",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-22",
+      "readDate": "",
+      "doi": "10.48550/arXiv.1507.08750",
+      "sourceUrl": "http://arxiv.org/abs/1507.08750",
+      "zoteroUri": "zotero://select/library/items/29QQRUW4",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-3ba44919e0-ed752c55a283.png\" alt=\"截屏2026-10-22 13.56.49\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
       "id": "paper-950732f3cc",
       "path": "20 论文/suttonDynaIntegratedArchitecture1991",
       "title": "Dyna, an integrated architecture for learning, planning, and reacting",
@@ -323,6 +453,32 @@
       "maturity": 27,
       "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-be728e4dbe-56625225c397.png\" alt=\"截屏2026-10-17 15.34.48\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>RECAp专注于长时限任务的大规模强化学习，RLT是机器人能够利用数小时甚至数分钟的数据，快速提升特定技能中个别且特别具有挑战性的阶段（可以在运行的时候直接跑）</li>\n<li>这项工作的核心贡献是提出 <strong>RL Token，将预训练 VLA 的内部特征压缩为紧凑表示，为大模型与轻量强化学习网络建立接口</strong>。在此基础上，冻结大模型，仅在线训练小型 Actor–Critic，结合 VLA 的参考动作，让机器人通过少量真实交互快速改进精细操作，降低直接微调整个 VLA 的计算和数据成本。实验在拧螺丝、扎带和插接等任务上验证了有效性，关键操作阶段的吞吐量最高提升约 3 倍，展示了利用通用模型知识实现快速技能适应的可行性</li>\n<li><img src=\"/images/atlas-cards/paper-be728e4dbe-42e234045e32.png\" alt=\"截屏2026-10-20 12.52.23\" loading=\"lazy\" decoding=\"async\" /><img src=\"/images/atlas-cards/paper-be728e4dbe-f0b03ecf5efe.png\" alt=\"截屏2026-10-20 13.05.50\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>在预测动作是，引入了reference action dropout，防止动作无止境的向val输出的动作靠近。</li>\n<li><img src=\"/images/atlas-cards/paper-be728e4dbe-9e60e9029bff.png\" alt=\"截屏2026-10-20 13.15.19\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>论文进行了Subsampling action chunks扩充数据量，提高学习效率</li>\n<li>RLT只在任务最难的阶段进行优化RL</li>\n</ol>",
       "atlasCardImages": 4
+    },
+    {
+      "id": "paper-78c7766a95",
+      "path": "20 论文/yangLearningInteractiveRealWorld2024",
+      "title": "Learning Interactive Real-World Simulators",
+      "type": "paper",
+      "citekey": "yangLearningInteractiveRealWorld2024",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2024,
+      "authors": "Sherry Yang, Yilun Du, Kamyar Ghasemipour, Jonathan Tompson, Leslie Kaelbling, Dale Schuurmans, Pieter Abbeel",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-23",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2310.06114",
+      "sourceUrl": "http://arxiv.org/abs/2310.06114",
+      "zoteroUri": "zotero://select/library/items/M6XU7NYU",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     },
     {
       "id": "concept-facd23940b",
