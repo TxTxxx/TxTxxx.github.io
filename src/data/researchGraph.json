@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-27T03:29:13.824Z",
+  "generatedAt": "2026-10-28T00:31:32.604Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 19,
-    "papers": 17,
+    "nodes": 21,
+    "papers": 19,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 156
+    "evidenceSignals": 174
   },
   "nodes": [
     {
@@ -474,6 +474,58 @@
       "doi": "10.48550/arXiv.2310.06114",
       "sourceUrl": "http://arxiv.org/abs/2310.06114",
       "zoteroUri": "zotero://select/library/items/M6XU7NYU",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
+    },
+    {
+      "id": "paper-00dfc9c10d",
+      "path": "20 论文/zhangDarwinGodelMachine2026",
+      "title": "Darwin Godel Machine: Open-Ended Evolution of Self-Improving Agents",
+      "type": "paper",
+      "citekey": "zhangDarwinGodelMachine2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Jenny Zhang, Shengran Hu, Cong Lu, Robert Lange, Jeff Clune",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-27",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2505.22954",
+      "sourceUrl": "http://arxiv.org/abs/2505.22954",
+      "zoteroUri": "zotero://select/library/items/PJB7HTBJ",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-00dfc9c10d-d37f840175ab.png\" alt=\"截屏2026-10-27 19.51.20\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>本文不设想智能体可以去训练基模，而是去训练harness</li>\n<li>他们发现开放式探索效果会更好（保存历史版本，可以从旧版本重新分支）</li>\n<li>父代选择大致与性能分数成正比，与子级数量成反比</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
+      "id": "paper-6dead5872f",
+      "path": "20 论文/zhangHyperagents2026",
+      "title": "Hyperagents",
+      "type": "paper",
+      "citekey": "zhangHyperagents2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Jenny Zhang, Bingchen Zhao, Wannan Yang, Jakob Foerster, Jeff Clune, Minqi Jiang, Sam Devlin, Tatiana Shavrina",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-27",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2603.19461",
+      "sourceUrl": "http://arxiv.org/abs/2603.19461",
+      "zoteroUri": "zotero://select/library/items/EXGYIYVS",
       "noteDensity": 0,
       "evidenceCount": 9,
       "maturity": 27,
