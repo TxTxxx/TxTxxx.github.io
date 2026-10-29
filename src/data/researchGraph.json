@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-28T00:31:32.604Z",
+  "generatedAt": "2026-10-29T04:09:22.899Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 21,
-    "papers": 19,
+    "nodes": 22,
+    "papers": 20,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 174
+    "evidenceSignals": 183
   },
   "nodes": [
     {
@@ -61,7 +61,7 @@
       "noteDensity": 0,
       "evidenceCount": 9,
       "maturity": 27,
-      "atlasCardHtml": "<ol>\n<li>JEPA（joint-embedding predict architecture）</li>\n<li>让I-JEPA学到具有语义信息的表示，掩码策略要做好（目标区域要足够大，从而包含有意义的语义信息， 上下文区域要提供足够丰富的信息，其可见内容应该再空间上分散分布）</li>\n<li><img src=\"/images/atlas-cards/paper-4c1919da85-ada2dbd33eda.png\" alt=\"截屏2026-10-24 14.36.35\" loading=\"lazy\" decoding=\"async\" /></li>\n<li><img src=\"/images/atlas-cards/paper-4c1919da85-f37fc3c60b8a.png\" alt=\"截屏2026-10-24 14.47.09\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>joint-embedding结构需要面临的挑战就是表征坍塌（无论输入是什么，编码器都输出同一个常量表示）//感觉和world model的一些固有缺陷好像</li>\n<li>他们在x编码器和y编码器之间采用了不对称的架构设计，来避免表征坍塌</li>\n<li>I-JEPA 是一种图像自监督学习方法，核心是<strong>根据可见区域的特征，预测同一张图像中被遮挡区域的特征表示</strong>。它在特征空间中进行预测，无需重建像素，也无需依赖人工设计的多视图数据增强来学习语义。。。。它通过较大的目标区域和信息充分、空间分散的上下文，引导模型学习高层语义，并使用指数移动平均更新目标编码器，为训练提供目标表示。实验表明，I-JEPA 能以较低的计算成本学到有效的视觉表示，在图像分类、物体计数和深度预测等下游任务中表现良好。</li>\n<li>I-JEPA的参考答案也是自己生成的，而EMA能让生成答案的目标编码器缓慢变化，使训练更加稳定</li>\n</ol>",
+      "atlasCardHtml": "<ol>\n<li>JEPA（joint-embedding predict architecture）</li>\n<li>让I-JEPA学到具有语义信息的表示，掩码策略要做好（目标区域要足够大，从而包含有意义的语义信息， 上下文区域要提供足够丰富的信息，其可见内容应该再空间上分散分布）</li>\n<li><img src=\"/images/atlas-cards/paper-4c1919da85-ada2dbd33eda.png\" alt=\"截屏2026-10-24 14.36.35\" loading=\"lazy\" decoding=\"async\" /></li>\n<li><img src=\"/images/atlas-cards/paper-4c1919da85-f37fc3c60b8a.png\" alt=\"截屏2026-10-24 14.47.09\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>joint-embedding结构需要面临的挑战就是表征坍塌（无论输入是什么，编码器都输出同一个常量表示）//感觉和world model的一些固有缺陷好像</li>\n<li>他们在x编码器和y编码器之间采用了不对称的架构设计，来避免表征坍塌</li>\n<li>I-JEPA 是一种图像自监督学习方法，核心是<strong>根据可见区域的特征，预测同一张图像中被遮挡区域的特征表示</strong>。它在特征空间中进行预测，无需重建像素，也无需依赖人工设计的多视图数据增强来学习语义。。。。它通过较大的目标区域和信息充分、空间分散的上下文，引导模型学习高层语义，并使用指数移动平均更新目标编码器，为训练提供目标表示。实验表明，I-JEPA 能以较低的计算成本学到有效的视觉表示，在图像分类、物体计数和深度预测等下游任务中表现良好。</li>\n<li>I-JEPA的参考答案也是自己生成的，而EMA能让生成答案的目标编码器缓慢变化，使训练更加稳定</li>\n<li></li>\n</ol>",
       "atlasCardImages": 2
     },
     {
@@ -79,7 +79,7 @@
       "topics": [
         "vla"
       ],
-      "created": "2026-10-26",
+      "created": "2026-10-28",
       "readDate": "",
       "doi": "10.48550/arXiv.2404.08471",
       "sourceUrl": "http://arxiv.org/abs/2404.08471",
@@ -87,8 +87,8 @@
       "noteDensity": 0,
       "evidenceCount": 9,
       "maturity": 27,
-      "atlasCardHtml": "<ol>\n<li></li>\n</ol>",
-      "atlasCardImages": 0
+      "atlasCardHtml": "<ol>\n<li>此篇论文回答的问题：借助现代工具，仅将特征预测作为学习目标，从视频中进行无监督学习，究竟能有多好的效果？</li>\n<li>他们发现：特征预测能够产生通用的视觉表征，在标注样本数量较少的悄况下，特征预测模型效果更好。</li>\n<li>作者强调v-jepa超越了时间不变性（之前的可能更加要求相似的情况表征尽量相似，但这样可能忽略动作这一步部分，要强调两个表征能互相预测）</li>\n<li>将指数移动平均特征提取器、停止梯度操作和预测器结合起来，已经被用作图像预训练中的防坍塌策略（Grill et al., 2020），并得到了实验研究（Xie et al., 2021）和理论研究（Tian et al., 2021）的支持。</li>\n<li><img src=\"/images/atlas-cards/paper-e9fe333edd-da8f8310110d.png\" alt=\"截屏2026-10-28 15.54.35\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>如何读取利用视觉骨干提取的特征，对评估结果影响很大。</li>\n<li><strong>运动理解是jepa相对于图像模型的突出优势</strong></li>\n<li></li>\n</ol>",
+      "atlasCardImages": 1
     },
     {
       "id": "paper-ae6488c109",
@@ -141,6 +141,32 @@
       "maturity": 27,
       "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-4f65b66851-8f2786ed072a.png\" alt=\"截屏2026-10-10 16.02.12\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>MBRL is appealing because the dynamics model is reward-independent and therefore can generalize to new tasks in the same environment, and it can easily benefit from all of the advances in deep supervised learning to utilize high-capacity models.</li>\n<li>高斯过程GP：非参数，输出分布；不确定性很可靠；适合小样本低维；大数据计算成本高</li>\n<li>PET出发点：普通神经网络小数据下容易过拟合，导致远期预测不可靠，于是选择保留神经网络的高表达能力，同时用概率输出和ensemble补充不确定性估计（恰当地把不确定性纳入动力学模型） //当年的dropout方法也是表现不确定性的一种方式</li>\n<li>偶然不确定性和认知不确定性</li>\n<li>总结：论文通过提出了一个新框架，巧妙地处理了偶然不确定性和认知不确定性之间的关系，实现了MBRL既可以省数据，又能达到较好的最终效果</li>\n</ol>",
       "atlasCardImages": 1
+    },
+    {
+      "id": "paper-787e613814",
+      "path": "20 论文/duLearningUniversalPolicies",
+      "title": "Learning Universal Policies via Text-Guided Video Generation",
+      "type": "paper",
+      "citekey": "duLearningUniversalPolicies",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": null,
+      "authors": "Yilun Du, Mengjiao Yang, Bo Dai, Hanjun Dai, Ofir Nachum, Joshua B Tenenbaum, Dale Schuurmans, Pieter Abbeel",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-28",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "zotero://select/library/items/S4298MQT",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "",
+      "atlasCardImages": 0
     },
     {
       "id": "paper-fc15e3571d",
@@ -521,7 +547,7 @@
       "topics": [
         "vla"
       ],
-      "created": "2026-10-27",
+      "created": "2026-10-28",
       "readDate": "",
       "doi": "10.48550/arXiv.2603.19461",
       "sourceUrl": "http://arxiv.org/abs/2603.19461",
@@ -529,8 +555,8 @@
       "noteDensity": 0,
       "evidenceCount": 9,
       "maturity": 27,
-      "atlasCardHtml": "",
-      "atlasCardImages": 0
+      "atlasCardHtml": "<ol>\n<li>DGM依赖一种手工设计的固定机制来生成自我改进指令，DGM还有一个限制性假设：解决评估任务所需的技能与有效自我反思和自我修改的技能相同（coding）（两个缺点hyper agent都假设解决）</li>\n<li><img src=\"/images/atlas-cards/paper-6dead5872f-08ba16530f6c.png\" alt=\"截屏2026-10-28 12.58.42\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 1
     },
     {
       "id": "concept-facd23940b",
