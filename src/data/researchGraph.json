@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-29T04:09:22.899Z",
+  "generatedAt": "2026-10-30T00:32:10.012Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 22,
-    "papers": 20,
+    "nodes": 24,
+    "papers": 22,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 183
+    "evidenceSignals": 201
   },
   "nodes": [
     {
@@ -167,6 +167,32 @@
       "maturity": 27,
       "atlasCardHtml": "",
       "atlasCardImages": 0
+    },
+    {
+      "id": "paper-b9fef4c717",
+      "path": "20 论文/guoPredictionActionVisual2024",
+      "title": "Prediction with Action: Visual Policy Learning via Joint Denoising Process",
+      "type": "paper",
+      "citekey": "guoPredictionActionVisual2024",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2024,
+      "authors": "Yanjiang Guo, Yucheng Hu, Jianke Zhang, Yen-Jen Wang, Xiaoyu Chen, Chaochao Lu, Jianyu Chen",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-29",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2411.18179",
+      "sourceUrl": "http://arxiv.org/abs/2411.18179",
+      "zoteroUri": "zotero://select/library/items/786XV5EG",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>论文人为两阶段的方法把预测和动作的学习过程分离，忽略了二者更深层的联系。从而动作生成无法充分利用预测模型中的预训练表示，二这些表示编码了丰富的物理知识</li>\n<li><img src=\"/images/atlas-cards/paper-b9fef4c717-2f9bacd326a7.png\" alt=\"截屏2026-10-29 17.21.04\" loading=\"lazy\" decoding=\"async\" /></li>\n<li><img src=\"/images/atlas-cards/paper-b9fef4c717-4fe256fca791.png\" alt=\"截屏2026-10-29 17.30.54\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>DiT架构相对于Unet可以处理模态缺失的问题（用mask）</li>\n<li>使用的是DDPM而不是flow matching</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 2
     },
     {
       "id": "paper-fc15e3571d",
@@ -349,6 +375,32 @@
       "maturity": 27,
       "atlasCardHtml": "",
       "atlasCardImages": 0
+    },
+    {
+      "id": "paper-6c274bad7a",
+      "path": "20 论文/huVideoPredictionPolicy2025",
+      "title": "Video Prediction Policy: A Generalist Robot Policy with Predictive Visual Representations",
+      "type": "paper",
+      "citekey": "huVideoPredictionPolicy2025",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2025,
+      "authors": "Yucheng Hu, Yanjiang Guo, Pengchao Wang, Xiaoyu Chen, Yen-Jen Wang, Jianke Zhang, Koushil Sreenath, Chaochao Lu, Jianyu Chen",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-29",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2412.14803",
+      "sourceUrl": "http://arxiv.org/abs/2412.14803",
+      "zoteroUri": "zotero://select/library/items/N95GKNII",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>他们先通过数据将一个通用的视频扩散模型（Stable Video Diffusion）微调为文本引导的视频预测模型（TVP text-guied Video Prediction）。然后直接以tvp模型产生的预测性表征，学习一个逆动力学模型</li>\n<li>之前的视觉编码器都是把视觉变成信息，而他们觉得自己的编码器不仅能把视觉变成信息，还包含了未来变化信息的特征在里面。</li>\n<li><img src=\"/images/atlas-cards/paper-6c274bad7a-abdc9bbd6f15.png\" alt=\"截屏2026-10-29 23.05.48\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>有研究说。扩散模型（预测噪音）也可以有效地充当视觉编码器，生成有意义的视觉表征（在判别任务中具有线性可分性，对语义分割也有价值）</li>\n<li>他们的研究发现： 视频扩散模型内部的表征具有独特的预测性</li>\n<li><img src=\"/images/atlas-cards/paper-6c274bad7a-4811ed977b85.png\" alt=\"截屏2026-10-29 23.20.55\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他们只进行了一次前向传播（将扩散模型用作视觉编码器，而不是去噪器）</li>\n<li>有研究指出扩散模型的上采样层能够产生更有效的表征。他们为零避免手动选择特征层，把每一个特征都利用上了（详看论文）</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 2
     },
     {
       "id": "paper-05c2360767",
