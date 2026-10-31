@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-30T00:32:10.012Z",
+  "generatedAt": "2026-10-31T00:30:43.157Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 24,
-    "papers": 22,
+    "nodes": 26,
+    "papers": 24,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 201
+    "evidenceSignals": 217
   },
   "nodes": [
     {
@@ -140,6 +140,32 @@
       "evidenceCount": 9,
       "maturity": 27,
       "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-4f65b66851-8f2786ed072a.png\" alt=\"截屏2026-10-10 16.02.12\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>MBRL is appealing because the dynamics model is reward-independent and therefore can generalize to new tasks in the same environment, and it can easily benefit from all of the advances in deep supervised learning to utilize high-capacity models.</li>\n<li>高斯过程GP：非参数，输出分布；不确定性很可靠；适合小样本低维；大数据计算成本高</li>\n<li>PET出发点：普通神经网络小数据下容易过拟合，导致远期预测不可靠，于是选择保留神经网络的高表达能力，同时用概率输出和ensemble补充不确定性估计（恰当地把不确定性纳入动力学模型） //当年的dropout方法也是表现不确定性的一种方式</li>\n<li>偶然不确定性和认知不确定性</li>\n<li>总结：论文通过提出了一个新框架，巧妙地处理了偶然不确定性和认知不确定性之间的关系，实现了MBRL既可以省数据，又能达到较好的最终效果</li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
+      "id": "paper-ae585cbbc3",
+      "path": "20 论文/daiRoboMMEBenchmarkingUnderstanding2026",
+      "title": "RoboMME: Benchmarking and Understanding Memory for Robotic Generalist Policies",
+      "type": "paper",
+      "citekey": "daiRoboMMEBenchmarkingUnderstanding2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Yinpei Dai, Hongze Fu, Jayjun Lee, Yuejiang Liu, Haoran Zhang, Jianing Yang, Chelsea Finn, Nima Fazeli, Joyce Chai",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-30",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2603.04639",
+      "sourceUrl": "http://arxiv.org/abs/2603.04639",
+      "zoteroUri": "zotero://select/library/items/KS2URDJL",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-ae585cbbc3-8afe0f04a999.png\" alt=\"截屏2026-10-30 17.21.35\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>RoboMME将知识划分为四个记忆：（Temporal memory， 发生过了几次， Spatical Memory 物体在哪里， Object memory 之前指的是哪个物体， procedural memory之前是怎么做的）</li>\n<li>现在的研究主要通过3种表示形式，将记忆引入机器人操作策略<ul>\n<li>符号记忆：使用不可微的抽象表示来概括历史信息</li>\n<li>感知记忆：将历史信息表示为一组视觉特征</li>\n<li>循环记忆：通过循环模型，将上下文特征压缩为固定大小的潜在状态</li>\n</ul>\n</li>\n<li>他们的实验表明，没有任何一种记忆表示或集成策略能够在所有任务中始终表现良好</li>\n</ol>",
       "atlasCardImages": 1
     },
     {
@@ -609,6 +635,32 @@
       "maturity": 27,
       "atlasCardHtml": "<ol>\n<li>DGM依赖一种手工设计的固定机制来生成自我改进指令，DGM还有一个限制性假设：解决评估任务所需的技能与有效自我反思和自我修改的技能相同（coding）（两个缺点hyper agent都假设解决）</li>\n<li><img src=\"/images/atlas-cards/paper-6dead5872f-08ba16530f6c.png\" alt=\"截屏2026-10-28 12.58.42\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
       "atlasCardImages": 1
+    },
+    {
+      "id": "paper-65ebbbb58d",
+      "path": "20 论文/zhuUnifiedWorldModels",
+      "title": "Unified World Models: Coupling Video and Action Diffusion for Pretraining on Large Robotic Datasets",
+      "type": "paper",
+      "citekey": "zhuUnifiedWorldModels",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": null,
+      "authors": "Chuning Zhu, Raymond Yu, Siyuan Feng, Benjamin Burchfiel, Paarth Shah, Abhishek Gupta",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-10-30",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "zotero://select/library/items/AQ4QYY5U",
+      "noteDensity": 0,
+      "evidenceCount": 7,
+      "maturity": 24,
+      "atlasCardHtml": "<ol>\n<li>这篇论文思路和PAD非常接近，但PAD的动作和未来图像共用同一个扩散时间步，UWM在训练时独立采样两个时间步（动作和预测画面）</li>\n<li>论文说可以通过调整每个diffusion的timestep，这个模型可以变成policy，vedio predicter，a forward dynamics， a inverse dynamics</li>\n<li>他们表面UWM通过同时预测环境动力学和机器人动作，能够在大规模多任务机器人数据集上进行有效的预训练，从而得到比模仿学习方法泛化能力更强，鲁棒性更好的策略</li>\n<li>他们表明通过独立控制个模态的扩散时间步，UWM能够自然地利用无动作标注的视频数据进行学习，进一步提升微调后策略的性能。（UWM 为利用大规模、异构数据集实现可扩展的机器人学习迈出了有前景的一步，同时以一种简单的方式，将通常相互分离的模仿学习与世界建模这两种范式统一起来）</li>\n<li>模仿学习方法学习从状态到最优动作的映射，但并不显式建模示范轨迹和视频中蕴含的时序动力学。</li>\n<li><img src=\"/images/atlas-cards/paper-65ebbbb58d-e0dad7db735a.png\" alt=\"截屏2026-10-30 13.21.29\" loading=\"lazy\" decoding=\"async\" /><img src=\"/images/atlas-cards/paper-65ebbbb58d-3b365930b4d4.png\" alt=\"截屏2026-10-30 14.00.20\" loading=\"lazy\" decoding=\"async\" /><img src=\"/images/atlas-cards/paper-65ebbbb58d-a1d3542522db.png\" alt=\"截屏2026-10-30 14.00.49\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 3
     },
     {
       "id": "concept-facd23940b",
