@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-10-31T00:30:43.157Z",
+  "generatedAt": "2026-11-02T00:31:23.412Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 26,
-    "papers": 24,
+    "nodes": 28,
+    "papers": 26,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 217
+    "evidenceSignals": 235
   },
   "nodes": [
     {
@@ -114,6 +114,32 @@
       "evidenceCount": 9,
       "maturity": 27,
       "atlasCardHtml": "<ol>\n<li>之前的论文的训练数据中都带有明确的动作标签（此篇论文研究能不能只看视频，自动推断出其中的潜在动作，并学习一个能被这些动作控制的世界模型）</li>\n<li>采用了时空transformer（普通transformer内存开销随token数量平方增长，视频token太多了），使用了一种新的视频分词器，并通过一个有因果结构的动作模型提取钱在动作。动力学模型使用MaskGIT</li>\n<li><img src=\"/images/atlas-cards/paper-ae6488c109-826b1c582629.png\" alt=\"截屏2026-10-23 21.10.42\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>它的训练模式是两阶段训练</li>\n<li><img src=\"/images/atlas-cards/paper-ae6488c109-ab24dbc9a12d.png\" alt=\"截屏2026-10-23 21.21.08\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>在训练LAM的时候，采用了基于VQ-VAE的目标函数，将模型预测的动作限制在一个较小的离散编码集合中</li>\n<li>在video tokenizer上，再次使用了VQ-VAE，将视频压缩为零离散token，然后encoder和decoder又是用的ST-transformer。。最后他们的分词器叫做（ST-ViViT）</li>\n<li>之前的训练世界模型的常见做法是，将时间步t的动作与对应帧的表示进行拼接。但作者发现，在LAM和Dynamics Model中，将潜在动作作为相加式嵌入加入，有助于提高生产结果的可控性。</li>\n<li>在训练的时候，部分token也被替换成{mask}来进行无监督学习</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
+      "id": "paper-677dda61c9",
+      "path": "20 论文/chenShowHarnessJustVLM2026",
+      "title": "Show-Harness: Just a VLM Agent Can Play Robots",
+      "type": "paper",
+      "citekey": "chenShowHarnessJustVLM2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Yanzhe Chen, Zechen Bai, Zhijun Cao, Wenzheng Zeng, Kevin Qinghong Lin, Yiqi Lin, Guoqiang Liang, Kevin Yuchen Ma, Qiming Huang, Mike Zheng Shou",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-01",
+      "readDate": "",
+      "doi": "10.48550/ARXIV.2609.10522",
+      "sourceUrl": "https://arxiv.org/abs/2609.10522",
+      "zoteroUri": "zotero://select/library/items/8IJRYNNI",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-677dda61c9-521649a7e0c1.png\" alt=\"截屏2026-11-01 12.43.52\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>他们认为 合适的语意接口能够释放基础VLM中相当可观的具身能力。而且他们表明轻量级vlm（2b）在微调后，能展现出比代表性VLA凡事更强的泛化能力，以及从simtoreal的能力</li>\n<li>他们认为vla是以牺牲semantic能力换取控制能力（让模型重新你和机器人本体的运动信号， 会将其广泛的预训练只是压缩为一种不透明的感知-运动映射）</li>\n<li><img src=\"/images/atlas-cards/paper-677dda61c9-1219ffbfdf38.png\" alt=\"截屏2026-11-01 13.47.46\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
       "atlasCardImages": 2
     },
     {
@@ -479,6 +505,32 @@
       "maturity": 27,
       "atlasCardHtml": "<ol>\n<li>ELBO(Evidence Lower Bound)</li>\n<li>蒙特卡洛估计（用样本平均（真实采样）近似真实期望）</li>\n<li>SGVB（Stochastic Gradient Variational Bayes 随机梯度变分贝叶斯）：用随机样本估计变分目标及其梯度，再用梯度优化模型</li>\n<li>MAP（最大后验估计）：与最大似然（只考虑数据）不同， MAP不仅考虑数据，还考虑我们对参数的先验认识---起到一个正则化的作用</li>\n<li>有一个看不见的生成过程，先生成隐藏元素z，再根据z生成我们看到的数据。我们看到许多x，想反过来学习z（有点世界模型的味道）</li>\n<li>重参数化仍然有随机性，但它让模型能够直接观察：对于同一个噪声 (\\epsilon)，(\\mu) 或 (\\sigma) 改变一点，会让 (z) 和损失怎样变化？</li>\n<li>VAE的三个假设：先验是标准正态分布，对角高斯近似后验（z之间相互独立），用神经网络实现</li>\n<li>VAE 单独blog 缓慢推进中</li>\n</ol>",
       "atlasCardImages": 0
+    },
+    {
+      "id": "paper-729aed914b",
+      "path": "20 论文/liVisionLanguageFoundationModels2024",
+      "title": "Vision-Language Foundation Models as Effective Robot Imitators",
+      "type": "paper",
+      "citekey": "liVisionLanguageFoundationModels2024",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2024,
+      "authors": "Xinghang Li, Minghuan Liu, Hanbo Zhang, Cunjun Yu, Jie Xu, Hongtao Wu, Chilam Cheang, Ya Jing, Weinan Zhang, Huaping Liu, Hang Li, Tao Kong",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-01",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2311.01378",
+      "sourceUrl": "http://arxiv.org/abs/2311.01378",
+      "zoteroUri": "zotero://select/library/items/2CFBMUI3",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-729aed914b-5f401673bfb6.png\" alt=\"截屏2026-11-01 11.24.16\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>这篇文章的主要贡献是提出了 <strong>RoboFlamingo</strong>，为将开源视觉语言模型转化为机器人控制策略提供了一种简单、计算资源门槛较低的方案：利用 OpenFlamingo 理解当前图像与语言指令，再通过独立的策略头（默认采用 LSTM＋MLP）建模历史信息并预测机器人动作，仅使用带语言标注的机器人示范数据进行模仿学习微调。作者在 <strong>CALVIN 仿真基准</strong>上取得了显著优于所比较方法的表现，并验证了模型对未见视觉环境和语言指令表达的泛化能力；同时通过消融实验，分析了历史信息建模、视觉语言预训练和模型规模等因素对控制性能的影响。</li>\n<li>RT-2的主要为微调方案是联合微调，RoBoFlamigo是纯机器人数据，并且后者冻结大部分主干，然后RT2时将动作离散化表示成token，二候着时直接输出的。</li>\n<li><img src=\"/images/atlas-cards/paper-729aed914b-5a8c22f26100.png\" alt=\"截屏2026-11-01 11.37.37\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他是在pretraining的self attention中间每一层加cross attention，有点奇怪。</li>\n<li>再用LSTM的时候对VLM输出的token进行了池化（也很奇怪）</li>\n<li>论文里还有一个transformer架构的resampler进行token压缩</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 2
     },
     {
       "id": "paper-3ba44919e0",
