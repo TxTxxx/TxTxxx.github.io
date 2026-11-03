@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-11-02T00:31:23.412Z",
+  "generatedAt": "2026-11-03T00:32:43.843Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 28,
-    "papers": 26,
+    "nodes": 31,
+    "papers": 29,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 235
+    "evidenceSignals": 262
   },
   "nodes": [
     {
@@ -91,6 +91,32 @@
       "atlasCardImages": 1
     },
     {
+      "id": "paper-041e49ff56",
+      "path": "20 论文/biMotusUnifiedLatent2025",
+      "title": "Motus: A Unified Latent Action World Model",
+      "type": "paper",
+      "citekey": "biMotusUnifiedLatent2025",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2025,
+      "authors": "Hongzhe Bi, Hengkai Tan, Shenghao Xie, Zeyuan Wang, Shuhe Huang, Haitian Liu, Ruowen Zhao, Yao Feng, Chendong Xiang, Yinze Rong, Hongyan Zhao, Hanyu Liu, Zhizhong Su, Lei Ma, Hang Su, Jun Zhu",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-02",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2512.13030",
+      "sourceUrl": "http://arxiv.org/abs/2512.13030",
+      "zoteroUri": "zotero://select/library/items/837JBURN",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>这个论文认为统一模型对具身智能体非常关键</li>\n<li>这个论文说他们做到了在统一框架内，对视觉，语言和动作的多种分布进行联合建模</li>\n<li>但统一模型有两个关键挑战：<ul>\n<li>很难在一个模型同时支持VLA，wm，IDM并且充分利用预训练模型的知识 很难</li>\n<li>从大规模异构数据中学习通用的动作知识很难</li>\n</ul>\n</li>\n<li>为了大规模利用异构数据，他们引入了潜在动作，将光流optical flow编码为像素级的增量动作</li>\n<li><img src=\"/images/atlas-cards/paper-041e49ff56-0fb5a56b56f5.png\" alt=\"截屏2026-11-02 15.45.02\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>它在六层数据金字塔（大规模互联网数据，第一人称人类数据，仿真数据，任务无关数据，多机器人数据，目标机器人数据）上进行3阶段的预训练和微调（视频预训练，潜在动作预训练，针对特定具身形态的动作微调）</li>\n<li>AdaLN（自适应层归一化）：让网络知道当前输入有多嘈杂，应该预测怎样的更新</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
       "id": "paper-ae6488c109",
       "path": "20 论文/bruceGenieGenerativeInteractive2024",
       "title": "Genie: Generative Interactive Environments",
@@ -114,6 +140,32 @@
       "evidenceCount": 9,
       "maturity": 27,
       "atlasCardHtml": "<ol>\n<li>之前的论文的训练数据中都带有明确的动作标签（此篇论文研究能不能只看视频，自动推断出其中的潜在动作，并学习一个能被这些动作控制的世界模型）</li>\n<li>采用了时空transformer（普通transformer内存开销随token数量平方增长，视频token太多了），使用了一种新的视频分词器，并通过一个有因果结构的动作模型提取钱在动作。动力学模型使用MaskGIT</li>\n<li><img src=\"/images/atlas-cards/paper-ae6488c109-826b1c582629.png\" alt=\"截屏2026-10-23 21.10.42\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>它的训练模式是两阶段训练</li>\n<li><img src=\"/images/atlas-cards/paper-ae6488c109-ab24dbc9a12d.png\" alt=\"截屏2026-10-23 21.21.08\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>在训练LAM的时候，采用了基于VQ-VAE的目标函数，将模型预测的动作限制在一个较小的离散编码集合中</li>\n<li>在video tokenizer上，再次使用了VQ-VAE，将视频压缩为零离散token，然后encoder和decoder又是用的ST-transformer。。最后他们的分词器叫做（ST-ViViT）</li>\n<li>之前的训练世界模型的常见做法是，将时间步t的动作与对应帧的表示进行拼接。但作者发现，在LAM和Dynamics Model中，将潜在动作作为相加式嵌入加入，有助于提高生产结果的可控性。</li>\n<li>在训练的时候，部分token也被替换成{mask}来进行无监督学习</li>\n<li></li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
+      "id": "paper-03896697b3",
+      "path": "20 论文/cenWorldVLAAutoregressiveAction2025",
+      "title": "WorldVLA: Towards Autoregressive Action World Model",
+      "type": "paper",
+      "citekey": "cenWorldVLAAutoregressiveAction2025",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2025,
+      "authors": "Jun Cen, Chaohui Yu, Hangjie Yuan, Yuming Jiang, Siteng Huang, Jiayan Guo, Xin Li, Yibing Song, Hao Luo, Fan Wang, Deli Zhao, Hao Chen",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-02",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2506.21539",
+      "sourceUrl": "http://arxiv.org/abs/2506.21539",
+      "zoteroUri": "zotero://select/library/items/HWPP3PY8",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-03896697b3-90043e27cf4d.png\" alt=\"截屏2026-11-02 12.51.23\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>他们发现动作模型以自回归方式生成一系列动作时，性能下降（不如flowmatching），于是他们提出了一种注意力掩码策略（在生成当前动作时，有选择低屏蔽之前的动作）</li>\n<li>不同于PAD，这个是自回归的生成方式</li>\n<li>论文有写觉得vla动作仅呗视为输出，没有作为输入和更深入的分析，而缺乏对动作的全面理解，世界模型做到了，但世界模型无法直接输出动作</li>\n<li>他们发现在自回归模型中按顺序生成多个动作性能不好。他们认为主要原因在于预训练多模态语言模型在预训练阶段接触的主要是图像和文本，而非动作，因此在动作领域的泛化能力有限</li>\n<li>WorldVLA 将动作生成与动作条件下的未来图像预测统一到一个自回归模型中，使二者相互促进，并通过注意力掩码减轻动作块生成中的误差累积。</li>\n<li><img src=\"/images/atlas-cards/paper-03896697b3-e8c1bb3de66d.png\" alt=\"截屏2026-11-02 14.21.34\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他是action model和world model，但不是wam，因为他本文中说他是awm</li>\n<li></li>\n</ol>",
       "atlasCardImages": 2
     },
     {
@@ -478,6 +530,32 @@
       "evidenceCount": 9,
       "maturity": 27,
       "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-05c2360767-f1310e753c89.png\" alt=\"截屏2026-10-15 16.10.25\" loading=\"lazy\" decoding=\"async\" /><br /><img src=\"/images/atlas-cards/paper-05c2360767-9bb855767a59.png\" alt=\"截屏2026-10-15 19.47.25\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>π*₀.₆ 增加了<strong>以二值化的优势值作为条件输入</strong>的能力，从而可以借助价值函数来改进策略</li>\n<li>RECAP 通过优势条件化，让表达能力更强的流匹配 VLA 能够接受端到端的迭代式离线强化学习训练。相比基于策略梯度的方法，它的训练方式更简单、更易扩展，而且在论文的对比实验中表现更好</li>\n<li>优秀的特征提取方法（用value model训练更好的vla）：1. 能有效利用多种来源的离策略数据，2. 有良好的扩展性 3. 能够利用坏的数据</li>\n<li>它的价值函数对应于距离success完成该回合所需步数的负值</li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
+      "id": "paper-066cf4a12d",
+      "path": "20 论文/kimCosmosPolicyFineTuning2026",
+      "title": "Cosmos Policy: Fine-Tuning Video Models for Visuomotor Control and Planning",
+      "type": "paper",
+      "citekey": "kimCosmosPolicyFineTuning2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Moo Jin Kim, Yihuai Gao, Tsung-Yi Lin, Yen-Chen Lin, Yunhao Ge, Grace Lam, Percy Liang, Shuran Song, Ming-Yu Liu, Chelsea Finn, Jinwei Gu",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-02",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2601.16163",
+      "sourceUrl": "http://arxiv.org/abs/2601.16163",
+      "zoteroUri": "zotero://select/library/items/Q7IBT8KD",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-066cf4a12d-88ea95874f01.png\" alt=\"截屏2026-11-02 20.35.04\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>先前工作在视频模型上加动作头，会引入新的组件（文章使用图像潜在帧之间插入新的潜在帧解决）。另一些工作用同一的视频动作模型来避免复杂性，但因为没有利用预训练视频模型，限制了自身利用这些时空先验知识的能力</li>\n<li>他用因为模型可以生成value和未来状态，于是可以像MPC那样自己做规划，而且论文中说规划的效果特别好。</li>\n<li>很多VLA的骨干网络都是在静态图像-文本对上训练的</li>\n<li>他们使用一个统一架构，同时承担policy，worldmodel，value model的功能，并以预训练视频模型进行初始化</li>\n<li><img src=\"/images/atlas-cards/paper-066cf4a12d-6e655d15f459.png\" alt=\"截屏2026-11-02 20.49.24\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他们采用的也是稀疏奖励（这东西我明明看着这么不靠谱，为什么都在用这玩意）</li>\n<li>数据中含有失败示范（replay无法完成任务），世界模型可以利用失败示范在世界模型上学习动作都实际后果，在价值函数上学习低回报的情况</li>\n<li>他们发现辅助监督（value，observation）可以提升性能</li>\n<li>可以通过输入掩码决定模型表示的是V还是Q</li>\n<li>既可以 自回归 也可以 并行解码</li>\n<li></li>\n</ol>",
       "atlasCardImages": 2
     },
     {
