@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-11-04T00:41:04.200Z",
+  "generatedAt": "2026-11-05T00:36:39.332Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 33,
-    "papers": 31,
+    "nodes": 35,
+    "papers": 33,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 280
+    "evidenceSignals": 298
   },
   "nodes": [
     {
@@ -503,8 +503,8 @@
       "noteDensity": 0,
       "evidenceCount": 9,
       "maturity": 27,
-      "atlasCardHtml": "<ol>\n<li>他们先通过数据将一个通用的视频扩散模型（Stable Video Diffusion）微调为文本引导的视频预测模型（TVP text-guied Video Prediction）。然后直接以tvp模型产生的预测性表征，学习一个逆动力学模型</li>\n<li>之前的视觉编码器都是把视觉变成信息，而他们觉得自己的编码器不仅能把视觉变成信息，还包含了未来变化信息的特征在里面。</li>\n<li><img src=\"/images/atlas-cards/paper-6c274bad7a-abdc9bbd6f15.png\" alt=\"截屏2026-10-29 23.05.48\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>有研究说。扩散模型（预测噪音）也可以有效地充当视觉编码器，生成有意义的视觉表征（在判别任务中具有线性可分性，对语义分割也有价值）</li>\n<li>他们的研究发现： 视频扩散模型内部的表征具有独特的预测性</li>\n<li><img src=\"/images/atlas-cards/paper-6c274bad7a-4811ed977b85.png\" alt=\"截屏2026-10-29 23.20.55\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他们只进行了一次前向传播（将扩散模型用作视觉编码器，而不是去噪器）</li>\n<li>有研究指出扩散模型的上采样层能够产生更有效的表征。他们为零避免手动选择特征层，把每一个特征都利用上了（详看论文）</li>\n<li></li>\n</ol>",
-      "atlasCardImages": 2
+      "atlasCardHtml": "<ol>\n<li>他们先通过数据将一个通用的视频扩散模型（Stable Video Diffusion）微调为文本引导的视频预测模型（TVP text-guied Video Prediction）。然后直接以tvp模型产生的预测性表征，学习一个逆动力学模型</li>\n<li>之前的视觉编码器都是把视觉变成信息，而他们觉得自己的编码器不仅能把视觉变成信息，还包含了未来变化信息的特征在里面。</li>\n<li><img src=\"/images/atlas-cards/paper-6c274bad7a-abdc9bbd6f15.png\" alt=\"截屏2026-10-29 23.05.48\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>有研究说。扩散模型（预测噪音）也可以有效地充当视觉编码器，生成有意义的视觉表征（在判别任务中具有线性可分性，对语义分割也有价值）</li>\n<li>他们的研究发现： 视频扩散模型内部的表征具有独特的预测性</li>\n<li><img src=\"/images/atlas-cards/paper-6c274bad7a-4811ed977b85.png\" alt=\"截屏2026-10-29 23.20.55\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他们只进行了一次前向传播（将扩散模型用作视觉编码器，而不是去噪器）</li>\n<li>有研究指出扩散模型的上采样层能够产生更有效的表征。他们为零避免手动选择特征层，把每一个特征都利用上了（详看论文）</li>\n<li><img src=\"/images/atlas-cards/paper-6c274bad7a-f5b4326d7a25.png\" alt=\"截屏2026-11-04 17.06.53\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 3
     },
     {
       "id": "paper-05c2360767",
@@ -637,6 +637,32 @@
       "atlasCardImages": 1
     },
     {
+      "id": "paper-6a68680054",
+      "path": "20 论文/shiMemoryVLAPerceptualCognitiveMemory2026",
+      "title": "MemoryVLA: Perceptual-Cognitive Memory in Vision-Language-Action Models for Robotic Manipulation",
+      "type": "paper",
+      "citekey": "shiMemoryVLAPerceptualCognitiveMemory2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Hao Shi, Bin Xie, Yingfei Liu, Lin Sun, Fengrong Liu, Tiancai Wang, Erjin Zhou, Haoqiang Fan, Xiangyu Zhang, Gao Huang",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-04",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2508.19236",
+      "sourceUrl": "http://arxiv.org/abs/2508.19236",
+      "zoteroUri": "zotero://select/library/items/A9K2NI3H",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>时间上下文对于机器人操作至关重要（因为这类任务本质上具有马尔可夫性质）</li>\n<li><img src=\"/images/atlas-cards/paper-6a68680054-23185ee6fb81.png\" alt=\"截屏2026-11-04 19.55.28\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>将连续多帧作为VLM的输入有两个限制，一是transformer的计算复杂度问题，二是连续多帧输入与模型在机器人数据上进行单帧训练的数据分布不同</li>\n<li>这是一个模仿人类神经结构的一篇工作（受海马体启发，引入了感知-perceptual-cognitive知识库）</li>\n<li><img src=\"/images/atlas-cards/paper-6a68680054-2f386e18f3dd.png\" alt=\"截屏2026-11-04 20.13.10\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>当记忆库容量达到上限时，系统会合并时间相邻切语义相似的条目，对记忆进行整合</li>\n<li>memoryVLA采用了Prismatic的双视觉编码器设计，让两个网络从同一张图像中提取互补的信息（将视觉特征拼接）</li>\n<li>dreamzero是用了kv cache来将此前执行过程中的真实视觉观测保留胃后续预测的上下文？？</li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
       "id": "paper-950732f3cc",
       "path": "20 论文/suttonDynaIntegratedArchitecture1991",
       "title": "Dyna, an integrated architecture for learning, planning, and reacting",
@@ -765,6 +791,32 @@
       "maturity": 27,
       "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-3a09e87515-4fb0428aacc8.png\" alt=\"截屏2026-11-03 12.01.34\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他们通过模型与系统层面的优化，让一个14b的自回归视频扩散模型以7hz的频率进行</li>\n<li>他们认为，他们模型的泛化能力特别夸张（跨环境，跨任务，跨具身）</li>\n<li>他们强调了他们的跨本体能力（用30分钟的play数据就可以适配新机器人）</li>\n<li>他们认为policy能力和视频生成质量存在根本性的联系</li>\n<li>他们观察到自回归架构能让机器人的运动更加平滑，并提高预测视频与实际执行动作之间的模态对齐程度</li>\n<li>dreamzero-flash特意让视频更常处于高噪音状态，动作保持均匀采样</li>\n<li>利用视频生成模型强大的泛化能力，能够提高多任务表现，样本效率，以及对新场景和新物体的泛化能力</li>\n<li><img src=\"/images/atlas-cards/paper-3a09e87515-e3a0b5d5847a.png\" alt=\"截屏2026-11-03 12.41.48\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他有用一个teacher force：训练的时候，把真实实际的视频提供给模型作为条件（比如给出真实的前半段抓取过程，让模型学习后续的视频与动作）</li>\n<li>每执行完一个动作，就用真实观测替换KVcahe中的预测帧来消除累计误差。（他说他通过对infra的优化，实现了38倍的推理加速）</li>\n<li>他还是共享了去噪时间，以便在训练初期更快收敛</li>\n<li>在dreamzero-flash中，他让视频采样中处于高噪音中，训练 “即使生成中的未来视频还很不准确，也要尽量把动作去噪好”。（因为部署的时候flowmathing的时间步很少，生成的视频token很不准确）</li>\n<li><img src=\"/images/atlas-cards/paper-3a09e87515-43d74fa5fa72.png\" alt=\"截屏2026-11-03 13.26.02\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
       "atlasCardImages": 3
+    },
+    {
+      "id": "paper-107a98c6a0",
+      "path": "20 论文/yuanFastWAMWorldAction2026",
+      "title": "Fast-WAM: Do World Action Models Need Test-time Future Imagination?",
+      "type": "paper",
+      "citekey": "yuanFastWAMWorldAction2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Tianyuan Yuan, Zibin Dong, Yicheng Liu, Hang Zhao",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-04",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2603.16666",
+      "sourceUrl": "http://arxiv.org/abs/2603.16666",
+      "zoteroUri": "zotero://select/library/items/T4RQZQMC",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-107a98c6a0-dceb3aac07ce.png\" alt=\"截屏2026-11-04 16.47.34\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>他们溢出视频联合训练目标会导致明显的性能下降。这表明WAM中视频预测的主要价值，可能在于训练时改善世界表征，而非推理时显式生成未来预测</li>\n<li><img src=\"/images/atlas-cards/paper-107a98c6a0-0c408487bcf4.png\" alt=\"截屏2026-11-04 20.46.45\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 2
     },
     {
       "id": "paper-00dfc9c10d",
