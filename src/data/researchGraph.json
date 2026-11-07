@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-11-06T00:32:00.810Z",
+  "generatedAt": "2026-11-07T00:37:29.959Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 36,
-    "papers": 34,
+    "nodes": 40,
+    "papers": 38,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 307
+    "evidenceSignals": 343
   },
   "nodes": [
     {
@@ -143,6 +143,32 @@
       "atlasCardImages": 2
     },
     {
+      "id": "paper-9e4641a4b2",
+      "path": "20 论文/carionSAM3Segment2026",
+      "title": "SAM 3: Segment Anything with Concepts",
+      "type": "paper",
+      "citekey": "carionSAM3Segment2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Nicolas Carion, Laura Gustafson, Yuan-Ting Hu, Shoubhik Debnath, Ronghang Hu, Didac Suris, Chaitanya Ryali, Kalyan Vasudev Alwala, Haitham Khedr, Andrew Huang, Jie Lei, Tengyu Ma, Baishan Guo, Arpit Kalla, Markus Marks, Joseph Greer, Meng Wang, Peize Sun, Roman Rädle, Triantafyllos Afouras, Effrosyni Mavroudi, Katherine Xu, Tsung-Han Wu, Yu Zhou, Liliane Momeni, Rishi Hazra, Shuangrui Ding, Sagar Vaze, Francois Porcher, Feng Li, Siyuan Li, Aishwarya Kamath, Ho Kei Cheng, Piotr Dollár, Nikhila Ravi, Kate Saenko, Pengchuan Zhang, Christoph Feichtenhofer",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-07",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2511.16719",
+      "sourceUrl": "http://arxiv.org/abs/2511.16719",
+      "zoteroUri": "zotero://select/library/items/3T8TWAVK",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>可提示的概念分割（Promptable Concept Segmentation）</li>\n<li>之前的工作没有解决一个更通用的问题：查找并分割输入中任意位置出现的，属于某个概念的全部对象实例。</li>\n<li><img src=\"/images/atlas-cards/paper-9e4641a4b2-e7dfbeb6a124.png\" alt=\"截屏2026-11-07 00.27.39\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
       "id": "paper-03896697b3",
       "path": "20 论文/cenWorldVLAAutoregressiveAction2025",
       "title": "WorldVLA: Towards Autoregressive Action World Model",
@@ -169,6 +195,32 @@
       "atlasCardImages": 2
     },
     {
+      "id": "paper-0cf7583212",
+      "path": "20 论文/chenLaWAMLatentWorld2026",
+      "title": "LaWAM: Latent World Action Models for Efficient Dynamics-Aware Robot Policies",
+      "type": "paper",
+      "citekey": "chenLaWAMLatentWorld2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Jialei Chen, Kai Wang, Kang Chen, Shuaihang Chen, Feng Gao, Wenhao Tang, Zhiyuan Li, Weilin Liu, Zhuyu Yao, Boxun Li, Yuanbo Xu, Chao Yu",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-06",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2606.15768",
+      "sourceUrl": "http://arxiv.org/abs/2606.15768",
+      "zoteroUri": "zotero://select/library/items/R2EKUF39",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-0cf7583212-a87b9f4c54a3.png\" alt=\"截屏2026-11-06 17.03.39\" loading=\"lazy\" decoding=\"async\" /><img src=\"/images/atlas-cards/paper-0cf7583212-b622b2995b6e.png\" alt=\"截屏2026-11-06 17.15.09\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
       "id": "paper-677dda61c9",
       "path": "20 论文/chenShowHarnessJustVLM2026",
       "title": "Show-Harness: Just a VLM Agent Can Play Robots",
@@ -192,6 +244,32 @@
       "evidenceCount": 9,
       "maturity": 27,
       "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-677dda61c9-521649a7e0c1.png\" alt=\"截屏2026-11-01 12.43.52\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>他们认为 合适的语意接口能够释放基础VLM中相当可观的具身能力。而且他们表明轻量级vlm（2b）在微调后，能展现出比代表性VLA凡事更强的泛化能力，以及从simtoreal的能力</li>\n<li>他们认为vla是以牺牲semantic能力换取控制能力（让模型重新你和机器人本体的运动信号， 会将其广泛的预训练只是压缩为一种不透明的感知-运动映射）</li>\n<li><img src=\"/images/atlas-cards/paper-677dda61c9-1219ffbfdf38.png\" alt=\"截屏2026-11-01 13.47.46\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 2
+    },
+    {
+      "id": "paper-efa70417ce",
+      "path": "20 论文/chouVFlashFastAccurate",
+      "title": "VFlash: Fast, Accurate Visual Planning via Flash Primitive Decoding",
+      "type": "paper",
+      "citekey": "chouVFlashFastAccurate",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": null,
+      "authors": "Yu-Cheng Chou, Shihao Wang, Jin Huang, Chi-Pin Huang, Chiao-An Yang, Xianzhe Fan, Jing Wang, Zhiqi Li, Yuanguo Kuang, Ruijie Zheng, Johan Bjorck, Sifei Liu, Hang Su, Abhishek Badki, Lei Zhang, Alan Yuille, Linxi Fan, Jan Kautz, Zhiding Yu",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-06",
+      "readDate": "",
+      "doi": "",
+      "sourceUrl": "",
+      "zoteroUri": "zotero://select/library/items/EVED2SPE",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<p><img src=\"/images/atlas-cards/paper-efa70417ce-ce7098f3005d.png\" alt=\"截屏2026-11-06 19.06.41\" loading=\"lazy\" decoding=\"async\" /></p>\n<ol>\n<li>VLM被用作physical ai的高层大佬，但他们的推理不必仅仅通过语言来表达（比如说也可以用轨迹描述与其执行的运动，用点和边界框表示相关位置或者物体）</li>\n<li>与自会归相比，扩散语言模型往往面临速度与质量之间的权衡</li>\n<li>他们发现一个现象：轻量级扩散草稿模型不仅解码速度快得多，其生产的视觉计划在空间准确性上生长能够超过它所对应的自回归目标模型（可能模型有机会共同考虑各个点之间的关系，而不是沿着序列逐个生成）</li>\n<li>并行草稿模型可以成为一个有独立预测价值的模块，而不只是愿模型的加速工具</li>\n<li>感觉跟jev的好像，可能自回归解码的表现，不一定是视觉输入质量的上限</li>\n<li>DFlash是这一块草稿里，连续多少个token与大模型一致，就接受多少。VFlash则是，对于符合结构越俗的视觉基元，直接接受完整预测</li>\n<li><img src=\"/images/atlas-cards/paper-efa70417ce-e717a0639388.png\" alt=\"截屏2026-11-06 20.04.06\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>这种“小模型打草稿，大模型验证”的通过框架，通常叫做推测解码（speculative Decoding）。。但这篇文章没有大模型预测的一个过程哈</li>\n</ol>",
       "atlasCardImages": 2
     },
     {
@@ -634,6 +712,32 @@
       "evidenceCount": 9,
       "maturity": 27,
       "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-3ba44919e0-ed752c55a283.png\" alt=\"截屏2026-10-22 13.56.49\" loading=\"lazy\" decoding=\"async\" /></li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
+      "id": "paper-8e2338d402",
+      "path": "20 论文/qiuMakingForesightActionable2026",
+      "title": "Making Foresight Actionable: Repurposing Representation Alignment in World Action Models",
+      "type": "paper",
+      "citekey": "qiuMakingForesightActionable2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Lu Qiu, Yizhuo Li, Yi Chen, Yuying Ge, Yixiao Ge, Xihui Liu",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-06",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2606.12217",
+      "sourceUrl": "http://arxiv.org/abs/2606.12217",
+      "zoteroUri": "zotero://select/library/items/TAJYTJST",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>作者认为生成视频的内部特征，未必适合解码机器人动作（模型可以想象出正确的未来动作，为什么机器人仍然做不对动作）视觉特征的组织方式可能仍不适合动作解码，导致注意力偏向于动作无关的区域</li>\n<li><img src=\"/images/atlas-cards/paper-8e2338d402-948a5ad90413.png\" alt=\"截屏2026-11-06 22.04.14\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>AGRA（Action-Grounded Representation Alignment）: 将视频扩散模型的中间特征，于视觉基础编码器（DINOv2）提供的，空间上连贯的语义进行对齐，从而越俗世界模型与动作模型之间的缺口。</li>\n<li>一些研究 [46, 18] 表明，生成式扩散模型的去噪过程能够形成有意义的表示 [47, 48, 49]，但这些表示的质量仍落后于自监督学习方法所学到的表示 [50, 51, 52]。</li>\n</ol>",
       "atlasCardImages": 1
     },
     {
