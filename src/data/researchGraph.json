@@ -1,14 +1,14 @@
 {
-  "generatedAt": "2026-11-07T00:37:29.959Z",
+  "generatedAt": "2026-11-09T01:13:38.486Z",
   "source": "Obsidian Vault · privacy-filtered metadata snapshot",
   "stats": {
-    "nodes": 40,
-    "papers": 38,
+    "nodes": 42,
+    "papers": 40,
     "concepts": 1,
     "fields": 1,
     "fragments": 0,
     "connections": 1,
-    "evidenceSignals": 343
+    "evidenceSignals": 361
   },
   "nodes": [
     {
@@ -585,6 +585,32 @@
       "atlasCardImages": 3
     },
     {
+      "id": "paper-3455dacddd",
+      "path": "20 论文/huangPointWorldScaling3D2026",
+      "title": "PointWorld: Scaling 3D World Models for In-The-Wild Robotic Manipulation",
+      "type": "paper",
+      "citekey": "huangPointWorldScaling3D2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Wenlong Huang, Yu-Wei Chao, Arsalan Mousavian, Ming-Yu Liu, Dieter Fox, Kaichun Mo, Li Fei-Fei",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-07",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2601.03782",
+      "sourceUrl": "http://arxiv.org/abs/2601.03782",
+      "zoteroUri": "zotero://select/library/items/WQW2L9K4",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li><img src=\"/images/atlas-cards/paper-3455dacddd-bf409b48bf40.png\" alt=\"截屏2026-11-07 17.45.12\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>这篇论述是将状态与动作统一表示为共享三位空间中的3D point flows</li>\n<li>基于学习的动力学模型，往往依赖特定领域的归纳偏置（完全可观测性假设，物体先验， 或预先制定的材料属性）。因此他的理念是：在点云这种相同模态中表示状态与动作</li>\n<li>在这个point world中，他们发现，使用夹爪表明的3维点流逼关节位置，EE和全省点流更有效。</li>\n</ol>",
+      "atlasCardImages": 1
+    },
+    {
       "id": "paper-05c2360767",
       "path": "20 论文/intelligence$p^_06$VLAThat2025",
       "title": "$π^{*}_{0.6}$: a VLA That Learns From Experience",
@@ -869,6 +895,32 @@
       "maturity": 27,
       "atlasCardHtml": "",
       "atlasCardImages": 0
+    },
+    {
+      "id": "paper-3a43ca0d3c",
+      "path": "20 论文/yangSyncWorldVisualCalibration2026",
+      "title": "SyncWorld: Visual Calibration Enables World Models as Zero-Shot Simulators",
+      "type": "paper",
+      "citekey": "yangSyncWorldVisualCalibration2026",
+      "status": "inbox",
+      "readingLevel": "",
+      "paperRole": "",
+      "atlasLabel": "",
+      "year": 2026,
+      "authors": "Yuncong Yang, Zhengtao Han, Furkan Ozyurt, Zeyuan Yang, Han Yang, Junyi Cao, Haoyu Zhen, Yilun Du, Chuang Gan",
+      "topics": [
+        "vla"
+      ],
+      "created": "2026-11-07",
+      "readDate": "",
+      "doi": "10.48550/arXiv.2609.09155",
+      "sourceUrl": "http://arxiv.org/abs/2609.09155",
+      "zoteroUri": "zotero://select/library/items/U9WR9A63",
+      "noteDensity": 0,
+      "evidenceCount": 9,
+      "maturity": 27,
+      "atlasCardHtml": "<ol>\n<li>动作在像素空间中不是一种通用语言。视觉环境，相机视角或机器人形态等的变化都会改变同一个数值动作在画面中的表现。这会导致模型在混合多种数据进行训练时，接收到相互冲突的监督信号，并在部署时表现出较弱的泛化能力</li>\n<li>近期的世界模型强调精细的动作控制</li>\n<li>将不同配置的数据混合训练，会迫使同一个模型针对相同的动作数据，你和多种彼此不兼容的动作-视觉映射，从而削弱泛化能力。<img src=\"/images/atlas-cards/paper-3a43ca0d3c-51586bc03a46.png\" alt=\"截屏2026-11-07 16.18.04\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>incontext-learning, 感觉不能完全说是zero-shot</li>\n<li>在训练阶段，他们将calibration context加入来自多个数据源的轨迹中，石墨烯学会利用visual calibration 来理解不同配置个字的映射关系，并生成可控的预测</li>\n<li>通过在训练中引入visual calibration，模型还学会了利用交互历史来近似推断当前的映射关系。</li>\n<li>以有研究利用视频模型来合成机器人欲动轨迹，从生成的视频中推断动作</li>\n<li>模型内部的动作编码保持一致，不等于它和真实机器人控制信号之间的对应关系也始终一致</li>\n<li>在固定动作约定下训练的世界模型，当相机位置，机器人形态或控制器接口发生变化时，性能往往会下降。</li>\n<li><img src=\"/images/atlas-cards/paper-3a43ca0d3c-58b6ea89b322.png\" alt=\"截屏2026-11-07 16.52.10\" loading=\"lazy\" decoding=\"async\" /></li>\n<li><img src=\"/images/atlas-cards/paper-3a43ca0d3c-5cbdb54a1a94.png\" alt=\"截屏2026-11-07 17.01.34\" loading=\"lazy\" decoding=\"async\" /></li>\n<li>其数据大部分都是在仿真中生存的，因为在仿真中可以大规模岁假话相机和控制器配置</li>\n</ol>",
+      "atlasCardImages": 3
     },
     {
       "id": "paper-d1cd2a1220",
